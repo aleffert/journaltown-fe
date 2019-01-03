@@ -13,3 +13,8 @@ resource "google_compute_backend_bucket" "static_backend" {
   bucket_name = "${google_storage_bucket.static_site.name}"
   enable_cdn  = true
 }
+
+resource "google_compute_url_map" "static_map" {
+  name            = "${var.app_name}-lb"
+  default_service = "${google_compute_backend_bucket.static_backend.self_link}"
+}
