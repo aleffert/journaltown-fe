@@ -21,3 +21,13 @@ steps:
     - "TF_VAR_project_id=${PROJECT_ID}"
     - "TF_VAR_state_bucket=${_BUCKET}"
     - "TF_VAR_app_name=${_APP_NAME}"
+- name: 'gcr.io/cloud-builders/npm'
+  args: ['ci']
+- name: 'gcr.io/cloud-builders/npm'
+  args: ['run', 'test']
+  env:
+    - "CI=true"
+- name: 'gcr.io/cloud-builders/npm'
+  args: ['run', 'build']
+  env:
+    - "CI=true"
