@@ -4,19 +4,28 @@ steps:
     '-backend-config=project=${PROJECT_ID}',
     '-backend-config=prefix=${_APP_NAME}-frontend',
     '-backend-config=bucket=${_BUCKET}',
-    'infrastructure/terraform']
+    '-var-file=infrastructure/terraform/env.tfvars',
+    'infrastructure/terraform'
+  ]
   env:
     - "TF_VAR_project_id=${PROJECT_ID}"
     - "TF_VAR_state_bucket=${_BUCKET}"
     - "TF_VAR_app_name=${_APP_NAME}"
 - name: 'gcr.io/${PROJECT_ID}/terraform'
-  args: ['plan', 'infrastructure/terraform']
+  args: ['plan',
+    '-var-file=infrastructure/terraform/env.tfvars',
+    'infrastructure/terraform'
+  ]
   env:
     - "TF_VAR_project_id=${PROJECT_ID}"
     - "TF_VAR_state_bucket=${_BUCKET}"
     - "TF_VAR_app_name=${_APP_NAME}"
 - name: 'gcr.io/${PROJECT_ID}/terraform'
-  args: ['apply', '-auto-approve', 'infrastructure/terraform']
+  args: ['apply',
+    '-auto-approve',
+    '-var-file=infrastructure/terraform/env.tfvars',
+    'infrastructure/terraform'
+  ]
   env:
     - "TF_VAR_project_id=${PROJECT_ID}"
     - "TF_VAR_state_bucket=${_BUCKET}"
