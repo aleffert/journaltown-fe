@@ -41,4 +41,4 @@ steps:
   env:
     - "CI=true"
 - name: 'gcr.io/cloud-builders/gsutil'
-  args: ['cp', 'build', 'gs://${_APP_NAME}-frontend/']
+  args: ['cp', '-r', 'build', 'gs://${_APP_NAME}-frontend/']
