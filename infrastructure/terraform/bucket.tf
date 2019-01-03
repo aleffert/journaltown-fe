@@ -11,6 +11,12 @@ resource "google_storage_bucket" "static_site" {
   }
 }
 
+resource "google_storage_bucket_acl" "static_site" {
+  bucket = "${google_storage_bucket.static_site.name}"
+  default_acl = "publicRead"
+  predefined_acl = "publicRead"
+}
+
 resource "google_compute_backend_bucket" "static_backend" {
   name        = "${local.component_name}-backend-bucket"
   description = "Backend bucket for frontend of ${var.app_name}"
