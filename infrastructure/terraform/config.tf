@@ -19,9 +19,3 @@ variable state_bucket {
 variable app_name {
     type = "string"
 }
-
-
-# internal
-variable domain_name {
-    type = "string"
-}
