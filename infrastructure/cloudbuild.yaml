@@ -30,6 +30,8 @@ steps:
     - "TF_VAR_environment=${_ENVIRONMENT}"
     - "TF_VAR_state_bucket=${_BUCKET}"
     - "TF_VAR_app_name=${_APP_NAME}"
+- name: 'gcr.io/cloud-builders/gsutil'
+  args: ['cp', 'infrastructure/env/.env.${_ENVIRONMENT}', '.env.production']
 - name: 'gcr.io/cloud-builders/npm'
   args: ['ci']
 - name: 'gcr.io/cloud-builders/npm'
