@@ -1,4 +1,4 @@
-import { combineLanguages } from './Localized';
+import { combineLanguages } from './localized';
 
 describe("combineLanguages", () => {
     it('combines multiple locale strings', () => {
