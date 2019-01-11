@@ -3,7 +3,7 @@ import React from 'react';
 import { Button, Form, Grid, Header, InputOnChangeData, Message } from 'semantic-ui-react';
 import strings from '../strings';
 import { L, LC } from '../widgets/L';
-import { AsyncResult, Optional, BoolStrings } from '../utils';
+import { AsyncResult, Optional } from '../utils';
 import { LoginError, LoginResponse } from '../services/api-service';
 
 
@@ -62,8 +62,8 @@ export class LoginForm extends React.Component<LoginFormProps, LoginFormState> {
                     {<L>{strings.login.log_in}</L>}
                 </Button>
             </Form>
-            {isSuccess ? <Message success={BoolStrings.true}><L>{strings.login.sendSuccess}</L></Message> : null}
-            {isFailure ? <Message failure={BoolStrings.true}><L>{strings.login.sendFailure}</L></Message> : null}
+            {isSuccess ? <Message positive><L>{strings.login.sendSuccess}</L></Message> : null}
+            {isFailure ? <Message error><L>{strings.login.sendFailure}</L></Message> : null}
             </Grid.Column>
             </Grid>
         </div> }</LC>
