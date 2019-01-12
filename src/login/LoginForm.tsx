@@ -4,7 +4,7 @@ import { Button, Form, Grid, Header, InputOnChangeData, Message } from 'semantic
 import strings from '../strings';
 import { L, LC } from '../widgets/L';
 import { AsyncResult, Optional } from '../utils';
-import { LoginError, LoginResponse } from '../services/api-service';
+import { LoginError, LoginResponse } from '../services/api/requests';
 
 
 type LoginFormProps = {
@@ -42,9 +42,7 @@ export class LoginForm extends React.Component<LoginFormProps, LoginFormState> {
 
         return <LC>{l => <div>
             <style>{`
-            body > div,
-            body > div > div,
-            body > div > div > div.login-form {
+            body > div, body > div > div {
                 height: 100%;
             }
             `}</style>

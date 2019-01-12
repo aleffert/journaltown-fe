@@ -1,5 +1,5 @@
 import * as qs from 'query-string';
-import { Result } from '../utils/';
+import { StorageService } from './storage-service';
 
 declare global {
     interface EnvironmentVariables {
@@ -7,60 +7,58 @@ declare global {
     }
 }
 
-type ConnectionError = {'type': 'connection-error'};
+export type ConnectionError = {'type': 'connection'};
+export type NoTokenError = {'type': 'no-token'};
 const ApiErrors = {
-    connectionError: {'type': 'connection-error'} as ConnectionError
+    connectionError: {'type': 'connection'} as ConnectionError,
+    noTokenError: {'type': 'no-token'} as NoTokenError
 }
 
-type ApiError<T> = ConnectionError | T;
-
-type ApiArgs = {[K: string]: string}
+export type ApiError<T = {}> = ConnectionError | T;
 
 export type ApiRequest<Result> = {
     path: string,
     method: 'GET' | 'POST',
-    query?: ApiArgs,
+    query?: {[K: string]: string},
     body?: object,
-    deserializer(response: Response): Result
+    deserializer(response: Response): Promise<Result>
 }
 
 export class ApiService {
 
     private base: string
+    private storage: StorageService;
 
-    constructor(base: string = process.env.REACT_APP_API_BASE) {
+    constructor(storageService: StorageService, base: string = process.env.REACT_APP_API_BASE) {
         this.base = base;
+        this.storage = storageService;
     }
 
-    async request<Result>(request: ApiRequest<Result>): Promise<Result> {
+    async request<Result>(request: ApiRequest<Result>): Promise<Result | { type: 'failure', error: ConnectionError}> {
+        debugger;
         const query = request.query ? qs.stringify(request.query) : '';
         const url = new URL(`${request.path}?${query}`, this.base);
-        const result = await fetch(url.href, {
-            method: request.method,
-            body: request.body ? JSON.stringify(request.body) : undefined,
-            credentials: 'include',
-            headers: {
-                'Content-Type': 'application/json'
-            }
-        });
-        return request.deserializer(result);
-    }
-}
+        const headers: {[K: string]: string} = {
+            'Content-Type': 'application/json'
+        };
 
-export type LoginError = ApiError<{}>;
-export type LoginResponse = {};
-export function loginRequest({email}: {email: string}): ApiRequest<Result<LoginResponse, LoginError>> {
-    return {
-        path: '/auth/email/',
-        method: 'POST',
-        query: {},
-        body: {email},
-        deserializer(response: Response) {
-            if(response.ok) {
-                return {type: 'success', value: {}};
-            }
-            return {type: 'failure', error: {type: 'connection-failure'}};
+        const token = this.storage.getToken();
+        if(token) {
+            headers['Authorization'] = `Token ${token}`;
+        }
+        try {
+            const body= request.body ? JSON.stringify(request.body) : undefined;
+            const result = await fetch(url.href, {
+                method: request.method,
+                credentials: 'include',
+                body,
+                headers
+            });
+
+            return request.deserializer(result);
+        }
+        catch {
+            return {type: 'failure', error: {type: 'connection'}};
         }
     }
 }
-

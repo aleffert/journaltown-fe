@@ -1,42 +1,37 @@
 import 'semantic-ui-css/semantic.min.css'
-
-import React, { Component } from 'react';
 import './App.css';
+
+import React from 'react';
 import { LocaleContext } from './utils';
-import { LoginForm } from './login/LoginForm';
-import { Services } from './services';
-import { loginRequest, LoginResponse, LoginError } from './services/api-service';
-import { AsyncResult, Optional } from './utils/';
+import { Services, ServiceContext } from './services';
+import { BrowserRouter as Router, Route } from "react-router-dom";
+import { PageWrapper } from './login/PageWrapper';
 
 
 type AppProps = {};
 
-type AppState = {loginResult: Optional<AsyncResult<LoginResponse, LoginError>>};
+export default class App extends React.Component<AppProps> {
+    
+    services = new Services();
+    
+    constructor(props: AppProps) {
+        super(props);
 
-class App extends Component<AppProps, AppState> {
-
-  services = new Services();
-
-  constructor(props: AppProps) {
-    super(props);
-
-    this.state = {loginResult: undefined};
-    this.onSubmitLogin = this.onSubmitLogin.bind(this);
-  }
-
-  async onSubmitLogin(email: string) {
-    this.setState({loginResult: {type: 'loading'}});
-    const result = await this.services.api.request(loginRequest({email: email}));
-    this.setState({loginResult: result});
-  }
-
-  render() {
-    return (
-      <LocaleContext.Provider value="en">
-        <LoginForm onSubmit={this.onSubmitLogin} status={this.state.loginResult}></LoginForm>
-      </LocaleContext.Provider>
-    );
-  }
+        this.services = new Services();
+    }
+    
+    
+    render() {
+        return (
+            <LocaleContext.Provider value="en">
+            <ServiceContext.Provider value={this.services}>
+                <Router>
+                    <Route path="/" component={PageWrapper}>
+                </Route>
+                </Router>
+            </ServiceContext.Provider>
+            </LocaleContext.Provider>
+        );
+    }
 }
-
-export default App;
+    
