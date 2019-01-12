@@ -50,7 +50,6 @@ export class ApiService {
             const body= request.body ? JSON.stringify(request.body) : undefined;
             const result = await fetch(url.href, {
                 method: request.method,
-                credentials: 'include',
                 body,
                 headers
             });
