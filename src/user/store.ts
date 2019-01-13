@@ -1,6 +1,12 @@
 import { ImmerReducer, createActionCreators, createReducerFunction } from 'immer-reducer';
-import { AsyncResult } from '../utils';
-import { LoginResponse, LoginError, CurrentUserResponse, CurrentUserError } from '../services/api/requests';
+import { put, takeLatest } from 'redux-saga/effects';
+import * as qs from 'query-string';
+
+import { AsyncResult, isString, callMethod } from '../utils';
+import { LoginResponse, LoginError, CurrentUserResponse, CurrentUserError, loginRequest, exchangeTokenRequest, currentUserRequest } from '../services/api/requests';
+import { services, ApiErrors } from '../services';
+
+// redux
 
 type LoginState = AsyncResult<LoginResponse, LoginError>;
 type CurrentUserState = AsyncResult<CurrentUserResponse, CurrentUserError>;
@@ -11,6 +17,7 @@ type UserState = {
     current: CurrentUserState
 }
 class UserReducers extends ImmerReducer<UserState> {
+    // state
     setLoginState(state: LoginState) {
         this.draftState.login = state;
     }
@@ -21,7 +28,48 @@ class UserReducers extends ImmerReducer<UserState> {
     setCurrent(state: CurrentUserState) {
         this.draftState.current = state;
     }
+
+    // actions
+    submitLogin({email}: {email: string}) {}
+    appStarted({query}: {query: qs.OutputParams}) {}
 }
 
-export const Actions = createActionCreators(UserReducers);
-export const Reducers = createReducerFunction(UserReducers, {login: null, validating: false, current: null});
+export const actions = createActionCreators(UserReducers);
+export const reducers = createReducerFunction(UserReducers, {login: null, validating: false, current: null});
+
+// sagas
+export function* appStartedSaga(action: ReturnType<typeof actions.appStarted>) {
+    // first check if we have a login token in the url
+    const token = action.payload[0].query.token;
+    if(token && isString(token)) {
+        yield put(actions.setValidating(true));
+        // if so, try to turn it into a useful auth token
+        const result = yield callMethod(services.api, o => o.request, exchangeTokenRequest({token: token}));
+        if(result.type === "success") {
+            services.storage.setToken(result.value.token);
+        }
+        yield put(actions.setValidating(false));
+    }
+
+    // now try to use the token to load the current user
+    const authToken = services.storage.getToken();
+    if(authToken) {
+        yield put(actions.setCurrent({type: 'loading'}));
+        const result = yield callMethod(services.api, o => o.request, currentUserRequest());
+        yield put(actions.setCurrent(result));
+    }
+    else {
+        yield put(actions.setCurrent({type: 'failure', error: ApiErrors.noTokenError}));
+    }
+}
+
+export function* submitLoginSaga(action: ReturnType<typeof actions.submitLogin>) {
+    yield put(actions.setLoginState({type: 'loading'}));
+    const result = yield callMethod(services.api, o => o.request, loginRequest({email: action.payload[0].email}));
+    yield put(actions.setLoginState(result));
+}
+
+export function* saga() {
+    yield takeLatest(actions.appStarted.type, appStartedSaga);
+    yield takeLatest(actions.submitLogin.type, submitLoginSaga);
+}

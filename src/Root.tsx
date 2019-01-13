@@ -2,9 +2,7 @@ import React from 'react';
 
 import { LoginForm } from './user/LoginForm';
 import { InitialLoader } from './user/InitialLoader';
-import { Services, withServices, ApiErrors } from './services';
-import { loginRequest, currentUserRequest, exchangeTokenRequest } from './services/api/requests';
-import { isString, bindDispatch } from './utils';
+import { bindDispatch } from './utils';
 import { withRouter, RouteComponentProps } from 'react-router-dom';
 import * as qs from 'query-string';
 import { connect } from 'react-redux';
@@ -20,7 +18,7 @@ const mapDispatchToProps = bindDispatch(actions.user);
 type RootStateProps = ReturnType<typeof mapStateToProps>;
 type RootDispatchProps = ReturnType<typeof mapDispatchToProps>;
 
-type RootProps = {services: Services} & RouteComponentProps & RootStateProps & RootDispatchProps;
+type RootProps = RouteComponentProps & RootStateProps & RootDispatchProps;
 
 class _Root extends React.Component<RootProps> {
     
@@ -32,32 +30,12 @@ class _Root extends React.Component<RootProps> {
 
     async componentDidMount() {
         const query = qs.parse(this.props.location.search);
-        if(query.token && isString(query.token)) {
-            this.props.setValidating(true);
-            const result = await this.props.services.api.request(exchangeTokenRequest({token: query.token}));
-            if(result.type === "success") {
-                this.props.services.storage.setToken(result.value.token);
-            }
-            this.props.setValidating(false);
-
-            // TODO: remove token from url
-        }
-
-        const token = this.props.services.storage.getToken();
-        if(token) {
-            this.props.setCurrent({type: 'loading'});
-            const result = await this.props.services.api.request(currentUserRequest());
-            this.props.setCurrent(result);
-        }
-        else {
-            this.props.setCurrent({type: 'failure', error: ApiErrors.noTokenError});
-        }
+        this.props.appStarted({query});
+        // TODO: remove token from url
     }
     
-    async onSubmitLogin(email: string) {
-        this.props.setLoginState({type: 'loading'});
-        const result = await this.props.services.api.request(loginRequest({email: email}));
-        this.props.setLoginState(result);
+    onSubmitLogin(email: string) {
+        this.props.submitLogin({email});
     }
     
     render() {
@@ -72,4 +50,4 @@ class _Root extends React.Component<RootProps> {
 }
 
 
-export const Root = connect(mapStateToProps, mapDispatchToProps)(withRouter(withServices(_Root)));
+export const Root = connect(mapStateToProps, mapDispatchToProps)(withRouter(_Root));

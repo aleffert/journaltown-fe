@@ -13,7 +13,8 @@ export class Services {
     }
 };
 
-export const ServiceContext: React.Context<Services> = React.createContext({} as Services);
+export const services = new Services();
+export const ServiceContext: React.Context<Services> = React.createContext(services);
 
 export type Omit<T, K extends keyof T> = Pick<T, Exclude<keyof T, K>>;
 
