@@ -2,7 +2,7 @@ import React from 'react';
 
 import { Button, Form, Grid, Header, InputOnChangeData, Message } from 'semantic-ui-react';
 import strings from '../strings';
-import { L, LC } from '../widgets/L';
+import { L, LC } from '../localization/L';
 import { AsyncResult, Optional } from '../utils';
 import { LoginError, LoginResponse } from '../services/api/requests';
 

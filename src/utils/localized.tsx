@@ -1,10 +1,10 @@
 import React from 'react';
 
-export type Locale = 'en';
+export type Language = 'en';
 
-export type LocalizedString = {[L in Locale]: string};
+export type LocalizedString = {[L in Language]: string};
 
-export const LocaleContext: React.Context<Locale> = React.createContext('en' as Locale);
+export const LanguageContext: React.Context<Language> = React.createContext('en' as Language);
 
 type LocalizedValue<T> = T extends string ? LocalizedString : {[K in keyof T]: LocalizedValue<T[K]>};
 

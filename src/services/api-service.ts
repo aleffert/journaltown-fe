@@ -35,7 +35,6 @@ export class ApiService {
     }
 
     async request<Result>(request: ApiRequest<Result>): Promise<Result | { type: 'failure', error: ConnectionError}> {
-        debugger;
         const query = request.query ? qs.stringify(request.query) : '';
         const url = new URL(`${request.path}?${query}`, this.base);
         const headers: {[K: string]: string} = {
