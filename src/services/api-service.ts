@@ -9,7 +9,7 @@ declare global {
 
 export type ConnectionError = {'type': 'connection'};
 export type NoTokenError = {'type': 'no-token'};
-const ApiErrors = {
+export const ApiErrors = {
     connectionError: {'type': 'connection'} as ConnectionError,
     noTokenError: {'type': 'no-token'} as NoTokenError
 }
@@ -56,7 +56,7 @@ export class ApiService {
             return request.deserializer(result);
         }
         catch {
-            return {type: 'failure', error: {type: 'connection'}};
+            return {type: 'failure', error: ApiErrors.connectionError};
         }
     }
 }

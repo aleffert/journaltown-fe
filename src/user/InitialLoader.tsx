@@ -1,13 +1,10 @@
 import React from 'react';
 import { Loader } from 'semantic-ui-react';
+import { FullScreen } from '../widgets/FullScreen';
 
 export function InitialLoader(props: {}) {
-    return <div>
-        <style>{`
-        body > div,
-        `}</style>
+    return <FullScreen>
         <Loader active size='huge'/>
-
-    </div>
+    </FullScreen>
 
 }

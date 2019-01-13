@@ -1,7 +1,6 @@
 import { ImmerReducer, createActionCreators, createReducerFunction } from 'immer-reducer';
-import { AsyncResult, ExtractCodomain } from '../utils';
+import { AsyncResult } from '../utils';
 import { LoginResponse, LoginError, CurrentUserResponse, CurrentUserError } from '../services/api/requests';
-import { CurrentUser } from '../services/api/models';
 
 type LoginState = AsyncResult<LoginResponse, LoginError>;
 type CurrentUserState = AsyncResult<CurrentUserResponse, CurrentUserError>;

@@ -1,10 +1,10 @@
-import React, { Dispatch } from 'react';
+import React from 'react';
 
 import { LoginForm } from './user/LoginForm';
 import { InitialLoader } from './user/InitialLoader';
-import { Services, withServices } from './services';
+import { Services, withServices, ApiErrors } from './services';
 import { loginRequest, currentUserRequest, exchangeTokenRequest } from './services/api/requests';
-import { isString, Domain, bindDispatch } from './utils';
+import { isString, bindDispatch } from './utils';
 import { withRouter, RouteComponentProps } from 'react-router-dom';
 import * as qs from 'query-string';
 import { connect } from 'react-redux';
@@ -31,7 +31,6 @@ class _Root extends React.Component<RootProps> {
     }
 
     async componentDidMount() {
-        debugger;
         const query = qs.parse(this.props.location.search);
         if(query.token && isString(query.token)) {
             this.props.setValidating(true);
@@ -48,11 +47,10 @@ class _Root extends React.Component<RootProps> {
         if(token) {
             this.props.setCurrent({type: 'loading'});
             const result = await this.props.services.api.request(currentUserRequest());
-            debugger;
             this.props.setCurrent(result);
         }
         else {
-            this.props.setCurrent({type: 'failure', error: 'no-token'});
+            this.props.setCurrent({type: 'failure', error: ApiErrors.noTokenError});
         }
     }
     

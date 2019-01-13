@@ -1,5 +1,5 @@
 import { Result, isObject, Validator } from '../../utils';
-import { ApiError, ApiRequest, NoTokenError } from '../api-service';
+import { ApiError, ApiRequest } from '../api-service';
 import { isCurrentUser, CurrentUser, isToken, Token} from './models';
 
 function objectDeserializer<T extends object, E>(validator: Validator<T>): (response: Response) => Promise<Result<T, ApiError<E>>> {
