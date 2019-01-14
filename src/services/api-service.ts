@@ -29,7 +29,7 @@ export class ApiService {
     private base: string
     private storage: StorageService;
 
-    constructor(storageService: StorageService, base: string = process.env.REACT_APP_API_BASE) {
+    constructor(storageService: StorageService, base: string = process.env.REACT_APP_API_BASE || "") {
         this.base = base;
         this.storage = storageService;
     }

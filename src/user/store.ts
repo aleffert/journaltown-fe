@@ -1,5 +1,5 @@
 import { ImmerReducer, createActionCreators, createReducerFunction } from 'immer-reducer';
-import { put, takeLatest } from 'redux-saga/effects';
+import { put, takeLatest, call } from 'redux-saga/effects';
 import * as qs from 'query-string';
 
 import { AsyncResult, isString, callMethod } from '../utils';
@@ -46,13 +46,13 @@ export function* appStartedSaga(action: ReturnType<typeof actions.appStarted>) {
         // if so, try to turn it into a useful auth token
         const result = yield callMethod(services.api, o => o.request, exchangeTokenRequest({token: token}));
         if(result.type === "success") {
-            services.storage.setToken(result.value.token);
+            yield callMethod(services.storage, o => o.setToken, result.value.token);
         }
         yield put(actions.setValidating(false));
     }
 
     // now try to use the token to load the current user
-    const authToken = services.storage.getToken();
+    const authToken = yield call(services.storage.getToken);
     if(authToken) {
         yield put(actions.setCurrent({type: 'loading'}));
         const result = yield callMethod(services.api, o => o.request, currentUserRequest());

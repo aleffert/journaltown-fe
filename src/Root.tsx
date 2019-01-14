@@ -7,6 +7,8 @@ import { withRouter, RouteComponentProps } from 'react-router-dom';
 import * as qs from 'query-string';
 import { connect } from 'react-redux';
 import { AppState, actions } from './store';
+import strings from './strings';
+import { L } from './localization/L';
 
 
 function mapStateToProps(state: AppState) {
@@ -17,10 +19,9 @@ const mapDispatchToProps = bindDispatch(actions.user);
 
 type RootStateProps = ReturnType<typeof mapStateToProps>;
 type RootDispatchProps = ReturnType<typeof mapDispatchToProps>;
-
 type RootProps = RouteComponentProps & RootStateProps & RootDispatchProps;
 
-class _Root extends React.Component<RootProps> {
+export class _Root extends React.Component<RootProps> {
     
     constructor(props: RootProps) {
         super(props);
@@ -28,10 +29,10 @@ class _Root extends React.Component<RootProps> {
         this.onSubmitLogin = this.onSubmitLogin.bind(this);
     }
 
-    async componentDidMount() {
+    componentDidMount() {
         const query = qs.parse(this.props.location.search);
-        this.props.appStarted({query});
         // TODO: remove token from url
+        this.props.appStarted({query});
     }
     
     onSubmitLogin(email: string) {
@@ -42,8 +43,8 @@ class _Root extends React.Component<RootProps> {
         // TODO: If there's a token, but loading user fails, give an opportunity to log out
         return this.props.current && this.props.current.type !== "loading"
         ? (
-            this.props.current.type === "success" ? "Logged In"
-            : <LoginForm onSubmit={this.onSubmitLogin} status={this.props.login}></LoginForm>
+            this.props.current.type === "success" ? <L>{strings.login.loggedInMessage}</L>
+            : <LoginForm onSubmit={this.onSubmitLogin} status={this.props.login}/>
         ) : <InitialLoader/>
     }
     

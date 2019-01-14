@@ -1,6 +1,8 @@
 import React from 'react';
 
-export type Language = 'en';
+// In practice we only have english translations
+// but have multiple languages here for support
+export type Language = 'en' | 'es';
 
 export type LocalizedString = {[L in Language]: string};
 

@@ -2,6 +2,7 @@ import React from 'react';
 
 import { ApiService } from './api-service';
 import { StorageService } from './storage-service';
+import { Omit } from '../utils';
 
 export class Services {
     api: ApiService
@@ -15,8 +16,6 @@ export class Services {
 
 export const services = new Services();
 export const ServiceContext: React.Context<Services> = React.createContext(services);
-
-export type Omit<T, K extends keyof T> = Pick<T, Exclude<keyof T, K>>;
 
 export function withServices<P extends {services: Services}>(Wrapped: React.ComponentType<P>): React.ComponentType<Omit<P, 'services'>> {
     return ((props: any) => <ServiceContext.Consumer>
