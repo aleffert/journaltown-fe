@@ -3,6 +3,8 @@ import { Language } from '../utils';
 import { all } from 'redux-saga/effects';
 
 class LocalizationReducers extends ImmerReducer<{language: Language}> {
+    static customName = "Localization";
+
     setLanguage(language: Language) {
         this.draftState.language = language;
     }
