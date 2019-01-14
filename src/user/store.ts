@@ -18,7 +18,6 @@ type UserState = {
 }
 class UserReducers extends ImmerReducer<UserState> {
     // state
-    static customName = "User";
 
     setLoginState(state: LoginState) {
         this.draftState.login = state;
