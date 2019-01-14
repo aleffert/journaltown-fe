@@ -5,6 +5,7 @@ import strings from './strings';
 import { LoginForm } from './user/LoginForm';
 import { ApiErrors } from './services';
 import { InitialLoader } from './user/InitialLoader';
+import { MemoryRouter } from 'react-router';
 
 describe('Root', () => {
     it('shows logged in message when there is a current user', () => {
@@ -13,6 +14,7 @@ describe('Root', () => {
                 current={{type: 'success', value: {email: 'abc@example.com', username: 'abc'}}}
                 location={{search: '/'}}
                 appStarted={() => {}}
+                history={{replace: () => {}}}
                 {...{} as any}
             />
         );
@@ -25,6 +27,7 @@ describe('Root', () => {
                 current={{type: 'loading'}}
                 location={{search: '/'}}
                 appStarted={() => {}}
+                history={{replace: () => {}}}
                 {...{} as any}
             />
         );
@@ -37,6 +40,7 @@ describe('Root', () => {
                 current={{type: 'loading'}}
                 location={{search: '/'}}
                 appStarted={() => {}}
+                history={{replace: () => {}}}
                 {...{} as any}
             />
         );
@@ -49,6 +53,7 @@ describe('Root', () => {
                 current={{type: 'success', value: {email: 'abc@example.com', username: 'abc'}}}
                 location={{search: '/'}}
                 appStarted={() => {}}
+                history={{replace: () => {}}}
                 {...{} as any}
             />
         );
@@ -59,6 +64,7 @@ describe('Root', () => {
                 current={{type: 'failed', error: {email: 'abc@example.com', username: 'abc'}}}
                 location={{search: '/'}}
                 appStarted={() => {}}
+                history={{replace: () => {}}}
                 {...{} as any}
             />
         );
@@ -71,6 +77,7 @@ describe('Root', () => {
                 current={{type: 'failed', error: ApiErrors.noTokenError}}
                 location={{search: '/'}}
                 appStarted={() => {}}
+                history={{replace: () => {}}}
                 {...{} as any}
             />
         );
@@ -83,9 +90,39 @@ describe('Root', () => {
                 current={{type: 'success', value: {email: 'abc@example.com', username: 'abc'}}}
                 location={{search: '/'}}
                 appStarted={() => {}}
+                history={{replace: () => {}}}
                 {...{} as any}
             />
         );
         expect(w.find(LoginForm).exists()).toBe(false);
+    });
+
+    it('removes login codes from the url', () => {
+        const spy = jest.fn();
+        mount(
+            <_Root
+                current={{type: 'success', value: {email: 'abc@example.com', username: 'abc'}}}
+                location={{search: 'token=whatever'}}
+                appStarted={() => {}}
+                history={{replace: spy}}
+                {...{} as any}
+            />
+        );
+        expect(spy.mock.calls[0]).toEqual([{search: ""}]);
+    });
+
+    it('does not remove other arguments from the url', () => {
+
+        const spy = jest.fn();
+        mount(
+            <_Root
+                current={{type: 'success', value: {email: 'abc@example.com', username: 'abc'}}}
+                location={{search: 'token=whatever&foo=bar'}}
+                appStarted={() => {}}
+                history={{replace: spy}}
+                {...{} as any}
+            />
+        );
+        expect(spy.mock.calls[0]).toEqual([{search: "foo=bar"}]);
     });
 });

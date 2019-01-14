@@ -40,12 +40,12 @@ describe('LoginForm', () => {
     });
 
     it('calls onSubmit with the current email when clicked', () => {
-        const callback = jest.fn();
+        const spy = jest.fn();
         const w = mount(
-            <_LoginForm language='en' status={undefined} onSubmit={callback}></_LoginForm>
+            <_LoginForm language='en' status={undefined} onSubmit={spy}></_LoginForm>
         );
         w.find('#email-field').hostNodes().simulate('change', {target: {value: 'test@example.com'}});
         w.find('#submit-button').hostNodes().simulate('click');
-        expect(callback.mock.calls[0]).toEqual(['test@example.com']);
+        expect(spy.mock.calls[0]).toEqual(['test@example.com']);
     });
 });

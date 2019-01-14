@@ -3,7 +3,9 @@
   "version": "1.0.0",
   "private": true,
   "dependencies": {
+    "@types/lodash": "^4.14.119",
     "immer-reducer": "^0.2.1",
+    "lodash": "^4.17.11",
     "query-string": "^6.2.0",
     "react": "^16.7.0",
     "react-dom": "^16.7.0",

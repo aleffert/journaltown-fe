@@ -1,11 +1,13 @@
 import React from 'react';
 
+import _ from 'lodash';
+import * as qs from 'query-string';
+import { connect } from 'react-redux';
+import { withRouter, RouteComponentProps } from 'react-router-dom';
+
 import { LoginForm } from './user/LoginForm';
 import { InitialLoader } from './user/InitialLoader';
 import { bindDispatch } from './utils';
-import { withRouter, RouteComponentProps } from 'react-router-dom';
-import * as qs from 'query-string';
-import { connect } from 'react-redux';
 import { AppState, actions } from './store';
 import strings from './strings';
 import { L } from './localization/L';
@@ -31,8 +33,10 @@ export class _Root extends React.Component<RootProps> {
 
     componentDidMount() {
         const query = qs.parse(this.props.location.search);
-        // TODO: remove token from url
         this.props.appStarted({query});
+
+        const newQuery = qs.stringify(_.omit(query, 'token'));
+        this.props.history.replace(Object.assign(this.props.location, {search: newQuery}));
     }
     
     onSubmitLogin(email: string) {
