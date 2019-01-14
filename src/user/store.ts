@@ -2,7 +2,7 @@ import { ImmerReducer, createActionCreators, createReducerFunction } from 'immer
 import { put, takeLatest, call } from 'redux-saga/effects';
 import * as qs from 'query-string';
 
-import { AsyncResult, isString, callMethod } from '../utils';
+import { AsyncResult, isString, callMethod, Optional } from '../utils';
 import { LoginResponse, LoginError, CurrentUserResponse, CurrentUserError, loginRequest, exchangeTokenRequest, currentUserRequest } from '../services/api/requests';
 import { services, ApiErrors } from '../services';
 
@@ -32,16 +32,16 @@ class UserReducers extends ImmerReducer<UserState> {
 
     // actions
     submitLogin({email}: {email: string}) {}
-    appStarted({query}: {query: qs.OutputParams}) {}
+    loadUserIfPossible({token}: {token: Optional<string>}) {}
 }
 
 export const actions = createActionCreators(UserReducers);
 export const reducers = createReducerFunction(UserReducers, {login: null, validating: false, current: null});
 
 // sagas
-export function* appStartedSaga(action: ReturnType<typeof actions.appStarted>) {
+export function* loadUserIfPossibleSaga(action: ReturnType<typeof actions.loadUserIfPossible>) {
     // first check if we have a login token in the url
-    const token = action.payload[0].query.token;
+    const token = action.payload[0].token;
     if(token && isString(token)) {
         yield put(actions.setValidating(true));
         // if so, try to turn it into a useful auth token
@@ -71,6 +71,6 @@ export function* submitLoginSaga(action: ReturnType<typeof actions.submitLogin>)
 }
 
 export function* saga() {
-    yield takeLatest(actions.appStarted.type, appStartedSaga);
+    yield takeLatest(actions.loadUserIfPossible.type, loadUserIfPossibleSaga);
     yield takeLatest(actions.submitLogin.type, submitLoginSaga);
 }

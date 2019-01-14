@@ -13,7 +13,7 @@ describe('Root', () => {
             <_Root
                 current={{type: 'success', value: {email: 'abc@example.com', username: 'abc'}}}
                 location={{search: '/'}}
-                appStarted={() => {}}
+                loadUserIfPossible={() => {}}
                 history={{replace: () => {}}}
                 {...{} as any}
             />
@@ -26,7 +26,7 @@ describe('Root', () => {
             <_Root
                 current={{type: 'loading'}}
                 location={{search: '/'}}
-                appStarted={() => {}}
+                loadUserIfPossible={() => {}}
                 history={{replace: () => {}}}
                 {...{} as any}
             />
@@ -39,7 +39,7 @@ describe('Root', () => {
             <_Root
                 current={{type: 'loading'}}
                 location={{search: '/'}}
-                appStarted={() => {}}
+                loadUserIfPossible={() => {}}
                 history={{replace: () => {}}}
                 {...{} as any}
             />
@@ -52,7 +52,7 @@ describe('Root', () => {
             <_Root
                 current={{type: 'success', value: {email: 'abc@example.com', username: 'abc'}}}
                 location={{search: '/'}}
-                appStarted={() => {}}
+                loadUserIfPossible={() => {}}
                 history={{replace: () => {}}}
                 {...{} as any}
             />
@@ -63,7 +63,7 @@ describe('Root', () => {
             <_Root
                 current={{type: 'failed', error: {email: 'abc@example.com', username: 'abc'}}}
                 location={{search: '/'}}
-                appStarted={() => {}}
+                loadUserIfPossible={() => {}}
                 history={{replace: () => {}}}
                 {...{} as any}
             />
@@ -76,7 +76,7 @@ describe('Root', () => {
             <_Root
                 current={{type: 'failed', error: ApiErrors.noTokenError}}
                 location={{search: '/'}}
-                appStarted={() => {}}
+                loadUserIfPossible={() => {}}
                 history={{replace: () => {}}}
                 {...{} as any}
             />
@@ -89,7 +89,7 @@ describe('Root', () => {
             <_Root
                 current={{type: 'success', value: {email: 'abc@example.com', username: 'abc'}}}
                 location={{search: '/'}}
-                appStarted={() => {}}
+                loadUserIfPossible={() => {}}
                 history={{replace: () => {}}}
                 {...{} as any}
             />
@@ -103,7 +103,7 @@ describe('Root', () => {
             <_Root
                 current={{type: 'success', value: {email: 'abc@example.com', username: 'abc'}}}
                 location={{search: 'token=whatever'}}
-                appStarted={() => {}}
+                loadUserIfPossible={() => {}}
                 history={{replace: spy}}
                 {...{} as any}
             />
@@ -118,7 +118,7 @@ describe('Root', () => {
             <_Root
                 current={{type: 'success', value: {email: 'abc@example.com', username: 'abc'}}}
                 location={{search: 'token=whatever&foo=bar'}}
-                appStarted={() => {}}
+                loadUserIfPossible={() => {}}
                 history={{replace: spy}}
                 {...{} as any}
             />

@@ -11,6 +11,7 @@ import { bindDispatch } from './utils';
 import { AppState, actions } from './store';
 import strings from './strings';
 import { L } from './localization/L';
+import { isString } from 'util';
 
 
 function mapStateToProps(state: AppState) {
@@ -33,7 +34,7 @@ export class _Root extends React.Component<RootProps> {
 
     componentDidMount() {
         const query = qs.parse(this.props.location.search);
-        this.props.appStarted({query});
+        this.props.loadUserIfPossible({token: isString(query.token) ? query.token : undefined});
 
         const newQuery = qs.stringify(_.omit(query, 'token'));
         this.props.history.replace(Object.assign(this.props.location, {search: newQuery}));

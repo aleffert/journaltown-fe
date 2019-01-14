@@ -1,4 +1,4 @@
-import { actions, submitLoginSaga, appStartedSaga } from "./store";
+import { actions, submitLoginSaga, loadUserIfPossibleSaga } from "./store";
 import { call, put } from "redux-saga/effects";
 import { callMethod } from "../utils";
 import { loginRequest, currentUserRequest } from "../services/api/requests";
@@ -30,21 +30,21 @@ describe('user sagas', () => {
         });
     });
 
-    describe('appStartedSaga', () => {
+    describe('loadUserIfPossibleSaga', () => {
         it('does not validate a token if we do not have one', () => {
-            const effects: Generator = appStartedSaga(actions.appStarted({query: {}}));
+            const effects: Generator = loadUserIfPossibleSaga(actions.loadUserIfPossible({token: undefined}));
             expect(effects.next().value).not.toEqual(put(actions.setValidating(true)));
         });
 
         it('does start validating a token if we do have one', () => {
             const token = 'abc123';
-            const effects: Generator = appStartedSaga(actions.appStarted({query: {token}}));
+            const effects: Generator = loadUserIfPossibleSaga(actions.loadUserIfPossible({token}));
             expect(effects.next().value).toEqual(put(actions.setValidating(true)));
         });
 
         it('if validation succeeds we store the token', () => {
             const token = 'abc123';
-            const effects: Generator = appStartedSaga(actions.appStarted({query: {token}}));
+            const effects: Generator = loadUserIfPossibleSaga(actions.loadUserIfPossible({token}));
             effects.next();
             effects.next();
             const result = {type: 'success', value: {token: token}};
@@ -53,7 +53,7 @@ describe('user sagas', () => {
 
         it('if validation succeeds we do not store the token', () => {
             const token = 'abc123';
-            const effects: Generator = appStartedSaga(actions.appStarted({query: {token}}));
+            const effects: Generator = loadUserIfPossibleSaga(actions.loadUserIfPossible({token}));
             effects.next();
             effects.next();
             const result = {type: 'failure', error: {}};
@@ -61,19 +61,19 @@ describe('user sagas', () => {
         });
 
         it('if we do not have a token we do not try to load the current user', () => {
-            const effects: Generator = appStartedSaga(actions.appStarted({query: {}}));
+            const effects: Generator = loadUserIfPossibleSaga(actions.loadUserIfPossible({token: undefined});
             effects.next();
             expect(effects.next().value).toEqual(put(actions.setCurrent({type: 'failure', error: ApiErrors.noTokenError})));
         });
 
         it('if we have a token we try to load the current user', () => {
-            const effects: Generator = appStartedSaga(actions.appStarted({query: {}}));
+            const effects: Generator = loadUserIfPossibleSaga(actions.loadUserIfPossible({token: undefined}));
             effects.next();
             expect(effects.next('token').value).toEqual(put(actions.setCurrent({type: 'loading'})));
         });
 
         it('if we have a token we request the current user', () => {
-            const effects: Generator = appStartedSaga(actions.appStarted({query: {}}));
+            const effects: Generator = loadUserIfPossibleSaga(actions.loadUserIfPossible({token: undefined}));
             effects.next();
             expect(effects.next('token').value).toEqual(put(actions.setCurrent({type: 'loading'})));
             expect(effects.next().value.CALL.body).toEqual((callMethod(services.api, o => o.request, currentUserRequest()) as any).CALL.body);
