@@ -1,4 +1,7 @@
 import { Action, Dispatch } from 'redux';
+import { push, replace, CallHistoryMethodAction } from 'connected-react-router';
+import { LocationDescriptorObject } from 'history';
+
 
 // Given an object whose values are action creators
 // return an object with the same keys whose values
@@ -12,5 +15,18 @@ export function bindDispatch<A extends Action, T extends object>(actions: T) {
             result[key] = (...args: any[]) => dispatch(action.apply(null, args));
         }
         return result;
+    }
+}
+
+type RouteLocation = LocationDescriptorObject
+
+export function historyActions<A extends Action, T>(map: (dispatch: Dispatch<A['type']>) => T) {
+    return function(dispatch: Dispatch<A['type']>) {
+        return {...map(dispatch),
+            history: {
+                push: (location: RouteLocation) => dispatch(push(location)),
+                replace: (location: RouteLocation) => dispatch(replace(location))
+            }
+        };
     }
 }

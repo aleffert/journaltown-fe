@@ -3,36 +3,39 @@ import './App.css';
 
 import React from 'react';
 import { Provider } from 'react-redux';
-import { BrowserRouter as Router, Route } from "react-router-dom";
+import { Route } from "react-router-dom";
 import { createStore, applyMiddleware, compose } from "redux";
 import createSagaMiddleware from 'redux-saga';
 
 import { LanguageContext } from './utils';
 import { Root } from './Root';
-import { reducers, saga } from './store';
+import { saga, createRootReducers } from './store';
+import { createBrowserHistory } from 'history';
+import { routerMiddleware, ConnectedRouter } from 'connected-react-router';
 
 
-
+const history = createBrowserHistory();
 const sagaMiddleware = createSagaMiddleware();
 const composeEnhancers = (window as any).__REDUX_DEVTOOLS_EXTENSION_COMPOSE__ || compose;
-const store = createStore(reducers, composeEnhancers(applyMiddleware(sagaMiddleware)));
+const store = createStore(
+    createRootReducers(history),
+    composeEnhancers(
+        applyMiddleware(sagaMiddleware, routerMiddleware(history))
+    )
+);
 
 sagaMiddleware.run(saga);
 
 export default class App extends React.Component<{}> {
     
-    constructor(props: {}) {
-        super(props);
-    }
-    
     render() {
         return (
             <Provider store={store}>
             <LanguageContext.Provider value={store.getState().localization.language}>
-                <Router>
+                <ConnectedRouter history={history}>
                     <Route component={Root}>
                 </Route>
-                </Router>
+                </ConnectedRouter>
             </LanguageContext.Provider>
             </Provider>
         );

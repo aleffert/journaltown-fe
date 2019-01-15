@@ -61,7 +61,7 @@ describe('user sagas', () => {
         });
 
         it('if we do not have a token we do not try to load the current user', () => {
-            const effects: Generator = loadUserIfPossibleSaga(actions.loadUserIfPossible({token: undefined});
+            const effects: Generator = loadUserIfPossibleSaga(actions.loadUserIfPossible({token: undefined}));
             effects.next();
             expect(effects.next().value).toEqual(put(actions.setCurrent({type: 'failure', error: ApiErrors.noTokenError})));
         });

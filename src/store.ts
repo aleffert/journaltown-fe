@@ -3,6 +3,8 @@ import { all } from 'redux-saga/effects';
 import { ObjectCodomain } from './utils';
 import * as Localization from './localization/store';
 import * as User from './user/store';
+import { connectRouter } from 'connected-react-router';
+import { History } from 'history';
 
 const modules = {
     localization: Localization,
@@ -39,7 +41,9 @@ function extractSaga<M extends object>(modules: M): Sagas<M> {
 }
 
 // Actual store pieces
-export const reducers = combineReducers(extractReducers(modules));
+export function createRootReducers(history: History) {
+    return combineReducers({...extractReducers(modules), router: connectRouter(history)});
+}
 
 export const actions = extractActions(modules);
 
@@ -56,5 +60,5 @@ type UnionActions<T, K> = K extends any ? ObjectCodomain<T[K]> : never;
 export type ExtractActions<T> = UnionActions<T, keyof T>;
 
 // actual types
-export type AppState = typeof reducers extends (s: infer _, a: infer _) => infer T ? T : null;
+export type AppState = ReturnType<typeof createRootReducers> extends (s: infer _, a: infer _) => infer T ? T : null;
 export type AppAction = ReturnType<ExtractActions<typeof actions>>;
