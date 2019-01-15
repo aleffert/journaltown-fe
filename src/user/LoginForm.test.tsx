@@ -48,4 +48,19 @@ describe('LoginForm', () => {
         w.find('#submit-button').hostNodes().simulate('click');
         expect(spy.mock.calls[0]).toEqual(['test@example.com']);
     });
+
+    it('disables the submit button when there is no email address', () => {
+        const w = mount(
+            <_LoginForm language='en' status={undefined} onSubmit={() => {}}></_LoginForm>
+        );
+        expect(w.find(Button).props().disabled).toEqual(true);
+    });
+
+    it('enables the submit button when there is an email address', () => {
+        const w = mount(
+            <_LoginForm language='en' status={undefined} onSubmit={() => {}}></_LoginForm>
+        );
+        w.find('#email-field').hostNodes().simulate('change', {target: {value: 'test@example.com'}});
+        expect(w.find(Button).props().disabled).toEqual(false);
+    });
 });

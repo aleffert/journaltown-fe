@@ -6,7 +6,7 @@ import { L, LC } from '../localization/L';
 import { AsyncResult, Optional, Language, Omit } from '../utils';
 import { LoginError, LoginResponse } from '../services/api/requests';
 import { FullScreen } from '../widgets/FullScreen';
-
+import EmailValidator from 'email-validator';
 
 type LoginFormProps = {
     status: Optional<AsyncResult<LoginResponse, LoginError>>,
@@ -41,6 +41,7 @@ export class _LoginForm extends React.Component<LoginFormProps, LoginFormState> 
         const isLoading = (this.props.status && this.props.status.type === 'loading') || undefined;
         const isSuccess = this.props.status && this.props.status.type === 'success';
         const isFailure = this.props.status && this.props.status.type === 'failure';
+        const submitDisabled = isLoading || !EmailValidator.validate(this.state.email);
 
         return <div>
             <FullScreen>
@@ -55,7 +56,7 @@ export class _LoginForm extends React.Component<LoginFormProps, LoginFormState> 
                             placeholder={strings.login.email_placeholder[this.props.language]}
                             onChange={this.onEmailChange}
                             />
-                        <Button id='submit-button' primary loading={isLoading} disabled={isLoading} fluid size='large' onClick={this.onLogin}>
+                        <Button id='submit-button' primary loading={isLoading} disabled={submitDisabled} fluid size='large' onClick={this.onLogin}>
                             {<L>{strings.login.logIn}</L>}
                         </Button>
                     </Form>
