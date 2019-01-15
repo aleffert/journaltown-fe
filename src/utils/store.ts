@@ -8,13 +8,13 @@ import { LocationDescriptorObject } from 'history';
 // are functions that take the argument to the action creator
 // and call dispatch on the result of calling that action creator with those arguments
 export function bindDispatch<A extends Action, T extends object>(actions: T) {
-    return function(dispatch: Dispatch<A['type']>): T {
+    return function(dispatch: Dispatch<A['type']>): {actions: T} {
         const result: any = {};
         for(const key of Object.keys(actions)) {
             const action = (actions as any)[key];
             result[key] = (...args: any[]) => dispatch(action.apply(null, args));
         }
-        return result;
+        return {actions: result};
     }
 }
 

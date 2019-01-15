@@ -8,13 +8,16 @@ import { InitialLoader } from './user/InitialLoader';
 import { MemoryRouter } from 'react-router';
 
 describe('Root', () => {
+    const baseProps = {
+        router: {location: {search: '' }},
+        actions: {loadUserIfPossible: () => {}},
+        history: {replace: () => {}}
+    };
     it('shows logged in message when there is a current user', () => {
         const w = mount(
             <_Root
+                {...baseProps}
                 user={{current:{type: 'success', value: {email: 'abc@example.com', username: 'abc'}}}}
-                router={{location:{search: ''}}}
-                loadUserIfPossible={() => {}}
-                history={{replace: () => {}}}
                 {...{} as any}
             />
         );
@@ -24,10 +27,8 @@ describe('Root', () => {
     it('does not show logged in message when there is not a current user', () => {
         const w = mount(
             <_Root
+                {...baseProps}
                 user={{current:{type: 'loading'}}}
-                router={{location:{search: ''}}}
-                loadUserIfPossible={() => {}}
-                history={{replace: () => {}}}
                 {...{} as any}
             />
         );
@@ -37,10 +38,8 @@ describe('Root', () => {
     it('shows the initial loader when loading', () => {
         const w = mount(
             <_Root
+                {...baseProps}
                 user={{current:{type: 'loading'}}}
-                router={{location:{search: ''}}}
-                loadUserIfPossible={() => {}}
-                history={{replace: () => {}}}
                 {...{} as any}
             />
         );
@@ -50,10 +49,8 @@ describe('Root', () => {
     it('does not show the initial loader after loading', () => {
         let w = mount(
             <_Root
+                {...baseProps}
                 user={{current:{type: 'success', value: {email: 'abc@example.com', username: 'abc'}}}}
-                router={{location:{search: ''}}}
-                loadUserIfPossible={() => {}}
-                history={{replace: () => {}}}
                 {...{} as any}
             />
         );
@@ -61,10 +58,8 @@ describe('Root', () => {
 
         w = mount(
             <_Root
+                {...baseProps}
                 user={{current:{type: 'failed', error: ApiErrors.noTokenError}}}
-                router={{location:{search: ''}}}
-                loadUserIfPossible={() => {}}
-                history={{replace: () => {}}}
                 {...{} as any}
             />
         );
@@ -74,10 +69,8 @@ describe('Root', () => {
     it('shows the login form when there is not a current user', () => {
         const w = mount(
             <_Root
+                {...baseProps}
                 user={{current:{type: 'failed', error: ApiErrors.noTokenError}}}
-                router={{location:{search: ''}}}
-                loadUserIfPossible={() => {}}
-                history={{replace: () => {}}}
                 {...{} as any}
             />
         );
@@ -87,10 +80,8 @@ describe('Root', () => {
     it('does not show the login form when there is a current user', () => {
         const w = mount(
             <_Root
+                {...baseProps}
                 user={{current:{type: 'success', value: {email: 'abc@example.com', username: 'abc'}}}}
-                router={{location:{search: ''}}}
-                loadUserIfPossible={() => {}}
-                history={{replace: () => {}}}
                 {...{} as any}
             />
         );
@@ -101,9 +92,9 @@ describe('Root', () => {
         const spy = jest.fn();
         mount(
             <_Root
+                {...baseProps}
                 user={{current:{type: 'success', value: {email: 'abc@example.com', username: 'abc'}}}}
                 router={{location:{search: 'token=foo'}}}
-                loadUserIfPossible={() => {}}
                 history={{replace: spy}}
                 {...{} as any}
             />
@@ -115,9 +106,9 @@ describe('Root', () => {
         const spy = jest.fn();
         mount(
             <_Root
+                {...baseProps}
                 user={{current:{type: 'success', value: {email: 'abc@example.com', username: 'abc'}}}}
                 router={{location:{search: 'token=xyz&foo=bar'}}}
-                loadUserIfPossible={() => {}}
                 history={{replace: spy}}
                 {...{} as any}
             />

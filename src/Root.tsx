@@ -30,14 +30,14 @@ export class _Root extends React.Component<RootProps> {
 
     componentDidMount() {
         const query = qs.parse(this.props.router.location.search);
-        this.props.loadUserIfPossible({token: isString(query.token) ? query.token : undefined});
+        this.props.actions.loadUserIfPossible({token: isString(query.token) ? query.token : undefined});
 
         const newQuery = qs.stringify(_.omit(query, 'token'));
         this.props.history.replace(Object.assign(this.props.router.location, {search: newQuery}));
     }
     
     onSubmitLogin(email: string) {
-        this.props.submitLogin({email});
+        this.props.actions.submitLogin({email});
     }
     
     render() {
