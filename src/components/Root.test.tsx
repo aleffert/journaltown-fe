@@ -1,89 +1,95 @@
 import React from 'react';
 import { _Root } from './Root';
 import { mount } from 'enzyme';
-import strings from './strings';
 import { LoginForm } from './user/LoginForm';
-import { ApiErrors } from './services';
+import { ApiErrors } from '../services';
 import { InitialLoader } from './user/InitialLoader';
-import { MemoryRouter } from 'react-router';
+import { Header } from './Header';
+import { MemoryRouter as Router } from 'react-router';
 
 describe('Root', () => {
     const baseProps = {
         router: {location: {search: '' }},
-        actions: {loadUserIfPossible: () => {}},
-        history: {replace: () => {}}
+        actions: {user: {loadIfPossible: () => {}}, history: {replace: () => {}}},
     };
-    it('shows logged in message when there is a current user', () => {
+    it('shows header when there is a current user', () => {
         const w = mount(
+            <Router>
             <_Root
                 {...baseProps}
                 user={{current:{type: 'success', value: {email: 'abc@example.com', username: 'abc'}}}}
                 {...{} as any}
-            />
+            /></Router>
         );
-        expect(w.text()).toContain(strings.login.loggedInMessage['en']);
+        expect(w.find(Header).exists()).toBe(true);
     });
 
-    it('does not show logged in message when there is not a current user', () => {
+    it('does not show header message when there is not a current user', () => {
         const w = mount(
+            <Router>
             <_Root
                 {...baseProps}
                 user={{current:{type: 'loading'}}}
                 {...{} as any}
-            />
+            /></Router>
         );
-        expect(w.text()).not.toContain(strings.login.loggedInMessage['en']);
+        expect(w.find(Header).exists()).toBe(false);
     });
 
     it('shows the initial loader when loading', () => {
         const w = mount(
+            <Router>
             <_Root
                 {...baseProps}
                 user={{current:{type: 'loading'}}}
                 {...{} as any}
-            />
+            /></Router>
         );
         expect(w.find(InitialLoader).exists()).toBe(true);
     });
 
     it('does not show the initial loader after loading', () => {
         let w = mount(
+            <Router>
             <_Root
                 {...baseProps}
                 user={{current:{type: 'success', value: {email: 'abc@example.com', username: 'abc'}}}}
                 {...{} as any}
-            />
+            /></Router>
         );
         expect(w.find(InitialLoader).exists()).toBe(false);
 
         w = mount(
+            <Router>
             <_Root
                 {...baseProps}
                 user={{current:{type: 'failed', error: ApiErrors.noTokenError}}}
                 {...{} as any}
-            />
+            /></Router>
         );
         expect(w.find(InitialLoader).exists()).toBe(false);
     });
 
     it('shows the login form when there is not a current user', () => {
         const w = mount(
+            <Router>
             <_Root
                 {...baseProps}
                 user={{current:{type: 'failed', error: ApiErrors.noTokenError}}}
                 {...{} as any}
-            />
+            /></Router>
         );
         expect(w.find(LoginForm).exists()).toBe(true);
     });
 
     it('does not show the login form when there is a current user', () => {
         const w = mount(
+            <Router>
             <_Root
                 {...baseProps}
                 user={{current:{type: 'success', value: {email: 'abc@example.com', username: 'abc'}}}}
                 {...{} as any}
-            />
+            /></Router>
         );
         expect(w.find(LoginForm).exists()).toBe(false);
     });
@@ -91,13 +97,14 @@ describe('Root', () => {
     it('removes login codes from the url', () => {
         const spy = jest.fn();
         mount(
+            <Router>
             <_Root
                 {...baseProps}
                 user={{current:{type: 'success', value: {email: 'abc@example.com', username: 'abc'}}}}
                 router={{location:{search: 'token=foo'}}}
-                history={{replace: spy}}
+                actions={{...baseProps.actions, history: {replace: spy}}}
                 {...{} as any}
-            />
+            /></Router>
         );
         expect(spy.mock.calls[0]).toEqual([{search: ""}]);
     });
@@ -105,13 +112,14 @@ describe('Root', () => {
     it('does not remove other arguments from the url', () => {
         const spy = jest.fn();
         mount(
+            <Router>
             <_Root
                 {...baseProps}
                 user={{current:{type: 'success', value: {email: 'abc@example.com', username: 'abc'}}}}
                 router={{location:{search: 'token=xyz&foo=bar'}}}
-                history={{replace: spy}}
+                actions={{...baseProps.actions, history: {replace: spy}}}
                 {...{} as any}
-            />
+            /></Router>
         );
         expect(spy.mock.calls[0]).toEqual([{search: "foo=bar"}]);
     });

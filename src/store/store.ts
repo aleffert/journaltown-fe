@@ -1,13 +1,15 @@
 import { combineReducers, Reducer } from 'redux';
 import { all } from 'redux-saga/effects';
-import { ObjectCodomain } from './utils';
-import * as Localization from './localization/store';
-import * as User from './user/store';
+import { ObjectCodomain, historyActions } from '../utils';
 import { connectRouter } from 'connected-react-router';
 import { History } from 'history';
+import * as Navigation from './navigation';
+import * as User from './user';
+import * as Compose from './compose';
 
 const modules = {
-    localization: Localization,
+    compose: Compose,
+    navigation: Navigation,
     user: User
 };
 
@@ -45,7 +47,7 @@ export function createRootReducers(history: History) {
     return combineReducers({...extractReducers(modules), router: connectRouter(history)});
 }
 
-export const actions = extractActions(modules);
+export const actions = {...extractActions(modules), history: historyActions};
 
 export function* saga() {
     yield all(

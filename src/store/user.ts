@@ -1,10 +1,9 @@
 import { ImmerReducer, createActionCreators, createReducerFunction } from 'immer-reducer';
 import { put, takeLatest, call } from 'redux-saga/effects';
-import * as qs from 'query-string';
 
 import { AsyncResult, isString, callMethod, Optional } from '../utils';
 import { LoginResponse, LoginError, CurrentUserResponse, CurrentUserError, loginRequest, exchangeTokenRequest, currentUserRequest } from '../services/api/requests';
-import { services, ApiErrors } from '../services';
+import { services, ApiErrors, callApi } from '../services';
 
 // redux
 
@@ -32,20 +31,21 @@ class UserReducers extends ImmerReducer<UserState> {
 
     // actions
     submitLogin({email}: {email: string}) {}
-    loadUserIfPossible({token}: {token: Optional<string>}) {}
+    logout() {}
+    loadIfPossible({token}: {token: Optional<string>}) {}
 }
 
 export const actions = createActionCreators(UserReducers);
 export const reducers = createReducerFunction(UserReducers, {login: null, validating: false, current: null});
 
 // sagas
-export function* loadUserIfPossibleSaga(action: ReturnType<typeof actions.loadUserIfPossible>) {
+export function* loadIfPossibleSaga(action: ReturnType<typeof actions.loadIfPossible>) {
     // first check if we have a login token in the url
     const token = action.payload[0].token;
     if(token && isString(token)) {
         yield put(actions.setValidating(true));
         // if so, try to turn it into a useful auth token
-        const result = yield callMethod(services.api, o => o.request, exchangeTokenRequest({token: token}));
+        const result = yield callApi(exchangeTokenRequest({token: token}));
         if(result.type === "success") {
             yield callMethod(services.storage, o => o.setToken, result.value.token);
         }
@@ -56,7 +56,7 @@ export function* loadUserIfPossibleSaga(action: ReturnType<typeof actions.loadUs
     const authToken = yield call(services.storage.getToken);
     if(authToken) {
         yield put(actions.setCurrent({type: 'loading'}));
-        const result = yield callMethod(services.api, o => o.request, currentUserRequest());
+        const result = yield callApi(currentUserRequest());
         yield put(actions.setCurrent(result));
     }
     else {
@@ -66,11 +66,17 @@ export function* loadUserIfPossibleSaga(action: ReturnType<typeof actions.loadUs
 
 export function* submitLoginSaga(action: ReturnType<typeof actions.submitLogin>) {
     yield put(actions.setLoginState({type: 'loading'}));
-    const result = yield callMethod(services.api, o => o.request, loginRequest({email: action.payload[0].email}));
+    const result = yield callApi(loginRequest({email: action.payload[0].email}));
     yield put(actions.setLoginState(result));
 }
 
+export function* logoutSaga(_: ReturnType<typeof actions.logout>) {
+    yield callMethod(services.storage, o => o.clear, {});
+    yield callMethod(window.location, o => o.reload, {});
+}
+
 export function* saga() {
-    yield takeLatest(actions.loadUserIfPossible.type, loadUserIfPossibleSaga);
+    yield takeLatest(actions.loadIfPossible.type, loadIfPossibleSaga);
     yield takeLatest(actions.submitLogin.type, submitLoginSaga);
+    yield takeLatest(actions.logout.type, logoutSaga);
 }

@@ -1,4 +1,5 @@
 export * from './async-result';
+export * from './functional';
 export * from './localized';
 export * from './optional';
 export * from './sagas';

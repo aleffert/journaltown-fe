@@ -2,7 +2,7 @@ import React from 'react';
 import { render } from 'enzyme';
 
 import { L } from "./L";
-import { LanguageContext } from "../utils";
+import { LanguageContext } from "../../utils";
 
 describe('L', () => {
     it('renders english', () => {

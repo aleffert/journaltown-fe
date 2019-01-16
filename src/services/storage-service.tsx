@@ -11,4 +11,8 @@ export class StorageService {
     getToken(): Optional<string> {
         return localStorage.getItem(AUTH_TOKEN_KEY);
     }
+
+    clear() {
+        localStorage.clear();
+    }
 }

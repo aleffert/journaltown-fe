@@ -1,12 +1,14 @@
 import React from 'react';
 
-import { Button, Form, Grid, Header, InputOnChangeData, Message, Container } from 'semantic-ui-react';
-import strings from '../strings';
-import { L, LC } from '../localization/L';
-import { AsyncResult, Optional, Language, Omit } from '../utils';
-import { LoginError, LoginResponse } from '../services/api/requests';
-import { FullScreen } from '../widgets/FullScreen';
+import { connect } from 'react-redux';
 import EmailValidator from 'email-validator';
+import { Button, Form, Grid, Header, InputOnChangeData, Message, Container } from 'semantic-ui-react';
+import strings from '../../strings';
+import { L, LC, withLanguage } from '../localization/L';
+import { AsyncResult, Optional, Language, pick } from '../../utils';
+import { LoginError, LoginResponse } from '../../services/api/requests';
+import { FullScreen } from '../widgets/FullScreen';
+import { Omit } from 'react-router';
 
 type LoginFormProps = {
     status: Optional<AsyncResult<LoginResponse, LoginError>>,
@@ -46,7 +48,7 @@ export class _LoginForm extends React.Component<LoginFormProps, LoginFormState> 
         return <div>
             <FullScreen>
                 <Container text className='full-height'>
-                <Grid className='full-height' textAlign='center' verticalAlign='middle'>
+                <Grid className='full-height' verticalAlign='middle'>
                 <Grid.Column>
                     <Header as='h2' textAlign='center'>
                         <L>{strings.login.prompt}</L>
@@ -69,6 +71,4 @@ export class _LoginForm extends React.Component<LoginFormProps, LoginFormState> 
     }
 }
 
-export function LoginForm(props: Omit<LoginFormProps, 'language'>) {
-    return <LC>{(l => <_LoginForm language={l} {...props}/>)}</LC>
-};
+export const LoginForm = withLanguage<LoginFormProps, typeof _LoginForm>(_LoginForm);

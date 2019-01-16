@@ -1,8 +1,9 @@
 import React from 'react';
 
-import { ApiService } from './api-service';
+import { ApiService, ApiRequest } from './api-service';
 import { StorageService } from './storage-service';
-import { Omit } from '../utils';
+import { Omit, callMethod } from '../utils';
+import { CallEffect } from 'redux-saga/effects';
 
 export class Services {
     api: ApiService
@@ -22,4 +23,8 @@ export function withServices<P extends {services: Services}>(Wrapped: React.Comp
         { (services: Services) => <Wrapped {...props} services={services} ></Wrapped> }
       </ServiceContext.Consumer>
     );
+}
+
+export function callApi<Result>(request: ApiRequest<Result>): CallEffect {
+    return callMethod(services.api, o => o.request, request);
 }

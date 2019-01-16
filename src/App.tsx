@@ -7,8 +7,7 @@ import { Route } from "react-router-dom";
 import { createStore, applyMiddleware, compose } from "redux";
 import createSagaMiddleware from 'redux-saga';
 
-import { LanguageContext } from './utils';
-import { Root } from './Root';
+import { Root } from './components/Root';
 import { saga, createRootReducers } from './store';
 import { createBrowserHistory } from 'history';
 import { routerMiddleware, ConnectedRouter } from 'connected-react-router';
@@ -31,12 +30,10 @@ export default class App extends React.Component<{}> {
     render() {
         return (
             <Provider store={store}>
-            <LanguageContext.Provider value={store.getState().localization.language}>
                 <ConnectedRouter history={history}>
                     <Route component={Root}>
                 </Route>
                 </ConnectedRouter>
-            </LanguageContext.Provider>
             </Provider>
         );
     }
