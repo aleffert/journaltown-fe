@@ -30,9 +30,9 @@ class UserReducers extends ImmerReducer<UserState> {
     }
 
     // actions
-    submitLogin({email}: {email: string}) {}
+    submitLogin(_: {email: string}) {}
     logout() {}
-    loadIfPossible({token}: {token: Optional<string>}) {}
+    loadIfPossible(_: {token: Optional<string>}) {}
 }
 
 export const actions = createActionCreators(UserReducers);

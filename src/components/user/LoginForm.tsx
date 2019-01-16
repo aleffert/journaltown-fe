@@ -58,7 +58,10 @@ export class _LoginForm extends React.Component<LoginFormProps, LoginFormState> 
                             placeholder={strings.login.email_placeholder[this.props.language]}
                             onChange={this.onEmailChange}
                             />
-                        <Button id='submit-button' primary loading={isLoading} disabled={submitDisabled} fluid size='large' onClick={this.onLogin}>
+                        <Button id='submit-button' primary loading={isLoading} disabled={submitDisabled} 
+                            fluid size='large'
+                            onClick={this.onLogin}
+                        >
                             {<L>{strings.login.logIn}</L>}
                         </Button>
                     </Form>

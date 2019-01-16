@@ -18,6 +18,8 @@ export default {
         body: {
             placeholder: 'Some stuff I want to write about',
         },
-        post: 'Post'
+        post: 'Post',
+        sendSuccess: 'Check out your new post!',
+        sendFailure: 'Failed to create a new post. Try again later.'
     }
 }

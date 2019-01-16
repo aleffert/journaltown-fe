@@ -1,7 +1,8 @@
 import { ImmerReducer, createActionCreators, createReducerFunction } from "immer-reducer";
 import { AsyncResult } from "../utils";
-import { ApiError } from "../services";
-import { all } from 'redux-saga/effects';
+import { ApiError, callApi } from "../services";
+import { put, takeEvery } from 'redux-saga/effects';
+import { createPostRequest } from "../services/api/requests";
 
 type PostResult = AsyncResult<{}, ApiError>;
 type ComposeState = {
@@ -22,6 +23,8 @@ class ComposeReducers extends ImmerReducer<ComposeState> {
     setPostResult({result}: {result: PostResult}) {
         this.draftState.postResult = result;
     }
+
+    post(_: {title: string, body: string}) {}
 }
 
 export const actions = createActionCreators(ComposeReducers);
@@ -29,6 +32,12 @@ export const reducers = createReducerFunction(ComposeReducers,
     {title: '', body: '', postResult: undefined}
 );
 
+export function* createPostSaga(action: ReturnType<typeof actions.post>) {
+    yield put(actions.setPostResult({result: {type: 'loading'}}))
+    const result = yield callApi(createPostRequest(action.payload[0]));
+    yield put(actions.setPostResult({result}));
+}
+
 export function* saga() {
-    yield all([]);
+    yield takeEvery(actions.post.type, createPostSaga);
 }
