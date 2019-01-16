@@ -1,7 +1,7 @@
 import React from 'react';
 import { render, shallow, mount } from 'enzyme';
 import { _LoginForm } from './LoginForm';
-import { Button } from 'semantic-ui-react';
+import { FormButton } from 'semantic-ui-react';
 import strings from '../../strings';
 
 describe('LoginForm', () => {
@@ -11,7 +11,7 @@ describe('LoginForm', () => {
         const w = shallow(
             <_LoginForm {...baseProps} status={undefined}></_LoginForm>
         );
-        expect(w.find(Button).props().spinner).toEqual(undefined);
+        expect(w.find(FormButton).props().spinner).toEqual(undefined);
         expect(w.render().text()).not.toContain(strings.login.sendSuccess['en']);
         expect(w.render().text()).not.toContain(strings.login.sendFailure['en']);
     });
@@ -20,7 +20,7 @@ describe('LoginForm', () => {
         const w = shallow(
             <_LoginForm {...baseProps} status={{type: 'loading'}}></_LoginForm>
         );
-        expect(w.find(Button).props().loading).toEqual(true);
+        expect(w.find(FormButton).props().loading).toEqual(true);
         expect(w.render().text()).not.toContain(strings.login.sendSuccess['en']);
         expect(w.render().text()).not.toContain(strings.login.sendFailure['en']);
     });
@@ -55,7 +55,7 @@ describe('LoginForm', () => {
         const w = mount(
             <_LoginForm {...baseProps} status={undefined}></_LoginForm>
         );
-        expect(w.find(Button).props().disabled).toEqual(true);
+        expect(w.find(FormButton).props().disabled).toEqual(true);
     });
 
     it('enables the submit button when there is an email address', () => {
@@ -63,6 +63,6 @@ describe('LoginForm', () => {
             <_LoginForm {...baseProps} status={undefined}></_LoginForm>
         );
         w.find('#email-field').hostNodes().simulate('change', {target: {value: 'test@example.com'}});
-        expect(w.find(Button).props().disabled).toEqual(false);
+        expect(w.find(FormButton).props().disabled).toEqual(false);
     });
 });

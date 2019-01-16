@@ -1,10 +1,10 @@
 import React from 'react';
 import { connect } from 'react-redux';
-import { Container, Form, Grid, InputOnChangeData, Message, TextAreaProps } from 'semantic-ui-react';
-import { L, withLanguage, LanguageProps } from '../../localization/L';
+import { InputOnChangeData, TextAreaProps } from 'semantic-ui-react';
+import { withLanguage, LanguageProps } from '../../localization/L';
 import { isString, bindDispatch, pick } from '../../../utils';
-import strings from '../../../strings';
 import { AppState, actions } from '../../../store';
+import { ComposeForm } from './ComposeForm';
 
 const mapStateToProps = (state: AppState) => pick(state, ['compose']);
 const mapDispatchToProps = bindDispatch(pick(actions, ['compose']));
@@ -39,34 +39,12 @@ export class _ComposePage extends React.Component<ComposePageProps, {}> {
     }
 
     render() {
-        const submitDisabled = this.props.compose.body.length == 0 || !!this.props.compose.postResult;
-        const isSuccess = this.props.compose.postResult && this.props.compose.postResult.type === 'success';
-        const isFailure = this.props.compose.postResult && this.props.compose.postResult.type === 'failure';
-        const isLoading = (this.props.compose.postResult && this.props.compose.postResult.type === 'loading')  || undefined;
-        return <Container text>
-                <Grid>
-                    <Grid.Column textAlign="right">
-                        <Form>
-                            <Form.Input size="huge" id='title-field'
-                                placeholder={strings.post.title.placeholder[this.props.language]}
-                                onChange={this.onTitleChange}
-                            />
-                            <Form.TextArea size="medium" id='body-field'
-                                placeholder={strings.post.body.placeholder[this.props.language]}
-                                onChange={this.onBodyChange}
-                            />
-                            <Form.Button primary disabled={submitDisabled} size="medium"
-                                loading={isLoading}
-                                onClick={this.onPost}
-                            >
-                            <L>{strings.post.post}</L>
-                            </Form.Button>
-                        </Form>
-                        {isSuccess ? <Message positive><L>{strings.post.sendSuccess}</L></Message> : null}
-                        {isFailure ? <Message error><L>{strings.post.sendFailure}</L></Message> : null}
-                    </Grid.Column>
-                </Grid>
-        </Container>
+        return <ComposeForm
+            {...this.props.compose}
+            onTitleChange={this.onTitleChange}
+            onBodyChange={this.onBodyChange}
+            onPost={this.onPost}
+        />
     }
 }
 
