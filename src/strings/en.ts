@@ -21,5 +21,9 @@ export default {
         post: 'Post',
         sendSuccess: 'Check out your new post!',
         sendFailure: 'Failed to create a new post. Try again later.'
+    },
+    feed: {
+        loadMore: 'Load More Posts',
+        allPostsLoaded: 'There are no more posts to load'
     }
 }

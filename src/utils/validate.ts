@@ -36,3 +36,17 @@ export function isObject<T extends object>(schema: ObjectValidator<T>): (v: any)
         return true;
     }
 }
+
+export function isArray<T extends object>(schema: Validator<T>): (v: any) => v is T[] {
+    return function(v: any): v is T[] {
+        if(!Array.isArray(v)) {
+            return false;
+        }
+        for(const item of v) {
+            if(!schema(item)) {
+                return false;
+            }
+        }
+        return true;
+    }
+}

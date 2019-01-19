@@ -10,17 +10,17 @@ type ComposeFormProps = {
     onTitleChange: (event: unknown, d: InputOnChangeData) => void,
     onBodyChange: (event: unknown, d: TextAreaProps) => void,
     onPost: () => void,
-    postResult: Domain<typeof actions.compose.setPostResult>['result'],
+    createPostResult: Domain<typeof actions.compose.setCreatePostResult>['result'],
     body: string,
     title: string,
     language: Language
 }
 
 export function _ComposeForm(props: ComposeFormProps) {
-    const submitDisabled = props.body.length == 0 || !!props.postResult;
-    const isSuccess = props.postResult && props.postResult.type === 'success';
-    const isFailure = props.postResult && props.postResult.type === 'failure';
-    const isLoading = (props.postResult && props.postResult.type === 'loading')  || undefined;
+    const submitDisabled = props.body.length == 0 || !!props.createPostResult;
+    const isSuccess = props.createPostResult && props.createPostResult.type === 'success';
+    const isFailure = props.createPostResult && props.createPostResult.type === 'failure';
+    const isLoading = (props.createPostResult && props.createPostResult.type === 'loading')  || undefined;
     return <Container text>
             <Grid>
                 <Grid.Column textAlign="right">

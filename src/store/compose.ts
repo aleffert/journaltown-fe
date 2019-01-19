@@ -1,27 +1,26 @@
 import { ImmerReducer, createActionCreators, createReducerFunction } from "immer-reducer";
-import { AsyncResult } from "../utils";
-import { ApiError, callApi } from "../services";
+import { callApi } from "../services";
 import { put, takeEvery } from 'redux-saga/effects';
-import { createPostRequest } from "../services/api/requests";
+import { createPostRequest, CreatePostResult } from "../services/api/requests";
+import { Async } from "../utils";
 
-type PostResult = AsyncResult<{}, ApiError>;
 type ComposeState = {
     title: string,
     body: string
-    postResult: PostResult
+    createPostResult: Async<CreatePostResult>
 }
 
 class ComposeReducers extends ImmerReducer<ComposeState> {
-    setTitle({title}: {title: string}) {
+    setTitle({title}: {title: ComposeState['title']}) {
         this.draftState.title = title;
     }
 
-    setBody({body}: {body: string}) {
+    setBody({body}: {body: ComposeState['body']}) {
         this.draftState.body = body;
     }
 
-    setPostResult({result}: {result: PostResult}) {
-        this.draftState.postResult = result;
+    setCreatePostResult({result}: {result: ComposeState['createPostResult']}) {
+        this.draftState.createPostResult = result;
     }
 
     post(_: {title: string, body: string}) {}
@@ -29,13 +28,13 @@ class ComposeReducers extends ImmerReducer<ComposeState> {
 
 export const actions = createActionCreators(ComposeReducers);
 export const reducers = createReducerFunction(ComposeReducers, 
-    {title: '', body: '', postResult: undefined}
+    {title: '', body: '', createPostResult: undefined}
 );
 
 export function* createPostSaga(action: ReturnType<typeof actions.post>) {
-    yield put(actions.setPostResult({result: {type: 'loading'}}))
+    yield put(actions.setCreatePostResult({result: {type: 'loading'}}))
     const result = yield callApi(createPostRequest(action.payload[0]));
-    yield put(actions.setPostResult({result}));
+    yield put(actions.setCreatePostResult({result}));
 }
 
 export function* saga() {

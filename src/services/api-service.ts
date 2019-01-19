@@ -1,5 +1,7 @@
 import * as qs from 'query-string';
 import { StorageService } from './storage-service';
+import _ from 'lodash';
+import { Optional } from '../utils';
 
 declare global {
     interface EnvironmentVariables {
@@ -19,7 +21,7 @@ export type ApiError<T = {}> = ConnectionError | T;
 export type ApiRequest<Result> = {
     path: string,
     method: 'GET' | 'POST',
-    query?: {[K: string]: string},
+    query?: {[K: string]: Optional<string>},
     body?: object,
     deserializer(response: Response): Promise<Result>
 }
@@ -35,7 +37,7 @@ export class ApiService {
     }
 
     async request<Result>(request: ApiRequest<Result>): Promise<Result | { type: 'failure', error: ConnectionError}> {
-        const query = request.query ? qs.stringify(request.query) : '';
+        const query = request.query ? qs.stringify(_.pickBy(request.query)) : '';
         const url = new URL(`${request.path}?${query}`, this.base);
         const headers: {[K: string]: string} = {
             'Content-Type': 'application/json'

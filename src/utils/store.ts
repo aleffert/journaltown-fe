@@ -1,4 +1,4 @@
-import { Action, Dispatch } from 'redux';
+import { Action, Dispatch, bindActionCreators } from 'redux';
 import { push, replace } from 'connected-react-router';
 
 
@@ -10,12 +10,7 @@ export function bindDispatch<A extends Action, T extends object>(actions: T) {
     return function(dispatch: Dispatch<A['type']>): {actions: T} {
         const result: any = {};
         for(const group of Object.keys(actions)) {
-            const groupResult: any = {};
-            for(const key of Object.keys((actions as any)[group])) {
-                const action = (actions as any)[group][key];
-                groupResult[key] = (...args: any[]) => dispatch(action.apply(null, args));
-            }
-            result[group] = groupResult;
+            result[group] = bindActionCreators((actions as any)[group], dispatch);
         }
         return {actions: result};
     }

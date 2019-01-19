@@ -9,9 +9,9 @@ import { ComposeForm } from './ComposeForm';
 const mapStateToProps = (state: AppState) => pick(state, ['compose']);
 const mapDispatchToProps = bindDispatch(pick(actions, ['compose']));
 
-type ComposeStateProps = ReturnType<typeof mapStateToProps>;
-type ComposeDispatchProps = ReturnType<typeof mapDispatchToProps>;
-type ComposePageProps = ComposeStateProps & ComposeDispatchProps & LanguageProps;
+type ComposePageStateProps = ReturnType<typeof mapStateToProps>;
+type ComposePageDispatchProps = ReturnType<typeof mapDispatchToProps>;
+type ComposePageProps = ComposePageStateProps & ComposePageDispatchProps & LanguageProps;
 
 export class _ComposePage extends React.Component<ComposePageProps, {}> {
 

@@ -62,22 +62,22 @@ describe('user sagas', () => {
         it('if we do not have a token we do not try to load the current user', () => {
             const effects: Generator = loadIfPossibleSaga(actions.loadIfPossible({token: undefined}));
             effects.next();
-            expect(effects.next().value).toEqual(put(actions.setCurrent({type: 'failure', error: ApiErrors.noTokenError})));
+            expect(effects.next().value).toEqual(put(actions.setCurrentUserResult({type: 'failure', error: ApiErrors.noTokenError})));
         });
 
         it('if we have a token we try to load the current user', () => {
             const effects: Generator = loadIfPossibleSaga(actions.loadIfPossible({token: undefined}));
             effects.next();
-            expect(effects.next('token').value).toEqual(put(actions.setCurrent({type: 'loading'})));
+            expect(effects.next('token').value).toEqual(put(actions.setCurrentUserResult({type: 'loading'})));
         });
 
         it('if we have a token we request the current user', () => {
             const effects: Generator = loadIfPossibleSaga(actions.loadIfPossible({token: undefined}));
             effects.next();
-            expect(effects.next('token').value).toEqual(put(actions.setCurrent({type: 'loading'})));
+            expect(effects.next('token').value).toEqual(put(actions.setCurrentUserResult({type: 'loading'})));
             expect(effects.next().value.CALL.body).toEqual((callApi(currentUserRequest()) as any).CALL.body);
             const result = {type: 'success', value: {username: 'whatever', email: 'whatever'}};
-            expect(effects.next(result).value).toEqual(put(actions.setCurrent(result as any)));
+            expect(effects.next(result).value).toEqual(put(actions.setCurrentUserResult(result as any)));
         });
 
     });

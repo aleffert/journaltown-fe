@@ -3,12 +3,14 @@ import { all } from 'redux-saga/effects';
 import { ObjectCodomain, historyActions } from '../utils';
 import { connectRouter } from 'connected-react-router';
 import { History } from 'history';
+import * as Feed from './feed';
 import * as Navigation from './navigation';
-import * as User from './user';
 import * as Compose from './compose';
+import * as User from './user';
 
 const modules = {
     compose: Compose,
+    feed: Feed,
     navigation: Navigation,
     user: User
 };

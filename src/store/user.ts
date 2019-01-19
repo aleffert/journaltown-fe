@@ -1,32 +1,29 @@
 import { ImmerReducer, createActionCreators, createReducerFunction } from 'immer-reducer';
 import { put, takeLatest, call } from 'redux-saga/effects';
 
-import { AsyncResult, isString, callMethod, Optional } from '../utils';
-import { LoginResponse, LoginError, CurrentUserResponse, CurrentUserError, loginRequest, exchangeTokenRequest, currentUserRequest } from '../services/api/requests';
+import { AsyncResult, isString, callMethod, Optional, Async } from '../utils';
+import { LoginResponse, LoginError, CurrentUserResult, CurrentUserError, loginRequest, exchangeTokenRequest, currentUserRequest, LoginResult } from '../services/api/requests';
 import { services, ApiErrors, callApi } from '../services';
 
 // redux
 
-type LoginState = AsyncResult<LoginResponse, LoginError>;
-type CurrentUserState = AsyncResult<CurrentUserResponse, CurrentUserError>;
-
 type UserState = {
-    login: LoginState,
+    login: Async<LoginResult>,
     validating: boolean,
-    current: CurrentUserState
+    currentUserResult: Async<CurrentUserResult>
 }
 class UserReducers extends ImmerReducer<UserState> {
     // state
 
-    setLoginState(state: LoginState) {
+    setLoginState(state: UserState['login']) {
         this.draftState.login = state;
     }
 
-    setValidating(state: boolean) {
+    setValidating(state: UserState['validating']) {
         this.draftState.validating = state;
     }
-    setCurrent(state: CurrentUserState) {
-        this.draftState.current = state;
+    setCurrentUserResult(state: UserState['currentUserResult']) {
+        this.draftState.currentUserResult = state;
     }
 
     // actions
@@ -36,7 +33,7 @@ class UserReducers extends ImmerReducer<UserState> {
 }
 
 export const actions = createActionCreators(UserReducers);
-export const reducers = createReducerFunction(UserReducers, {login: null, validating: false, current: null});
+export const reducers = createReducerFunction(UserReducers, {login: null, validating: false, currentUserResult: null});
 
 // sagas
 export function* loadIfPossibleSaga(action: ReturnType<typeof actions.loadIfPossible>) {
@@ -55,12 +52,12 @@ export function* loadIfPossibleSaga(action: ReturnType<typeof actions.loadIfPoss
     // now try to use the token to load the current user
     const authToken = yield call(services.storage.getToken);
     if(authToken) {
-        yield put(actions.setCurrent({type: 'loading'}));
+        yield put(actions.setCurrentUserResult({type: 'loading'}));
         const result = yield callApi(currentUserRequest());
-        yield put(actions.setCurrent(result));
+        yield put(actions.setCurrentUserResult(result));
     }
     else {
-        yield put(actions.setCurrent({type: 'failure', error: ApiErrors.noTokenError}));
+        yield put(actions.setCurrentUserResult({type: 'failure', error: ApiErrors.noTokenError}));
     }
 }
 

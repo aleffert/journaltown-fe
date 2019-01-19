@@ -7,3 +7,5 @@ export type Result<V, E = DefaultError> =
     {type: 'failure', error: E};
 
 export type AsyncResult<V, E = DefaultError> = Optional<{type: 'loading'} | Result<V, E>>
+
+export type Async<T> = T | Optional<{type: 'loading'} | T>

@@ -6,7 +6,7 @@ import strings from '../../../strings';
 
 describe('LoginForm', () => {
     const baseProps = {
-        language: 'en' as 'en', postResult:undefined,
+        language: 'en' as 'en', createPostResult:undefined,
         onPost: () => {},
         onTitleChange: () => {},
         onBodyChange: () => {},
@@ -16,7 +16,7 @@ describe('LoginForm', () => {
 
     it('shows no spinner when postResult is undefined', () => {
         const w = shallow(
-            <_ComposeForm {...baseProps} postResult={undefined}></_ComposeForm>
+            <_ComposeForm {...baseProps} createPostResult={undefined}></_ComposeForm>
         );
         expect(w.find(FormButton).props().spinner).toEqual(undefined);
         expect(w.render().text()).not.toContain(strings.login.sendSuccess['en']);
@@ -25,7 +25,7 @@ describe('LoginForm', () => {
 
     it('shows a spinner when postResult loading', () => {
         const w = shallow(
-            <_ComposeForm {...baseProps} postResult={{type: 'loading'}}></_ComposeForm>
+            <_ComposeForm {...baseProps} createPostResult={{type: 'loading'}}></_ComposeForm>
         );
         expect(w.find(FormButton).props().loading).toEqual(true);
         expect(w.render().text()).not.toContain(strings.login.sendSuccess['en']);
@@ -34,7 +34,7 @@ describe('LoginForm', () => {
 
     it('shows a success message when postResult is success', () => {
         const w = render(
-            <_ComposeForm {...baseProps} postResult={{type: 'success', value: {}}}></_ComposeForm>
+            <_ComposeForm {...baseProps} createPostResult={{type: 'success', value: {} as any}}></_ComposeForm>
         );
         expect(w.text()).toContain(strings.post.sendSuccess['en']);
         expect(w.text()).not.toContain(strings.post.sendFailure['en']);
@@ -42,7 +42,7 @@ describe('LoginForm', () => {
 
     it('shows a failure message when postResult is failure', () => {
         const w = render(
-            <_ComposeForm {...baseProps} postResult={{type: 'failure', error: {}}}></_ComposeForm>
+            <_ComposeForm {...baseProps} createPostResult={{type: 'failure', error: {}}}></_ComposeForm>
         );
         expect(w.text()).not.toContain(strings.post.sendSuccess['en']);
         expect(w.text()).toContain(strings.post.sendFailure['en']);
@@ -50,14 +50,14 @@ describe('LoginForm', () => {
 
     it('disables the post button when there is no body', () => {
         const w = mount(
-            <_ComposeForm {...baseProps} postResult={undefined} body={''}></_ComposeForm>
+            <_ComposeForm {...baseProps} createPostResult={undefined} body={''}></_ComposeForm>
         );
         expect(w.find(FormButton).props().disabled).toEqual(true);
     });
 
     it('enables the post button when there is a body', () => {
         const w = mount(
-            <_ComposeForm {...baseProps} postResult={undefined} body={'foo'}></_ComposeForm>
+            <_ComposeForm {...baseProps} createPostResult={undefined} body={'foo'}></_ComposeForm>
         );
         expect(w.find(FormButton).props().disabled).toEqual(false);
     });

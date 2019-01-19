@@ -53,13 +53,13 @@ export class _Root extends React.Component<RootProps> {
     
     render() {
         // TODO: If there's a token, but loading user fails, give an opportunity to log out
-        return this.props.user.current && this.props.user.current.type !== "loading"
+        return this.props.user.currentUserResult && this.props.user.currentUserResult.type !== "loading"
         ? (
-            this.props.user.current.type === "success"
+            this.props.user.currentUserResult.type === "success"
             ? (
                 <>
                     <Header
-                        user={this.props.user.current.value}
+                        user={this.props.user.currentUserResult.value}
                         onPost={this.onPost}
                         onLogout={this.onLogout}>
                     </Header>
