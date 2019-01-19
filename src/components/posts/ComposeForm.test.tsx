@@ -2,7 +2,7 @@ import React from 'react';
 import { render, shallow, mount } from 'enzyme';
 import { _ComposeForm } from './ComposeForm';
 import { FormButton } from 'semantic-ui-react';
-import strings from '../../../strings';
+import strings from '../../strings';
 
 describe('LoginForm', () => {
     const baseProps = {

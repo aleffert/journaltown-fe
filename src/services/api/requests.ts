@@ -65,8 +65,8 @@ export type PostsResponse = models.Post[];
 export type PostsError = ApiError;
 export type PostsResult = Result<PostsResponse, PostsError>;
 export type PostsFilters = {
-    modification_date__lt?: string,
-    modification_date__gt?: string,
+    last_modified__lt?: string,
+    last_modified__gt?: string,
     created_at__lt?: string,
     created_at__gt?: string
 }

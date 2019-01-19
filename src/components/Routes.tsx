@@ -1,8 +1,8 @@
 import React from 'react';
 
 import { Switch, Route, Redirect } from 'react-router';
-import { ComposePage } from './posts/compose/ComposePage';
-import { FeedPage } from './posts/feed/FeedPage';
+import { ComposePage } from './posts/ComposePage';
+import { FeedPage } from './posts/FeedPage';
 
 
 export const Routes = (_: {}) => (

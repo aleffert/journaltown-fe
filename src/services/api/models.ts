@@ -2,6 +2,7 @@ import { ValidatorOf, isString, isObject } from '../../utils/';
 import { isNumber } from 'util';
 
 export const isCurrentUser = isObject({
+    id: isNumber,
     username: isString,
     email: isString
 });

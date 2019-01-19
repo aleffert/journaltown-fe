@@ -1,8 +1,8 @@
 import React from 'react';
 
-import _ from 'lodash';
 import * as qs from 'query-string';
 import { connect } from 'react-redux';
+import { omit } from 'lodash';
 
 import { LoginForm } from './user/LoginForm';
 import { InitialLoader } from './user/InitialLoader';
@@ -35,7 +35,7 @@ export class _Root extends React.Component<RootProps> {
         const query = qs.parse(this.props.router.location.search);
         this.props.actions.user.loadIfPossible({token: isString(query.token) ? query.token : undefined});
 
-        const newQuery = qs.stringify(_.omit(query, 'token'));
+        const newQuery = qs.stringify(omit(query, 'token'));
         this.props.actions.history.replace(Object.assign(this.props.router.location, {search: newQuery}));
     }
     

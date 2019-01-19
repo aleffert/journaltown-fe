@@ -1,5 +1,5 @@
 import React from 'react';
-import { Root, _Root } from './Root';
+import { Root } from './Root';
 import { mount } from 'enzyme';
 import { LoginForm } from './user/LoginForm';
 import { ApiErrors } from '../services';
@@ -7,16 +7,17 @@ import { InitialLoader } from './user/InitialLoader';
 import { Header } from './Header';
 import { MemoryRouter as Router } from 'react-router';
 import { Provider } from 'react-redux';
-import { createStore, applyMiddleware } from 'redux';
-import { createMemoryHistory } from 'history';
-import { routerMiddleware, replace } from 'connected-react-router';
-import { Optional } from '../utils';
+import { createStore } from 'redux';
+import { replace } from 'connected-react-router';
+import { FactoryBot } from 'factory-bot-ts';
+import { CurrentUser } from '../services/api/models';
 
 describe('Root', () => {
 
+    const user = FactoryBot.build<CurrentUser>('currentUser');
+
     function makeTestStore(currentUserResult: any, spy: any = jest.fn(), search: string = '') {
-        const history = createMemoryHistory();
-        return createStore((s: any, a: any) => {
+        return createStore((_: any, a: any) => {
             spy(a);
             return {
                 router: {location: {search: search}},
@@ -36,7 +37,7 @@ describe('Root', () => {
 
     it('shows header when there is a current user', () => {
         const w = mount(
-            <Router><Provider store={makeTestStore({type: 'success', value: {email: 'abc@example.com', username: 'abc'}})}>
+            <Router><Provider store={makeTestStore({type: 'success', value: user})}>
             <Root
                 {...{} as any}
             /></Provider></Router>
@@ -66,7 +67,7 @@ describe('Root', () => {
 
     it('does not show the initial loader after loading', () => {
         let w = mount(
-            <Router><Provider store={makeTestStore({type: 'success', value: {email: 'abc@example.com', username: 'abc'}})}>
+            <Router><Provider store={makeTestStore({type: 'success', value: user})}>
             <Root
                 {...{} as any}
             /></Provider></Router>
@@ -94,7 +95,7 @@ describe('Root', () => {
 
     it('does not show the login form when there is a current user', () => {
         const w = mount(
-            <Router><Provider store={makeTestStore({type: 'success', value: {email: 'abc@example.com', username: 'abc'}})}>
+            <Router><Provider store={makeTestStore({type: 'success', value: user})}>
             <Root
                 {...{} as any}
             /></Provider></Router>
@@ -106,7 +107,7 @@ describe('Root', () => {
         const spy = jest.fn();
         mount(
             <Router><Provider store={makeTestStore(
-                {type: 'success', value: {email: 'abc@example.com', username: 'abc'}}, spy, 'token=xyz'
+                {type: 'success', value: user}, spy, 'token=xyz'
             )}>
             <Root
                 {...{} as any}
@@ -120,7 +121,7 @@ describe('Root', () => {
         mount(
             <Router initialEntries={[{search:'token=xyz&foo=bar'}]}>
             <Provider store={makeTestStore(
-                {type: 'success', value: {email: 'abc@example.com', username: 'abc'}}, spy, 'token=xyz&foo=bar'
+                {type: 'success', value: user}, spy, 'token=xyz&foo=bar'
             )}>
             <Root
                 {...{} as any}

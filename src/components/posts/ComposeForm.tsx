@@ -1,10 +1,10 @@
 import React from 'react';
 
 import { Container, Form, Grid, InputOnChangeData, Message, TextAreaProps } from 'semantic-ui-react';
-import { L, withLanguage } from '../../localization/L';
-import { Language, Domain } from '../../../utils';
-import strings from '../../../strings';
-import { actions } from '../../../store';
+import { L, withLanguage } from '../localization/L';
+import { Language, Domain } from '../../utils';
+import strings from '../../strings';
+import { actions } from '../../store';
 
 type ComposeFormProps = {
     onTitleChange: (event: unknown, d: InputOnChangeData) => void,

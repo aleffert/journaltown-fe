@@ -1,5 +1,5 @@
 import React from 'react';
-import { Post } from '../../../services/api/models';
+import { Post } from '../../services/api/models';
 import { Container, Header } from 'semantic-ui-react';
 
 type FeedPostProps = {post: Post};

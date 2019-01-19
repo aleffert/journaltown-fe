@@ -37,8 +37,9 @@ function* getPostsSaga(
     since: Optional<string>, makeParams: (since: string) => PostsFilters, 
     action: (result: Async<PostsResult>) => ReturnType<ObjectCodomain<typeof actions>>
 ) {
-    const params = since ? makeParams(since) : {};
     yield put(action({type: 'loading'}));
+
+    const params = since ? makeParams(since) : {};
     const result = yield callApi(postsRequest(params));
     if(result.type === 'success') {
         yield put(actions.integratePosts(result.value));
@@ -46,12 +47,12 @@ function* getPostsSaga(
     yield put(action(result));
 }
 
-function* getNextPostsSaga(action: ReturnType<typeof actions.loadNextPosts>) {
+export function* getNextPostsSaga(action: ReturnType<typeof actions.loadNextPosts>) {
     yield* getPostsSaga(action.payload[0].since, since => ({created_at__lt: since}), actions.setNextPostsResult);
 }
 
-function* getChangedPostsSaga(action: ReturnType<typeof actions.loadChangedPosts>) {
-    yield* getPostsSaga(action.payload[0].since, since => ({modification_date__gt: since}), actions.setChangedPostsResult);
+export function* getChangedPostsSaga(action: ReturnType<typeof actions.loadChangedPosts>) {
+    yield* getPostsSaga(action.payload[0].since, since => ({last_modified__gt: since}), actions.setChangedPostsResult);
 }
 
 export function* saga() {

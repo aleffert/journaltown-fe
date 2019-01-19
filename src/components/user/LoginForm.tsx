@@ -5,7 +5,7 @@ import EmailValidator from 'email-validator';
 import { Button, Form, Grid, Header, InputOnChangeData, Message, Container } from 'semantic-ui-react';
 import strings from '../../strings';
 import { L, LC, withLanguage } from '../localization/L';
-import { AsyncResult, Optional, Language, pick } from '../../utils';
+import { AsyncResult, Optional, Language, pick, resultIsLoading } from '../../utils';
 import { LoginError, LoginResponse } from '../../services/api/requests';
 import { FullScreen } from '../widgets/FullScreen';
 import { Omit } from 'react-router';
@@ -40,7 +40,7 @@ export class _LoginForm extends React.Component<LoginFormProps, LoginFormState> 
     }
 
     render() {
-        const isLoading = (this.props.status && this.props.status.type === 'loading') || undefined;
+        const isLoading = resultIsLoading(this.props.status);
         const isSuccess = this.props.status && this.props.status.type === 'success';
         const isFailure = this.props.status && this.props.status.type === 'failure';
         const submitDisabled = isLoading || !EmailValidator.validate(this.state.email);

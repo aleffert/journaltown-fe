@@ -1,9 +1,9 @@
 import React from 'react';
 import { connect } from 'react-redux';
 import { InputOnChangeData, TextAreaProps } from 'semantic-ui-react';
-import { withLanguage, LanguageProps } from '../../localization/L';
-import { isString, bindDispatch, pick } from '../../../utils';
-import { AppState, actions } from '../../../store';
+import { withLanguage, LanguageProps } from '../localization/L';
+import { isString, bindDispatch, pick } from '../../utils';
+import { AppState, actions } from '../../store';
 import { ComposeForm } from './ComposeForm';
 
 const mapStateToProps = (state: AppState) => pick(state, ['compose']);
