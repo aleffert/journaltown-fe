@@ -48,7 +48,7 @@ export class _Root extends React.Component<RootProps> {
     }
 
     onPost() {
-        this.props.actions.navigation.toNewPost();
+        this.props.actions.navigation.to({type: 'new-post'});
     }
     
     render() {

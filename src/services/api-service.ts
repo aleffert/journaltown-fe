@@ -11,12 +11,14 @@ declare global {
 
 export type ConnectionError = {'type': 'connection'};
 export type NoTokenError = {'type': 'no-token'};
+export type NotFoundError = {'type': 'not-found'};
 export const ApiErrors = {
     connectionError: {'type': 'connection'} as ConnectionError,
-    noTokenError: {'type': 'no-token'} as NoTokenError
+    noTokenError: {'type': 'no-token'} as NoTokenError,
+    notFoundError: {'type': 'not-found'} as NotFoundError
 }
 
-export type ApiError<T = {}> = ConnectionError | T;
+export type ApiError<T = {}> = ConnectionError | NotFoundError | T;
 
 export type ApiRequest<Result> = {
     path: string,

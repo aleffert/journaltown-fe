@@ -1,4 +1,4 @@
-import { ValidatorOf, isString, isObject } from '../../utils/';
+import { Validates, isString, isObject } from '../../utils/';
 import { isNumber } from 'util';
 
 export const isCurrentUser = isObject({
@@ -7,18 +7,25 @@ export const isCurrentUser = isObject({
     email: isString
 });
 
-export type CurrentUser = ValidatorOf<typeof isCurrentUser>;
+export type CurrentUser = Validates<typeof isCurrentUser>;
 
 export const isToken = isObject({
     token: isString
 });
-export type Token = ValidatorOf<typeof isToken>;
+export type Token = Validates<typeof isToken>;
 
 export const isDraftPost = isObject({
     title: isString,
     body: isString
 });
-export type DraftPost = ValidatorOf<typeof isDraftPost>;
+export type DraftPost = Validates<typeof isDraftPost>;
+
+export const isUser = isObject({
+    id: isNumber,
+    username: isString,
+});
+
+export type User = Validates<typeof isUser>;
 
 export const isPost = isObject({
     title: isString,
@@ -26,6 +33,6 @@ export const isPost = isObject({
     last_modified: isString,
     created_at: isString,
     id: isNumber,
-    author: isNumber
+    author: isUser
 });
-export type Post = ValidatorOf<typeof isPost>;
+export type Post = Validates<typeof isPost>;

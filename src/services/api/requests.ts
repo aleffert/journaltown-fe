@@ -10,6 +10,9 @@ function jsonDeserializer<T, E>(validator: Validator<T>): (response: Response) =
                 return {type: 'success', value: json};
             }
         }
+        else if(response.status == 404) {
+            return {type: 'failure', error: {type: 'not-found'}};
+        }
         return {type: 'failure', error: {type: 'connection'}};
     }
 }
@@ -22,7 +25,7 @@ export function currentUserRequest(): ApiRequest<CurrentUserResult> {
         path: '/me/',
         method: 'GET',
         deserializer: jsonDeserializer(models.isCurrentUser)
-    }
+    };
 }
 
 export type LoginResponse = {};
@@ -34,7 +37,7 @@ export function loginRequest(body: {email: string}): ApiRequest<LoginResult> {
         method: 'POST',
         body,
         deserializer: jsonDeserializer(isObject({}))
-    }
+    };
 }
 
 export type ExchangeTokenResponse = models.Token;
@@ -46,7 +49,7 @@ export function exchangeTokenRequest(body: {token: string}): ApiRequest<Exchange
         method: 'POST',
         body,
         deserializer: jsonDeserializer(models.isToken)
-    }
+    };
 }
 
 export type CreatePostResponse = models.Post;
@@ -58,7 +61,7 @@ export function createPostRequest(body: models.DraftPost): ApiRequest<CreatePost
         method: 'POST',
         body,
         deserializer: jsonDeserializer(models.isPost)
-    }
+    };
 }
 
 export type PostsResponse = models.Post[];
@@ -76,5 +79,17 @@ export function postsRequest(filters: PostsFilters): ApiRequest<PostsResult> {
         method: 'GET',
         query: filters,
         deserializer: jsonDeserializer(isArray(models.isPost))
-    }
+    };
+}
+
+export type PostResponse = models.Post;
+export type PostError = ApiError;
+export type PostResult = Result<PostResponse, PostError>;
+export function postRequest(id: number): ApiRequest<PostResult> {
+    return {
+        path: `/posts/${id}/`,
+        method: 'GET',
+        deserializer: jsonDeserializer(models.isPost)
+    };
+
 }

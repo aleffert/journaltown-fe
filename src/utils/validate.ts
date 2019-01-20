@@ -1,7 +1,7 @@
 
 
 export type Validator<T> = (v: any) => v is T;
-export type ValidatorOf<T> = T extends Validator<infer U> ? U : null;
+export type Validates<T> = T extends Validator<infer U> ? U : null;
 
 export type ObjectValidator<T extends object> = {[K in keyof T]: (v: any) => v is T[K]}
 

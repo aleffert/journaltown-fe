@@ -2,27 +2,38 @@ import { ImmerReducer, createActionCreators, createReducerFunction } from 'immer
 import { takeEvery, put } from 'redux-saga/effects';
 import { ObjectCodomain } from '../utils';
 import { push } from 'connected-react-router';
+import { LocationDescriptorObject } from 'history';
+
+type NavigationPath =
+| {type: 'main'}
+| {type: 'new-post'}
+| {type: 'post', id: number, username: string}
 
 class NavigationReducers extends ImmerReducer<{}> {
-    toNewPost() {}
-    toMain() {}
+    to(_: NavigationPath) {}
 }
 
 export const actions = createActionCreators(NavigationReducers);
 export const reducers = createReducerFunction(NavigationReducers, {language: 'en'});
 
-type NavigationAction = ObjectCodomain<typeof actions>;
+type NavigationAction = ReturnType<ObjectCodomain<typeof actions>>;
 
-function* navigate(action: NavigationAction) {
-    switch(action.type) {
-        case actions.toMain.type:
-            yield put(push({pathname: '/'}));
-        case actions.toNewPost.type:
-            yield put(push({pathname: '/posts/new'}));
+export function renderNavigationAction(path: NavigationPath): LocationDescriptorObject {
+    switch(path.type) {
+        case 'main':
+            return {pathname: `/`};
+        case 'new-post':
+            return {pathname: `/posts/new`};
+        case 'post':
+            return {pathname: `/u/${path.username}/posts/${path.id}`};
     }
 }
 
+function* navigate(action: NavigationAction) {
+    const path = renderNavigationAction(action.payload[0]);
+    yield put(push(path));
+}
+
 export function* saga() {
-    const types = Object.keys(actions).map((x: string) => actions[x as keyof typeof actions].type);
-    yield takeEvery(types, navigate);
+    yield takeEvery(actions.to.type, navigate);
 }

@@ -1,8 +1,8 @@
 import { ImmerReducer, createActionCreators, createReducerFunction } from 'immer-reducer';
 import { put, takeLatest, call } from 'redux-saga/effects';
 
-import { AsyncResult, isString, callMethod, Optional, Async } from '../utils';
-import { LoginResponse, LoginError, CurrentUserResult, CurrentUserError, loginRequest, exchangeTokenRequest, currentUserRequest, LoginResult } from '../services/api/requests';
+import { isString, callMethod, Optional, Async } from '../utils';
+import { CurrentUserResult, loginRequest, exchangeTokenRequest, currentUserRequest, LoginResult } from '../services/api/requests';
 import { services, ApiErrors, callApi } from '../services';
 
 // redux
