@@ -19,7 +19,7 @@ class PostReducers extends ImmerReducer<PostState> {
 export const actions = createActionCreators(PostReducers);
 export const reducers = createReducerFunction(PostReducers, {posts: {}});
 
-function* loadPostSaga(action: ReturnType<typeof actions.loadPost>) {
+export function* loadPostSaga(action: ReturnType<typeof actions.loadPost>) {
     const postId = action.payload[0].postId;
     if(!action.payload[0].current) {
         yield put(actions.setPostResult({postId, value: {type: 'loading'}}));

@@ -4,10 +4,11 @@ import { ObjectCodomain } from '../utils';
 import { push } from 'connected-react-router';
 import { LocationDescriptorObject } from 'history';
 
-type NavigationPath =
+export type NavigationPath =
 | {type: 'main'}
 | {type: 'new-post'}
-| {type: 'post', id: number, username: string}
+| {type: 'view-post', id: number, username: string}
+| {type: 'edit-post', id: number, username: string}
 
 class NavigationReducers extends ImmerReducer<{}> {
     to(_: NavigationPath) {}
@@ -16,7 +17,7 @@ class NavigationReducers extends ImmerReducer<{}> {
 export const actions = createActionCreators(NavigationReducers);
 export const reducers = createReducerFunction(NavigationReducers, {language: 'en'});
 
-type NavigationAction = ReturnType<ObjectCodomain<typeof actions>>;
+export type NavigationAction = ReturnType<ObjectCodomain<typeof actions>>;
 
 export function renderNavigationAction(path: NavigationPath): LocationDescriptorObject {
     switch(path.type) {
@@ -24,12 +25,14 @@ export function renderNavigationAction(path: NavigationPath): LocationDescriptor
             return {pathname: `/`};
         case 'new-post':
             return {pathname: `/posts/new`};
-        case 'post':
+        case 'view-post':
             return {pathname: `/u/${path.username}/posts/${path.id}`};
+        case 'edit-post':
+            return {pathname: `/u/${path.username}/posts/${path.id}/edit`};
     }
 }
 
-function* navigate(action: NavigationAction) {
+export function* navigate(action: NavigationAction) {
     const path = renderNavigationAction(action.payload[0]);
     yield put(push(path));
 }

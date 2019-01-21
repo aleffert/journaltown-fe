@@ -1,5 +1,5 @@
 import React from 'react';
-import { Menu, Container, Button, Segment } from 'semantic-ui-react';
+import { Menu, Button } from 'semantic-ui-react';
 import { CurrentUser } from '../services/api/models';
 import strings from '../strings';
 import { L } from './localization/L';

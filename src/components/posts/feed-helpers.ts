@@ -1,7 +1,7 @@
 import { reduce, orderBy } from 'lodash';
 import { Post } from "../../services/api/models";
-import { Optional, AsyncResult } from "../../utils";
-import { PostsResponse, PostsError } from '../../services/api/requests';
+import { Optional, AsyncResult, Async } from "../../utils";
+import { PostsResponse, PostsError, CurrentUserResult } from '../../services/api/requests';
 
 export function shouldShowLoadMore(nextPostResult: AsyncResult<PostsResponse, PostsError>) {
     if(nextPostResult && nextPostResult.type === 'success') {
@@ -35,4 +35,11 @@ export function oldestCreatedDate(posts: Post[]): Optional<string> {
 
 export function sortPosts(posts: {[id: number]: Post}) {
     return orderBy(Object.values(posts), 'created_at', 'desc');
+}
+
+export function canEditPost(post: Post, currentUser: Async<CurrentUserResult>) {
+    if(currentUser && currentUser.type === "success") {
+        return currentUser.value.id == post.author.id;
+    }
+    return false;
 }

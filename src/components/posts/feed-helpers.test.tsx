@@ -3,8 +3,8 @@ import * as faker from 'faker';
 import { DateTime, Duration } from 'luxon';
 import { shuffle } from 'lodash';
 
-import { sortPosts, newestModifiedDate, oldestCreatedDate, shouldShowLoadMore } from './feed-helpers';
-import { Post } from '../../services/api/models';
+import { sortPosts, newestModifiedDate, oldestCreatedDate, shouldShowLoadMore, canEditPost } from './feed-helpers';
+import { Post, CurrentUser } from '../../services/api/models';
 import { isSorted } from '../../utils';
 
 describe('feed-helpers', () => {
@@ -64,6 +64,25 @@ describe('feed-helpers', () => {
             }
             const result = sortPosts(posts);
             expect(isSorted(result.map(p => p.created_at).reverse())).toBe(true);
+        });
+    });
+
+    describe('canEditPosts', () => {
+        it('should return true if the post author is the user', () => {
+            const post = FactoryBot.build<Post>('post');
+            const currentUser = FactoryBot.build<CurrentUser>('currentUser', post.author);
+            expect(canEditPost(post, {type: 'success', value: currentUser})).toBe(true);
+        });
+
+        it('should return false if the post author is not the user', () => {
+            const post = FactoryBot.build<Post>('post');
+            const currentUser = FactoryBot.build<CurrentUser>('currentUser');
+            expect(canEditPost(post, {type: 'success', value: currentUser})).toBe(false);
+        });
+
+        it('should return false if there is no user', () => {
+            const post = FactoryBot.build<Post>('post');
+            expect(canEditPost(post, undefined)).toBe(false);
         });
     });
 })

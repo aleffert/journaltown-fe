@@ -12,6 +12,9 @@ import { FeedPost } from './FeedPost';
 describe('FeedPage', () => {
 
     const baseProps = {
+        user: {
+            currentUserResult: undefined
+        },
         feed: {
             posts: {}
         },

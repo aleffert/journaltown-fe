@@ -9,7 +9,7 @@ import strings from '../../strings';
 import { L } from '../localization/L';
 import { sortPosts, oldestCreatedDate, newestModifiedDate, shouldShowLoadMore } from './feed-helpers';
 
-const mapStateToProps = (state: AppState) => pick(state, ['feed']);
+const mapStateToProps = (state: AppState) => pick(state, ['feed', 'user']);
 const mapDispatchToProps = bindDispatch(pick(actions, ['feed', 'history']));
 
 type FeedPageStateProps = ReturnType<typeof mapStateToProps>;
@@ -35,12 +35,13 @@ export class _FeedPage extends React.Component<FeedPageProps> {
     }
 
     render() {
+        const currentUser = this.props.user.currentUserResult;
         const posts = sortPosts(this.props.feed.posts);
         const showLoadMore = shouldShowLoadMore(this.props.feed.nextPostsResult);
         const isLoading = resultIsLoading(this.props.feed.nextPostsResult);
         return <Container>
-            <Grid textAlign="center">
-            {posts.map(post => <Grid.Row key={post.id}><FeedPost post={post}></FeedPost></Grid.Row>)}
+            <Grid textAlign="center" divided='vertically'>
+            {posts.map(post => <Grid.Row key={post.id}><FeedPost post={post} currentUser={currentUser}></FeedPost></Grid.Row>)}
             {showLoadMore ? 
                 <Grid.Column width={6}>
                     <Button id="load-more-button" fluid secondary loading={isLoading} onClick={this.onLoadMore}>

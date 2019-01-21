@@ -116,7 +116,7 @@ describe('Root', () => {
         expect(spy.mock.calls).toContainEqual([replace({search: ''})]);
     });
 
-    fit('does not remove other arguments from the url', () => {
+    it('does not remove other arguments from the url', () => {
         const spy = jest.fn();
         mount(
             <Router initialEntries={[{search:'token=xyz&foo=bar'}]}>

@@ -63,7 +63,7 @@ export class _Root extends React.Component<RootProps> {
                         onPost={this.onPost}
                         onLogout={this.onLogout}>
                     </Header>
-                    <Container className='page-body'>
+                    <Container text className='page-body'>
                         <Routes/>
                     </Container>
                 </>

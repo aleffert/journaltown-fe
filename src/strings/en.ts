@@ -11,7 +11,7 @@ export default {
         logout: 'Logout',
         post: 'New Post'
     },
-    post: {
+    compose: {
         title: {
             placeholder: 'My Post Title',
         },
@@ -22,8 +22,24 @@ export default {
         sendSuccess: 'Check out your new post!',
         sendFailure: 'Failed to create a new post. Try again later.'
     },
+    edit: {
+        sendSuccess: 'Check out your updated post!',
+        sendFailure: 'Failed to update post. Try again later.',
+        update: 'Update'
+    },
     feed: {
         loadMore: 'Load More Posts',
         allPostsLoaded: 'There are no more posts to load'
+    },
+    post: {
+        actions: {
+            link: 'Link',
+            edit: 'Edit'
+        }
+    },
+    errors: {
+        unknown: "An error occurred. Try again later.",
+        notFound: "Page wasn't found! Maybe you don't permission to it or you mistyped the URL?",
+        connectionError: "We had trouble loading the page. Try again later."
     }
-}
+};

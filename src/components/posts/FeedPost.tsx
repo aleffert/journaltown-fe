@@ -1,15 +1,19 @@
 import React from 'react';
 import { Post } from '../../services/api/models';
 import { Container, Header, Grid } from 'semantic-ui-react';
-import { renderNavigationAction } from '../../store/navigation';
+import { PostActions } from './PostActions';
+import { CurrentUserResult } from '../../services/api/requests';
+import { Async } from '../../utils';
+import { canEditPost } from './feed-helpers';
 
-type FeedPostProps = {post: Post};
+type FeedPostProps = {
+    post: Post,
+    currentUser: Async<CurrentUserResult>
+};
 
 export class FeedPost extends React.Component<FeedPostProps> {
-
     render() {
-        const action = {'type': 'post' as 'post', id: this.props.post.id, username: this.props.post.author.username}
-        const path = renderNavigationAction(action);
+        const canEdit = canEditPost(this.props.post, this.props.currentUser);
         return <Container>
             <Grid>
                 <Grid.Row>
@@ -19,7 +23,7 @@ export class FeedPost extends React.Component<FeedPostProps> {
                     {this.props.post.body}
                 </Grid.Row>
                 <Grid.Row>
-                    <a href={path.pathname}>Link</a>
+                    <PostActions post={this.props.post} canEdit={canEdit}/>
                 </Grid.Row>
             </Grid>
         </Container>

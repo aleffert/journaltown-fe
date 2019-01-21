@@ -1,5 +1,5 @@
 import { Result, isObject, isArray, Validator, } from '../../utils';
-import { ApiError, ApiRequest } from '../api-service';
+import { ApiError, ApiRequest, NoTokenError } from '../api-service';
 import * as models from './models';
 
 function jsonDeserializer<T, E>(validator: Validator<T>): (response: Response) => Promise<Result<T, ApiError<E>>> {
@@ -18,7 +18,7 @@ function jsonDeserializer<T, E>(validator: Validator<T>): (response: Response) =
 }
 
 export type CurrentUserResponse = models.CurrentUser;
-export type CurrentUserError = ApiError
+export type CurrentUserError = ApiError<NoTokenError>;
 export type CurrentUserResult = Result<CurrentUserResponse, CurrentUserError>;
 export function currentUserRequest(): ApiRequest<CurrentUserResult> {
     return {
@@ -55,11 +55,23 @@ export function exchangeTokenRequest(body: {token: string}): ApiRequest<Exchange
 export type CreatePostResponse = models.Post;
 export type CreatePostError = ApiError;
 export type CreatePostResult = Result<CreatePostResponse, CreatePostError>;
-export function createPostRequest(body: models.DraftPost): ApiRequest<CreatePostResult> {
+export function createPostRequest(draft: models.DraftPost): ApiRequest<CreatePostResult> {
     return {
         path: '/posts/',
         method: 'POST',
-        body,
+        body: draft,
+        deserializer: jsonDeserializer(models.isPost)
+    };
+}
+
+export type UpdatePostResponse = models.Post;
+export type UpdatePostError = ApiError;
+export type UpdatePostResult = Result<CreatePostResponse, CreatePostError>;
+export function updatePostRequest(postId: number, draft: models.DraftPost): ApiRequest<CreatePostResult> {
+    return {
+        path: `/posts/${postId}/`,
+        method: 'PUT',
+        body: draft,
         deserializer: jsonDeserializer(models.isPost)
     };
 }

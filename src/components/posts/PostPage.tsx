@@ -3,9 +3,11 @@ import { pick, bindDispatch } from '../../utils';
 import { AppState, actions } from '../../store';
 import { connect } from 'react-redux';
 import { RouteComponentProps } from 'react-router';
-import { Header, Container } from 'semantic-ui-react';
+import { FeedPost } from './FeedPost';
+import { ApiErrorView } from '../widgets/ErrorView';
+import { InitialLoader } from '../user/InitialLoader';
 
-const mapStateToProps = (state: AppState) => pick(state, ['feed', 'router', 'post']);
+const mapStateToProps = (state: AppState) => pick(state, ['feed', 'router', 'post', 'user']);
 const mapDispatchToProps = bindDispatch(pick(actions, ['feed', 'history', 'post']));
 
 
@@ -18,7 +20,6 @@ type PostPageProps =
 export class _PostPage extends React.Component<PostPageProps> {
 
     componentDidMount() {
-        debugger;
         const postId = Number.parseInt(this.props.match.params.postId);
         const current = this.props.post.posts[postId];
         this.props.actions.post.loadPost({postId, current});
@@ -26,20 +27,17 @@ export class _PostPage extends React.Component<PostPageProps> {
 
     render() {
         const postId = Number.parseInt(this.props.match.params.postId);
-        const current = this.props.post.posts[postId];
-        if(!current) {
+        const currentPost = this.props.post.posts[postId];
+        if(!currentPost) {
             return null;
         }
-        switch(current.type) {
+        switch(currentPost.type) {
             case 'loading':
-                return 'loading';
+                return <InitialLoader/>;
             case 'failure':
-                return 'page not found';
+                return <ApiErrorView error={currentPost.error}/>;
             case 'success':
-                return <Container>
-                    <Header>{current.value.title}</Header>
-                    {current.value.body}
-                </Container>
+                return <FeedPost post={currentPost.value} currentUser={this.props.user.currentUserResult}></FeedPost>
         }
     }
 }

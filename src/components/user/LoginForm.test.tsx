@@ -3,6 +3,7 @@ import { render, shallow, mount } from 'enzyme';
 import { _LoginForm } from './LoginForm';
 import { FormButton } from 'semantic-ui-react';
 import strings from '../../strings';
+import { ApiErrors } from '../../services';
 
 describe('LoginForm', () => {
     const baseProps = {language: 'en' as 'en', status:undefined, onSubmit: () => {}};
@@ -35,7 +36,7 @@ describe('LoginForm', () => {
 
     it('shows a failure message when status is failure', () => {
         const w = render(
-            <_LoginForm {...baseProps} status={{type: 'failure', error: {}}}></_LoginForm>
+            <_LoginForm {...baseProps} status={{type: 'failure', error: ApiErrors.notFoundError}}/>
         );
         expect(w.text()).not.toContain(strings.login.sendSuccess['en']);
         expect(w.text()).toContain(strings.login.sendFailure['en']);

@@ -18,11 +18,11 @@ export const ApiErrors = {
     notFoundError: {'type': 'not-found'} as NotFoundError
 }
 
-export type ApiError<T = {}> = ConnectionError | NotFoundError | T;
+export type ApiError<T = never> = ConnectionError | NotFoundError | T;
 
 export type ApiRequest<Result> = {
     path: string,
-    method: 'GET' | 'POST',
+    method: 'GET' | 'POST' | 'PUT',
     query?: {[K: string]: Optional<string>},
     body?: object,
     deserializer(response: Response): Promise<Result>
