@@ -9,11 +9,18 @@ import { LocalizedString } from '../../utils';
 
 type PostActionsProps = {
     post: Post,
-    canEdit: boolean
+    canEdit: boolean,
+    onDelete: () => void
 }
+
+type PostAction =
+    ({link: NavigationPath, type: 'link'} | {callback: () => void, type: 'callback'}) &
+    {text: LocalizedString, icon: SemanticICONS}
+
 export const PostActions = (props: PostActionsProps) => {
-    let actions: [{action: NavigationPath, text: LocalizedString, icon: SemanticICONS}] = [{
-        action: {
+    let actions: PostAction[] = [{
+        type: 'link',
+        link: {
             type: 'view-post',
             id: props.post.id,
             username: props.post.author.username
@@ -23,18 +30,30 @@ export const PostActions = (props: PostActionsProps) => {
     }];
     if(props.canEdit) {
         actions.push({
-            action: {
-                'type': 'edit-post',
+            type: 'link',
+            link: {
+                type: 'edit-post',
                 id: props.post.id,
                 username: props.post.author.username
             },
             text: strings.post.actions.edit,
             icon: "edit"
-        })
+        });
+        actions.push({
+            type: 'callback',
+            callback: props.onDelete,
+            text: strings.post.actions.delete,
+            icon: "delete"
+        });
     }
     return (
-        <List horizontal relaxed>{actions.map(action => <List.Item key={action.icon}><a href={renderNavigationAction(action.action).pathname}>
-            <Icon name={action.icon}></Icon><L>{action.text}</L></a></List.Item>)
-        }</List>
+        <List horizontal relaxed>{actions.map(action => {
+            const aprops = action.type === 'link' ? {href: renderNavigationAction(action.link).pathname} : {onClick: action.callback};
+            return <List.Item key={action.icon}>
+                <a {...aprops}>
+                    <Icon name={action.icon}></Icon>
+                    <L>{action.text}</L>
+                </a></List.Item>
+        })}</List>
     );
 };

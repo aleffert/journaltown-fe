@@ -24,6 +24,10 @@ class FeedReducers extends ImmerReducer<FeedState> {
         }
     }
 
+    deletePost(postId: number) {
+        delete this.draftState.posts[postId];
+    }
+
     loadNextPosts(_: {since: Optional<string>}) {}
     loadChangedPosts(_: {since: Optional<string>}) {}
 }

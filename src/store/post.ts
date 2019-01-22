@@ -14,6 +14,9 @@ class PostReducers extends ImmerReducer<PostState> {
         // TODO: garbage collect
         this.draftState.posts[params.postId] = params.value;
     }
+    clearPost(postId: number) {
+        delete this.draftState.posts[postId];
+    }
 }
 
 export const actions = createActionCreators(PostReducers);

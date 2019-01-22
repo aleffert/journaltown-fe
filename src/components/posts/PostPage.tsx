@@ -8,7 +8,7 @@ import { ApiErrorView } from '../widgets/ErrorView';
 import { InitialLoader } from '../user/InitialLoader';
 
 const mapStateToProps = (state: AppState) => pick(state, ['feed', 'router', 'post', 'user']);
-const mapDispatchToProps = bindDispatch(pick(actions, ['feed', 'history', 'post']));
+const mapDispatchToProps = bindDispatch(pick(actions, ['feed', 'history', 'post', 'delete']));
 
 
 type PostPageStateProps = ReturnType<typeof mapStateToProps>;
@@ -19,10 +19,20 @@ type PostPageProps =
     & RouteComponentProps<{authorId: string, postId: string}>;
 export class _PostPage extends React.Component<PostPageProps> {
 
+    constructor(props: PostPageProps) {
+        super(props);
+        this.onDelete = this.onDelete.bind(this);
+    }
+
     componentDidMount() {
         const postId = Number.parseInt(this.props.match.params.postId);
         const current = this.props.post.posts[postId];
         this.props.actions.post.loadPost({postId, current});
+    }
+
+    onDelete() {
+        const postId = Number.parseInt(this.props.match.params.postId);
+        this.props.actions.delete.sendDeletePost({postId, redirect: {type: 'main'}});
     }
 
     render() {
@@ -37,7 +47,11 @@ export class _PostPage extends React.Component<PostPageProps> {
             case 'failure':
                 return <ApiErrorView error={currentPost.error}/>;
             case 'success':
-                return <FeedPost post={currentPost.value} currentUser={this.props.user.currentUserResult}></FeedPost>
+                return <FeedPost
+                    post={currentPost.value}
+                    currentUser={this.props.user.currentUserResult}
+                    onDelete={this.onDelete}
+                />
         }
     }
 }

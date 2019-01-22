@@ -22,7 +22,7 @@ export type ApiError<T = never> = ConnectionError | NotFoundError | T;
 
 export type ApiRequest<Result> = {
     path: string,
-    method: 'GET' | 'POST' | 'PUT',
+    method: 'GET' | 'POST' | 'PUT' | 'DELETE',
     query?: {[K: string]: Optional<string>},
     body?: object,
     deserializer(response: Response): Promise<Result>

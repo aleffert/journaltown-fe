@@ -32,7 +32,7 @@ describe('feed-helpers', () => {
                 posts[i].last_modified = DateTime.fromJSDate(base).minus(Duration.fromObject({days: order[i]})).toISO();
             }
             const result = newestModifiedDate(posts);
-            expect(result).toEqual((posts.find(post => post.title === "1") as any).last_modified)
+            expect(result).toEqual((posts.find(post => post.title === "5") as any).last_modified)
         });
     });
 
@@ -49,7 +49,7 @@ describe('feed-helpers', () => {
                 posts[i].created_at = DateTime.fromJSDate(base).minus(Duration.fromObject({days: order[i]})).toISO();
             }
             const result = oldestCreatedDate(posts);
-            expect(result).toEqual((posts.find(post => post.title === "5") as any).created_at)
+            expect(result).toEqual((posts.find(post => post.title === "1") as any).created_at)
         });
     });
 

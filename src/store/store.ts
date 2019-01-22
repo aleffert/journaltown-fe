@@ -4,6 +4,7 @@ import { ObjectCodomain, historyActions } from '../utils';
 import { connectRouter } from 'connected-react-router';
 import { History } from 'history';
 import * as Compose from './compose';
+import * as Delete from './delete';
 import * as Feed from './feed';
 import * as Post from './post';
 import * as Navigation from './navigation';
@@ -11,6 +12,7 @@ import * as User from './user';
 
 const modules = {
     compose: Compose,
+    delete: Delete,
     feed: Feed,
     navigation: Navigation,
     post: Post,
@@ -26,9 +28,10 @@ type Sagas<T> = {[K in keyof T]: T[K] extends {saga: infer _} ? T[K]['saga'] : n
 function extractKey<M extends object>(modules: M, key: string): any {
     const result = {} as any;
     for(const field of Object.keys(modules)) {
-        const fieldValue = (modules as any)[field];
+        const module = (modules as any)[field];
+        const fieldValue = module[key];
         if(fieldValue) {
-            result[field] = fieldValue[key];
+            result[field] = fieldValue;
         }
     }
     return result;

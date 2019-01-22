@@ -34,7 +34,8 @@ export default {
     post: {
         actions: {
             link: 'Link',
-            edit: 'Edit'
+            edit: 'Edit',
+            delete: 'Delete'
         }
     },
     errors: {

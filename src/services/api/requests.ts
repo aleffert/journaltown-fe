@@ -2,6 +2,16 @@ import { Result, isObject, isArray, Validator, } from '../../utils';
 import { ApiError, ApiRequest, NoTokenError } from '../api-service';
 import * as models from './models';
 
+async function noContentDeserializer<E>(response: Response): Promise<Result<{}, ApiError<E>>> {
+    if(response.ok) {
+        return {type: 'success', value: {}};
+    }
+    else if(response.status == 404) {
+        return {type: 'failure', error: {type: 'not-found'}};
+    }
+    return {type: 'failure', error: {type: 'connection'}};
+}
+
 function jsonDeserializer<T, E>(validator: Validator<T>): (response: Response) => Promise<Result<T, ApiError<E>>> {
     return async function(response: Response) {
         if(response.ok) {
@@ -73,6 +83,17 @@ export function updatePostRequest(postId: number, draft: models.DraftPost): ApiR
         method: 'PUT',
         body: draft,
         deserializer: jsonDeserializer(models.isPost)
+    };
+}
+
+export type DeletePostResponse = {};
+export type DeletePostError = ApiError;
+export type DeletePostResult = Result<DeletePostResponse, DeletePostError>;
+export function deletePostRequest(postId: number): ApiRequest<DeletePostResult> {
+    return {
+        path: `/posts/${postId}/`,
+        method: 'DELETE',
+        deserializer: noContentDeserializer
     };
 }
 
