@@ -12,6 +12,7 @@ import { L } from '../localization/L';
 import { ApiError } from '../../services';
 import { InitialLoader } from '../user/InitialLoader';
 import { ApiErrorView } from '../widgets/ErrorView';
+import { AsyncView } from '../widgets/AsyncView';
 
 const mapStateToProps = (state: AppState) => pick(state, ['compose']);
 const mapDispatchToProps = bindDispatch(pick(actions, ['compose', 'post']));
@@ -80,28 +81,10 @@ export class _EditPostPage extends React.Component<EditPostPageProps> {
         );
     }
 
-    renderLoading() {
-        return <InitialLoader/>;
-    }
-
-    renderError(error: ApiError) {
-        return <ApiErrorView error={error}/>;
-    }
-
     render() {
-        if(this.props.compose.existingPostResult) {
-            switch(this.props.compose.existingPostResult.type) {
-                case 'success':
-                    return this.renderEditor();
-                case 'loading':
-                    return this.renderLoading();
-                case 'failure':
-                    return this.renderError(this.props.compose.existingPostResult.error);
-            }
-        }
-        else {
-            return this.renderLoading();
-        }
+        return <AsyncView result={this.props.compose.existingPostResult}>{
+            v => this.renderEditor()
+        }</AsyncView>
     }
 }
 

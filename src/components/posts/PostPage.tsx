@@ -6,6 +6,7 @@ import { RouteComponentProps } from 'react-router';
 import { FeedPost } from './FeedPost';
 import { ApiErrorView } from '../widgets/ErrorView';
 import { InitialLoader } from '../user/InitialLoader';
+import { AsyncView } from '../widgets/AsyncView';
 
 const mapStateToProps = (state: AppState) => pick(state, ['feed', 'router', 'post', 'user']);
 const mapDispatchToProps = bindDispatch(pick(actions, ['feed', 'history', 'post', 'delete']));
@@ -38,21 +39,13 @@ export class _PostPage extends React.Component<PostPageProps> {
     render() {
         const postId = Number.parseInt(this.props.match.params.postId);
         const currentPost = this.props.post.posts[postId];
-        if(!currentPost) {
-            return null;
-        }
-        switch(currentPost.type) {
-            case 'loading':
-                return <InitialLoader/>;
-            case 'failure':
-                return <ApiErrorView error={currentPost.error}/>;
-            case 'success':
-                return <FeedPost
-                    post={currentPost.value}
+        return <AsyncView result={currentPost}>{v => (<FeedPost
+                    post={v}
                     currentUser={this.props.user.currentUserResult}
                     onDelete={this.onDelete}
-                />
+                />)
         }
+        </AsyncView>
     }
 }
 
