@@ -68,8 +68,9 @@ export function* submitLoginSaga(action: ReturnType<typeof actions.submitLogin>)
 }
 
 export function* logoutSaga(_: ReturnType<typeof actions.logout>) {
+    const redirectToBase = () => window.location.href = '/';
     yield callMethod(services.storage, o => o.clear, {});
-    yield callMethod(window.location, o => o.reload, {});
+    yield call(redirectToBase);
 }
 
 export function* saga() {
