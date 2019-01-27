@@ -21,7 +21,6 @@ export const reducers = createReducerFunction(DeleteReducers,
 );
 
 export function* deletePostSaga(action: ReturnType<typeof actions.sendDeletePost>) {
-    debugger;
     const postId = action.payload[0].postId;
     const result = yield callApi(deletePostRequest(postId));
     if(resultIsSuccess(result)) {
