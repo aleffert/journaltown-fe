@@ -9,16 +9,21 @@ declare global {
     }
 }
 
-export type ConnectionError = {'type': 'connection'};
-export type NoTokenError = {'type': 'no-token'};
-export type NotFoundError = {'type': 'not-found'};
+export type ConnectionError = {type: 'connection'};
+export type NoTokenError = {type: 'no-token'};
+export type NotFoundError = {type: 'not-found'};
+export type InvalidFieldsError = {type: 'invalid-fields', errors: {name: string, message: string}[]};
+export type MissingFieldsError = {type: 'missing-fields', errors: {name: string, message: string}[]};
+export type EmailInUseError = {type: 'email-in-use', message: string};
+export type UnknownError = {type: 'unknown'};
 export const ApiErrors = {
-    connectionError: {'type': 'connection'} as ConnectionError,
-    noTokenError: {'type': 'no-token'} as NoTokenError,
-    notFoundError: {'type': 'not-found'} as NotFoundError
+    connectionError: {type: 'connection'} as ConnectionError,
+    noTokenError: {type: 'no-token'} as NoTokenError,
+    notFoundError: {type: 'not-found'} as NotFoundError,
+    unknownError: {type: 'unknown'} as UnknownError,
 }
 
-export type ApiError<T = never> = ConnectionError | NotFoundError | T;
+export type ApiError = UnknownError | ConnectionError | NotFoundError | NoTokenError | InvalidFieldsError | MissingFieldsError | EmailInUseError;
 
 export type ApiRequest<Result> = {
     path: string,

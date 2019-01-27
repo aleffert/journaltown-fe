@@ -6,6 +6,7 @@ import strings from '../../strings';
 import { L } from '../localization/L';
 import { Icon, List, SemanticICONS } from "semantic-ui-react";
 import { LocalizedString } from '../../utils';
+import { Link } from 'react-router-dom';
 
 type PostActionsProps = {
     post: Post,
@@ -15,7 +16,7 @@ type PostActionsProps = {
 
 type PostAction =
     ({link: NavigationPath, type: 'link'} | {callback: () => void, type: 'callback'}) &
-    {text: LocalizedString, icon: SemanticICONS}
+    {text: LocalizedString, icon: SemanticICONS, key: string}
 
 export const PostActions = (props: PostActionsProps) => {
     let actions: PostAction[] = [{
@@ -26,7 +27,8 @@ export const PostActions = (props: PostActionsProps) => {
             username: props.post.author.username
         },
         text: strings.post.actions.link,
-        icon: "linkify"
+        icon: 'linkify',
+        key: 'link'
     }];
     if(props.canEdit) {
         actions.push({
@@ -37,23 +39,33 @@ export const PostActions = (props: PostActionsProps) => {
                 username: props.post.author.username
             },
             text: strings.post.actions.edit,
-            icon: "edit"
+            key: 'edit',
+            icon: 'edit'
         });
         actions.push({
             type: 'callback',
             callback: props.onDelete,
             text: strings.post.actions.delete,
-            icon: "delete"
+            key: 'delete',
+            icon: 'delete'
         });
     }
     return (
         <List horizontal relaxed>{actions.map(action => {
-            const aprops = action.type === 'link' ? {href: renderNavigationAction(action.link).pathname} : {onClick: action.callback};
+            const Wrapper = (props: {children: JSX.Element[]}) => {
+                switch(action.type) {
+                    case 'link':
+                        return <Link id={`action-${action.key}`} to={renderNavigationAction(action.link)}>{props.children}</Link>
+                    case 'callback':
+                        return <a id={`action-${action.key}`} onClick={action.callback}>{props.children}</a>
+                }
+            } 
             return <List.Item key={action.icon}>
-                <a {...aprops}>
+                <Wrapper>
                     <Icon name={action.icon}></Icon>
                     <L>{action.text}</L>
-                </a></List.Item>
+                </Wrapper>
+            </List.Item>
         })}</List>
     );
 };

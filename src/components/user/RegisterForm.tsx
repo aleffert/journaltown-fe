@@ -4,33 +4,34 @@ import EmailValidator from 'email-validator';
 import { Form, Grid, Header, InputOnChangeData, Message, Container } from 'semantic-ui-react';
 import strings from '../../strings';
 import { L, withLanguage } from '../localization/L';
-import { AsyncResult, Optional, Language, resultIsLoading, LocalizedString, resultIsFailure, resultIsSuccess } from '../../utils';
-import { LoginError, LoginResponse, RegisterError } from '../../services/api/requests';
+import { Language, resultIsLoading, resultIsSuccess, isFailure, Async } from '../../utils';
+import { RegisterResult } from '../../services/api/requests';
 import { FullScreen } from '../widgets/FullScreen';
+import { ApiError } from '../../services';
 import { Link } from 'react-router-dom';
 
-type LoginFormProps = {
-    status: Optional<AsyncResult<LoginResponse, LoginError>>,
+type RegisterFormProps = {
+    status: Async<RegisterResult>,
     onSubmit(email: string): void,
     language: Language
 };
 
-type LoginFormState = {
+type RegisterFormState = {
     email: string
 }
 
-export class _LoginForm extends React.Component<LoginFormProps, LoginFormState> {
+export class _RegisterForm extends React.Component<RegisterFormProps, RegisterFormState> {
 
-    constructor(props: LoginFormProps) {
+    constructor(props: RegisterFormProps) {
         super(props);
 
         this.state = {email: ""};
 
-        this.onLogin = this.onLogin.bind(this);
+        this.onRegister = this.onRegister.bind(this);
         this.onEmailChange = this.onEmailChange.bind(this);
     }
 
-    onLogin() {
+    onRegister() {
         this.props.onSubmit(this.state.email);
     }
 
@@ -38,17 +39,18 @@ export class _LoginForm extends React.Component<LoginFormProps, LoginFormState> 
         this.setState({email: d.value});
     }
 
-    errorMessage(error: RegisterError): LocalizedString {
-        switch(error) {
+    getError(error: ApiError) {
+        switch(error.type) {
+            case 'email-in-use':
+                return strings.login.emailInUse;
             default:
-            return strings.login.sendRegisterFailure;
+                return strings.login.sendLoginFailure;
         }
     }
 
     render() {
         const isLoading = resultIsLoading(this.props.status);
         const isSuccess = resultIsSuccess(this.props.status);
-        const isFailure = resultIsFailure(this.props.status);
         const submitDisabled = isLoading || !EmailValidator.validate(this.state.email);
 
         return <div>
@@ -57,7 +59,7 @@ export class _LoginForm extends React.Component<LoginFormProps, LoginFormState> 
                 <Grid className='full-height' verticalAlign='middle'>
                 <Grid.Column>
                     <Header as='h2' textAlign='center'>
-                        <L>{strings.login.loginPrompt}</L>
+                        <L>{strings.login.registerPrompt}</L>
                     </Header>
                     <Form size='large'>
                         <Form.Input id='email-field' fluid icon='user' iconPosition='left' 
@@ -66,20 +68,21 @@ export class _LoginForm extends React.Component<LoginFormProps, LoginFormState> 
                             />
                         <Form.Button id='submit-button' primary loading={isLoading} disabled={submitDisabled} 
                             fluid size='large'
-                            onClick={this.onLogin}
+                            onClick={this.onRegister}
                         >
-                            {<L>{strings.login.logIn}</L>}
+                            {<L>{strings.login.signUp}</L>}
                         </Form.Button>
                     </Form>
                     {isSuccess
-                        ? <Message positive><L>{strings.login.sendLoginSuccess}</L></Message> 
-                        : null}
-                    {isFailure
-                        ? <Message negative><L>{strings.login.sendLoginFailure}</L></Message> 
+                        ? <Message positive><L>{strings.login.sendRegisterSuccess}</L></Message> 
+                        : null
+                    }
+                    {isFailure(this.props.status)
+                        ? <Message error><L>{this.getError(this.props.status.error)}</L></Message> 
                         : null
                     }
                     <Grid.Row>
-                        <L>{strings.login.noAccount}</L> <Link to="/register"><L>{strings.login.signUpPrompt}</L></Link>
+                        <L>{strings.login.hasAccount}</L> <Link to="/login"><L>{strings.login.switchToLogin}</L></Link>
                     </Grid.Row>
                 </Grid.Column>
                 </Grid></Container>
@@ -88,4 +91,4 @@ export class _LoginForm extends React.Component<LoginFormProps, LoginFormState> 
     }
 }
 
-export const LoginForm = withLanguage<LoginFormProps, typeof _LoginForm>(_LoginForm);
+export const RegisterForm = withLanguage<RegisterFormProps, typeof _RegisterForm>(_RegisterForm);

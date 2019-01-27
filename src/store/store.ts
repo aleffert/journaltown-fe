@@ -3,6 +3,7 @@ import { all } from 'redux-saga/effects';
 import { ObjectCodomain, historyActions } from '../utils';
 import { connectRouter } from 'connected-react-router';
 import { History } from 'history';
+import * as CreateAccount from './create-account';
 import * as Compose from './compose';
 import * as Delete from './delete';
 import * as Feed from './feed';
@@ -12,6 +13,7 @@ import * as User from './user';
 
 const modules = {
     compose: Compose,
+    createAccount: CreateAccount,
     delete: Delete,
     feed: Feed,
     navigation: Navigation,

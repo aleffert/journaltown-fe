@@ -1,18 +1,36 @@
 import { Result, isObject, isArray, Validator, } from '../../utils';
-import { ApiError, ApiRequest, NoTokenError } from '../api-service';
+import { ApiError, ApiRequest, NoTokenError, ApiErrors } from '../api-service';
 import * as models from './models';
+import { ApiErrorView } from '../../components/widgets/ErrorView';
 
-async function noContentDeserializer<E>(response: Response): Promise<Result<{}, ApiError<E>>> {
+function parseError(type: string, error: any): ApiError {
+    switch(type) {
+        case 'invalid-fields':
+            return {type: 'invalid-fields', errors: error};
+        case 'missing-fields':
+            return {type: 'invalid-fields', errors: error};
+        case 'email-in-use':
+            return {type: 'email-in-use', message: error};
+        default:
+            return ApiErrors.unknownError;
+    }
+}
+
+async function noContentDeserializer(response: Response): Promise<Result<{}, ApiError>> {
     if(response.ok) {
         return {type: 'success', value: {}};
     }
     else if(response.status == 404) {
         return {type: 'failure', error: {type: 'not-found'}};
     }
+    else if (response.status == 400) {
+        const json = await response.json();
+        return {type: 'failure', error: parseError(json.type, json.errors)};
+    }
     return {type: 'failure', error: {type: 'connection'}};
 }
 
-function jsonDeserializer<T, E>(validator: Validator<T>): (response: Response) => Promise<Result<T, ApiError<E>>> {
+function jsonDeserializer<T>(validator: Validator<T>): (response: Response) => Promise<Result<T, ApiError>> {
     return async function(response: Response) {
         if(response.ok) {
             const json = await response.json();
@@ -28,7 +46,7 @@ function jsonDeserializer<T, E>(validator: Validator<T>): (response: Response) =
 }
 
 export type CurrentUserResponse = models.CurrentUser;
-export type CurrentUserError = ApiError<NoTokenError>;
+export type CurrentUserError = ApiError;
 export type CurrentUserResult = Result<CurrentUserResponse, CurrentUserError>;
 export function currentUserRequest(): ApiRequest<CurrentUserResult> {
     return {
@@ -47,6 +65,41 @@ export function loginRequest(body: {email: string}): ApiRequest<LoginResult> {
         method: 'POST',
         body,
         deserializer: jsonDeserializer(isObject({}))
+    };
+}
+
+export type RegisterResponse = {};
+export type RegisterError = ApiError;
+export type RegisterResult = Result<RegisterResponse, LoginError>;
+export function registerRequest(body: {email: string}): ApiRequest<RegisterResult> {
+    return {
+        path: '/register/email/',
+        method: 'POST',
+        body,
+        deserializer: noContentDeserializer
+    };
+}
+
+export type CreateAccountResponse = {token: string};
+export type CreateAccountError = ApiError;
+export type CreateAccountResult = Result<CreateAccountResponse, CreateAccountError>;
+export function createAccountRequest(body: {username: string, token: string}): ApiRequest<CreateAccountResult> {
+    return {
+        path: '/callback/register/',
+        method: 'POST',
+        body,
+        deserializer: jsonDeserializer(models.isToken)
+    };
+}
+
+export type UsernameAvailableResponse = {};
+export type UsernameAvailableError = ApiError;
+export type UsernameAvailableResult = Result<UsernameAvailableResponse, UsernameAvailableError>;
+export function usernameAvailableRequest(username: string): ApiRequest<UsernameAvailableResult> {
+    return {
+        path: `/users/${username}/available`,
+        method: 'GET',
+        deserializer: noContentDeserializer
     };
 }
 

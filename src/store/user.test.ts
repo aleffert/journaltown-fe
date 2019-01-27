@@ -1,15 +1,39 @@
-import { actions, submitLoginSaga, loadIfPossibleSaga } from "./user";
+import { actions, submitLoginSaga, loadIfPossibleSaga, submitRegisterSaga } from "./user";
 import { put } from "redux-saga/effects";
 import { callMethod } from "../utils";
-import { loginRequest, currentUserRequest } from "../services/api/requests";
+import { loginRequest, currentUserRequest, registerRequest } from "../services/api/requests";
 import { services, ApiErrors, callApi } from "../services";
 
 describe('user sagas', () => {
+    describe('submitRegisterSaga', () => {
+        it('marks the state as loading on start', () => {
+            const email = 'test@example.com';
+            const effects: Generator = submitRegisterSaga(actions.submitRegister({email}));
+            expect(effects.next().value).toEqual(put(actions.setRegisterResult({type: 'loading'})));
+        });
+
+        it('passes the given email to the api', () => {
+            const email = 'test@example.com';
+            const effects: Generator = submitRegisterSaga(actions.submitRegister({email}));
+            effects.next();
+            expect(effects.next().value.CALL.body).toEqual((callApi(registerRequest({email})) as any).CALL.body);
+        });
+
+        it('marks the state with the result of the api call', () => {
+            const email = 'test@example.com';
+            const effects: Generator = submitRegisterSaga(actions.submitRegister({email}));
+            const result = {type: 'success', value: {}};
+            effects.next();
+            effects.next();
+            expect(effects.next(result).value).toEqual(put(actions.setRegisterResult(result as any)));
+        });
+    });
+
     describe('submitLoginSaga', () => {
         it('marks the state as loading on start', () => {
             const email = 'test@example.com';
             const effects: Generator = submitLoginSaga(actions.submitLogin({email}));
-            expect(effects.next().value).toEqual(put(actions.setLoginState({type: 'loading'})));
+            expect(effects.next().value).toEqual(put(actions.setLoginResult({type: 'loading'})));
         });
 
         it('passes the given email to the api', () => {
@@ -25,7 +49,7 @@ describe('user sagas', () => {
             const result = {type: 'success', value: {username: 'whatever', email}};
             effects.next();
             effects.next();
-            expect(effects.next(result).value).toEqual(put(actions.setLoginState(result as any)));
+            expect(effects.next(result).value).toEqual(put(actions.setLoginResult(result as any)));
         });
     });
 

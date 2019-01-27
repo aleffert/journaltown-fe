@@ -12,6 +12,7 @@ export type NavigationPath =
 
 class NavigationReducers extends ImmerReducer<{}> {
     to(_: NavigationPath) {}
+    replace(_: NavigationPath) {}
 }
 
 export const actions = createActionCreators(NavigationReducers);

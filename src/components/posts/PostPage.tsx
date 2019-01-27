@@ -4,8 +4,6 @@ import { AppState, actions } from '../../store';
 import { connect } from 'react-redux';
 import { RouteComponentProps } from 'react-router';
 import { FeedPost } from './FeedPost';
-import { ApiErrorView } from '../widgets/ErrorView';
-import { InitialLoader } from '../user/InitialLoader';
 import { AsyncView } from '../widgets/AsyncView';
 
 const mapStateToProps = (state: AppState) => pick(state, ['feed', 'router', 'post', 'user']);

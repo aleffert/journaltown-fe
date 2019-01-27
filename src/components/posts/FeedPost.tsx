@@ -5,6 +5,8 @@ import { PostActions } from './PostActions';
 import { CurrentUserResult } from '../../services/api/requests';
 import { Async } from '../../utils';
 import { canEditPost } from './feed-helpers';
+import strings from '../../strings';
+import { L } from '../localization/L';
 
 type FeedPostProps = {
     post: Post,
@@ -44,17 +46,17 @@ export class FeedPost extends React.Component<FeedPostProps, FeedPostState> {
     render() {
         const canEdit = canEditPost(this.props.post, this.props.currentUser);
         return <Container>
-            <Modal size='small' open={this.state.deleting} onClose={this.onCancelDelete}>
-                <Modal.Header>Delete Post</Modal.Header>
+            <Modal id="delete-modal" size='small' open={this.state.deleting} onClose={this.onCancelDelete}>
+                <Modal.Header><L>{strings.post.delete.header}</L></Modal.Header>
                 <Modal.Content>
-                    <p>Are you sure you want to delete this post? The operation cannot be undone.</p>
+                    <p><L>{strings.post.delete.prompt}</L></p>
                 </Modal.Content>
                 <Modal.Actions>
                 <Button onClick={this.onCancelDelete}>
-                    Cancel
+                    <L>{strings.common.cancel}</L>
                 </Button>
                 <Button negative onClick={this.onConfirmDelete} >
-                    Delete
+                    <L>{strings.common.delete}</L>
                 </Button>
                 </Modal.Actions>
             </Modal>

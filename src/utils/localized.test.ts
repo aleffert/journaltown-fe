@@ -18,6 +18,20 @@ describe("combineLanguages", () => {
             "foo": {"en": "bar", "es": "bar"}
         });
     });
+
+    it('combines functions', () => {
+        const result = combineLanguages({
+            en: {
+                foo: (x: string) => `is ${x}`
+            },
+            es: {
+                foo: (x: string) => `es ${x}`
+            }
+        });
+
+        expect(result.foo('example')['en']).toEqual('is example');
+        expect(result.foo('example')['es']).toEqual('es example');
+    })
 });
 
 export {};

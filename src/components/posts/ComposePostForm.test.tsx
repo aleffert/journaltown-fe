@@ -22,8 +22,8 @@ describe('ComposePostForm', () => {
             <_ComposePostForm {...baseProps} isLoading={false}></_ComposePostForm>
         );
         expect(w.find(FormButton).props().spinner).toEqual(undefined);
-        expect(w.render().text()).not.toContain(strings.login.sendSuccess['en']);
-        expect(w.render().text()).not.toContain(strings.login.sendFailure['en']);
+        expect(w.render().text()).not.toContain(strings.login.sendLoginSuccess['en']);
+        expect(w.render().text()).not.toContain(strings.login.sendLoginFailure['en']);
     });
 
     it('shows a spinner when isLoading is true', () => {
