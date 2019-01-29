@@ -5,7 +5,7 @@ import { put, takeEvery } from 'redux-saga/effects';
 import * as Feed from './feed';
 import * as Post from './post';
 import * as Navigate from './navigation';
-import { resultIsSuccess } from "../utils";
+import { isSuccess } from "../utils";
 import { NavigationPath } from "./navigation";
 
 
@@ -23,7 +23,7 @@ export const reducers = createReducerFunction(DeleteReducers,
 export function* deletePostSaga(action: ReturnType<typeof actions.sendDeletePost>) {
     const postId = action.payload[0].postId;
     const result = yield callApi(deletePostRequest(postId));
-    if(resultIsSuccess(result)) {
+    if(isSuccess(result)) {
         yield put(Feed.actions.deletePost(postId));
         yield put(Post.actions.clearPost(postId));
         const redirect = action.payload[0].redirect;
