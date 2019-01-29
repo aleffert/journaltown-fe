@@ -4,7 +4,7 @@ import EmailValidator from 'email-validator';
 import { Form, Grid, Header, InputOnChangeData, Message, Container } from 'semantic-ui-react';
 import strings from '../../strings';
 import { L, withLanguage } from '../localization/L';
-import { Language, resultIsLoading, resultIsSuccess, isFailure, Async } from '../../utils';
+import { Language, isFailure, Async, isLoading, isSuccess } from '../../utils';
 import { RegisterResult } from '../../services/api/requests';
 import { FullScreen } from '../widgets/FullScreen';
 import { ApiError } from '../../services';
@@ -49,9 +49,9 @@ export class _RegisterForm extends React.Component<RegisterFormProps, RegisterFo
     }
 
     render() {
-        const isLoading = resultIsLoading(this.props.status);
-        const isSuccess = resultIsSuccess(this.props.status);
-        const submitDisabled = isLoading || !EmailValidator.validate(this.state.email);
+        const loading = isLoading(this.props.status);
+        const success = isSuccess(this.props.status);
+        const submitDisabled = loading || !EmailValidator.validate(this.state.email);
 
         return <div>
             <FullScreen>
@@ -66,14 +66,14 @@ export class _RegisterForm extends React.Component<RegisterFormProps, RegisterFo
                             placeholder={strings.login.email_placeholder[this.props.language]}
                             onChange={this.onEmailChange}
                             />
-                        <Form.Button id='submit-button' primary loading={isLoading} disabled={submitDisabled} 
+                        <Form.Button id='submit-button' primary loading={loading} disabled={submitDisabled} 
                             fluid size='large'
                             onClick={this.onRegister}
                         >
                             {<L>{strings.login.signUp}</L>}
                         </Form.Button>
                     </Form>
-                    {isSuccess
+                    {success
                         ? <Message positive><L>{strings.login.sendRegisterSuccess}</L></Message> 
                         : null
                     }

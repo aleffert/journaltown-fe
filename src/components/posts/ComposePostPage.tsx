@@ -2,7 +2,7 @@ import React from 'react';
 import { Container, Grid, InputOnChangeData, Message, TextAreaProps } from 'semantic-ui-react';
 import { connect } from 'react-redux';
 import { withLanguage, LanguageProps, L } from '../localization/L';
-import { isString, bindDispatch, pick, resultIsSuccess, resultIsFailure, resultIsLoading } from '../../utils';
+import { isString, bindDispatch, pick, isLoading, isSuccess, isFailure } from '../../utils';
 import { AppState, actions } from '../../store';
 import { ComposePostForm } from './ComposePostForm';
 import strings from '../../strings';
@@ -41,9 +41,9 @@ export class _ComposePostPage extends React.Component<ComposePostPageProps, {}> 
 
     render() {
         const submitDisabled = this.props.compose.body.length == 0 || !!this.props.compose.createPostResult;
-        const isSuccess = resultIsSuccess(this.props.compose.createPostResult);
-        const isFailure = resultIsFailure(this.props.compose.createPostResult);
-        const isLoading = resultIsLoading(this.props.compose.createPostResult);
+        const success = isSuccess(this.props.compose.createPostResult);
+        const failure = isFailure(this.props.compose.createPostResult);
+        const loading = isLoading(this.props.compose.createPostResult);
         return (
             <Container text>
                 <Grid>
@@ -54,11 +54,11 @@ export class _ComposePostPage extends React.Component<ComposePostPageProps, {}> 
                             onBodyChange={this.onBodyChange}
                             onPost={this.onPost}
                             submitDisabled={submitDisabled}
-                            isLoading={isLoading}
+                            isLoading={loading}
                             submitMode='post'
                         />
-                        {isSuccess ? <Message positive><L>{strings.compose.sendSuccess}</L></Message> : null}
-                        {isFailure ? <Message error><L>{strings.compose.sendFailure}</L></Message> : null}
+                        {success ? <Message positive><L>{strings.compose.sendSuccess}</L></Message> : null}
+                        {failure ? <Message error><L>{strings.compose.sendFailure}</L></Message> : null}
                     </Grid.Column>
                 </Grid>
             </Container>

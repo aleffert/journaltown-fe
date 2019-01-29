@@ -1,6 +1,6 @@
 import React from 'react';
 
-import { bindDispatch, pick, resultIsLoading } from '../../utils';
+import { bindDispatch, pick, isLoading } from '../../utils';
 import { actions, AppState } from '../../store';
 import { FeedPost } from './FeedPost';
 import { connect } from 'react-redux';
@@ -43,7 +43,7 @@ export class _FeedPage extends React.Component<FeedPageProps> {
         const currentUser = this.props.user.currentUserResult;
         const posts = sortPosts(this.props.feed.posts);
         const showLoadMore = shouldShowLoadMore(this.props.feed.nextPostsResult);
-        const isLoading = resultIsLoading(this.props.feed.nextPostsResult);
+        const loading = isLoading(this.props.feed.nextPostsResult);
         return <Container>
             <Grid textAlign="center" divided='vertically'>
             {posts.map(post =>
@@ -53,7 +53,7 @@ export class _FeedPage extends React.Component<FeedPageProps> {
             )}
             {showLoadMore ? 
                 <Grid.Column width={6}>
-                    <Button id="load-more-button" fluid secondary loading={isLoading} onClick={this.onLoadMore}>
+                    <Button id="load-more-button" fluid secondary loading={loading} onClick={this.onLoadMore}>
                         <L>{strings.feed.loadMore}</L>
                     </Button>
                 </Grid.Column>

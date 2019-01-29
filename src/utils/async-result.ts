@@ -12,18 +12,6 @@ export type Async<T> = Optional<LoadingResult | T>
 
 export type AsyncResult<V, E = DefaultError> = Async<Result<V, E>>
 
-export function resultIsLoading<V, E>(result: AsyncResult<V, E>): boolean {
-    return result && result.type == 'loading' || false;
-}
-
-export function resultIsFailure<V, E>(result: AsyncResult<V, E>): boolean {
-    return result && result.type == 'failure' || false;
-}
-
-export function resultIsSuccess<V, E>(result: AsyncResult<V, E>): boolean {
-    return result && result.type == 'success' || false;
-}
-
 export function isLoading<V, E>(result: AsyncResult<V, E>): result is LoadingResult {
     return result && result.type == 'loading' || false;
 }

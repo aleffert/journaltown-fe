@@ -3,15 +3,12 @@ import { RouteComponentProps } from 'react-router';
 import { connect } from 'react-redux';
 
 import { AppState, actions } from "../../store";
-import { pick, bindDispatch, resultIsFailure, resultIsSuccess, resultIsLoading } from "../../utils";
+import { pick, bindDispatch, isSuccess, isFailure, isLoading } from "../../utils";
 import { ComposePostForm } from './ComposePostForm';
-import { Container, Grid, InputOnChangeData, Message, TextAreaProps, Loader } from 'semantic-ui-react';
+import { Container, Grid, InputOnChangeData, Message, TextAreaProps } from 'semantic-ui-react';
 import { isString } from 'util';
 import strings from '../../strings';
 import { L } from '../localization/L';
-import { ApiError } from '../../services';
-import { InitialLoader } from '../user/InitialLoader';
-import { ApiErrorView } from '../widgets/ErrorView';
 import { AsyncView } from '../widgets/AsyncView';
 
 const mapStateToProps = (state: AppState) => pick(state, ['compose']);
@@ -57,9 +54,9 @@ export class _EditPostPage extends React.Component<EditPostPageProps> {
 
     renderEditor() {
         const submitDisabled = this.props.compose.body.length == 0 || !!this.props.compose.updatePostResult;
-        const isSuccess = resultIsSuccess(this.props.compose.updatePostResult);
-        const isFailure = resultIsFailure(this.props.compose.updatePostResult);
-        const isLoading = resultIsLoading(this.props.compose.updatePostResult);
+        const success = isSuccess(this.props.compose.updatePostResult);
+        const failure = isFailure(this.props.compose.updatePostResult);
+        const loading = isLoading(this.props.compose.updatePostResult);
         return (
             <Container text>
                 <Grid>
@@ -70,11 +67,11 @@ export class _EditPostPage extends React.Component<EditPostPageProps> {
                             onBodyChange={this.onBodyChange}
                             onPost={this.onPost}
                             submitDisabled={submitDisabled}
-                            isLoading={isLoading}
+                            isLoading={loading}
                             submitMode='update'
                         />
-                        {isSuccess ? <Message positive><L>{strings.edit.sendSuccess}</L></Message> : null}
-                        {isFailure ? <Message error><L>{strings.edit.sendFailure}</L></Message> : null}
+                        {success ? <Message positive><L>{strings.edit.sendSuccess}</L></Message> : null}
+                        {failure ? <Message error><L>{strings.edit.sendFailure}</L></Message> : null}
                     </Grid.Column>
                 </Grid>
             </Container>

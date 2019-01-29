@@ -1,12 +1,12 @@
 import React from 'react';
 
-import { Form, Grid, Header, InputOnChangeData, Message, Container, Loader } from 'semantic-ui-react';
+import { Form, Grid, Header, InputOnChangeData, Message, Container } from 'semantic-ui-react';
 import strings from '../../strings';
 import { L, withLanguage } from '../localization/L';
-import { Language, resultIsLoading, resultIsSuccess, isFailure, Async, resultIsFailure } from '../../utils';
-import { CreateAccountResult, UsernameAvailableResult, usernameAvailableRequest } from '../../services/api/requests';
+import { Language, isFailure, Async, isSuccess, isLoading } from '../../utils';
+import { CreateAccountResult, UsernameAvailableResult } from '../../services/api/requests';
 import { FullScreen } from '../widgets/FullScreen';
-import { ApiError, withServices, Services, services } from '../../services';
+import { ApiError } from '../../services';
 
 type CreateAccountFormProps = {
     onSubmit(email: string): void,
@@ -66,10 +66,9 @@ export class _CreateAccountForm extends React.Component<CreateAccountFormProps> 
     }
 
     render() {
-        const checkingAvailability = resultIsLoading(this.props.createAccount.checkAvailabilityResult);
-        const isLoading = resultIsLoading(this.props.createAccount.createAccountResult) || checkingAvailability;
-        const isSuccess = resultIsSuccess(this.props.createAccount.createAccountResult);
-        const submitDisabled = isLoading || this.props.createAccount.username.length == 0 || resultIsFailure(this.props.createAccount.checkAvailabilityResult);
+        const checkingAvailability = isLoading(this.props.createAccount.checkAvailabilityResult);
+        const loading = isLoading(this.props.createAccount.createAccountResult) || checkingAvailability;
+        const submitDisabled = loading || this.props.createAccount.username.length == 0 || isFailure(this.props.createAccount.checkAvailabilityResult);
 
         return <div>
             <FullScreen>
@@ -84,14 +83,14 @@ export class _CreateAccountForm extends React.Component<CreateAccountFormProps> 
                             placeholder={strings.login.username_placeholder[this.props.language]}
                             onChange={this.onUsernameChange}
                             />
-                        <Form.Button id='submit-button' primary loading={isLoading} disabled={submitDisabled} 
+                        <Form.Button id='submit-button' primary loading={loading} disabled={submitDisabled} 
                             fluid size='large'
                             onClick={this.onRegister}
                         >
                             {<L>{this.buttonMessage()}</L>}
                         </Form.Button>
                     </Form>
-                    {isSuccess
+                    {isSuccess(this.props.createAccount.createAccountResult)
                         ? <Message positive><L>{strings.login.sendRegisterSuccess}</L></Message> 
                         : null
                     }
