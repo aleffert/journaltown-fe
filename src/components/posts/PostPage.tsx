@@ -15,7 +15,7 @@ type PostPageDispatchProps = ReturnType<typeof mapDispatchToProps>;
 type PostPageProps =
     & PostPageStateProps
     & PostPageDispatchProps
-    & RouteComponentProps<{authorId: string, postId: string}>;
+    & RouteComponentProps<{username: string, postId: string}>;
 export class _PostPage extends React.Component<PostPageProps> {
 
     constructor(props: PostPageProps) {

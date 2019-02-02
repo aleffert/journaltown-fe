@@ -1,17 +1,23 @@
 import * as faker from 'faker';
 import { FactoryBot } from 'factory-bot-ts';
-import { Post, CurrentUser, User, DraftPost } from '../services/api/models';
+import { Post, CurrentUser, User, DraftPost, UserProfile } from '../services/api/models';
 import { DateTime } from 'luxon';
 
 FactoryBot.define<CurrentUser>('currentUser', {
     id: (() => FactoryBot.seq(s => s)) as any,
     username: faker.name.firstName as any,
-    email: faker.internet.exampleEmail as any
+    email: faker.internet.exampleEmail as any,
+    profile: (() => FactoryBot.build<UserProfile>('userProfile')) as any
 });
 
 FactoryBot.define<User>('user', {
     username: faker.name.findName as any,
-    id: (() => FactoryBot.seq(s => s)) as any
+    id: (() => FactoryBot.seq(s => s)) as any,
+    profile: (() => FactoryBot.build<UserProfile>('userProfile')) as any
+});
+
+FactoryBot.define<UserProfile>('userProfile', {
+    bio: 'Some stuff about me'
 });
 
 FactoryBot.define<DraftPost>('draftPost', {

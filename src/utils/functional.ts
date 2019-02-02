@@ -1,3 +1,6 @@
+import { Optional } from './optional';
+import { isNull, isUndefined } from 'lodash';
+
 export function pick<T, K extends keyof T>(object: T, fields: K[]): Pick<T, K> {
     const result: any = {};
     for(const field of fields) {
@@ -13,4 +16,14 @@ export function isSorted<T>(list: T[]) {
         }
     }
     return true;
+}
+
+export function safeGet<T, K extends keyof T>(value: Optional<T>, field: K): Optional<T[K]> {
+    if(isNull(value) || isUndefined(value)) {
+        return undefined;
+    }
+    else {
+        return value[field];
+    }
+
 }

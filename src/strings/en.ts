@@ -1,7 +1,17 @@
 export default {
     common: {
         cancel: "Cancel",
-        delete: "Delete"
+        delete: "Delete",
+        save: "Save"
+    },
+    user: {
+        profile: {
+            edit: "Edit my Profile",
+            biography: "Biography",
+            fieldDescriptions: {
+                bio: 'Bio (limit 10000 characters)'
+            }
+        }
     },
     login: {
         createAccount: "Create Account",
@@ -28,6 +38,7 @@ export default {
         username_placeholder: "your-username"
     },
     header: {
+        profile: 'Profile',
         logout: 'Logout',
         post: 'New Post'
     },

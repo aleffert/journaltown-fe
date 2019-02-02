@@ -9,6 +9,8 @@ export type NavigationPath =
 | {type: 'new-post'}
 | {type: 'view-post', id: number, username: string}
 | {type: 'edit-post', id: number, username: string}
+| {type: 'view-profile', username: string}
+| {type: 'edit-profile', username: string}
 
 class NavigationReducers extends ImmerReducer<{}> {
     to(_: NavigationPath) {}
@@ -30,6 +32,10 @@ export function renderNavigationAction(path: NavigationPath): LocationDescriptor
             return {pathname: `/u/${path.username}/posts/${path.id}`};
         case 'edit-post':
             return {pathname: `/u/${path.username}/posts/${path.id}/edit`};
+        case 'view-profile':
+            return {pathname: `/u/${path.username}/profile/`};
+        case 'edit-profile':
+            return {pathname: `/u/${path.username}/profile/edit`};
     }
 }
 

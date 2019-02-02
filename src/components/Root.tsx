@@ -30,6 +30,7 @@ export class _Root extends React.Component<RootProps> {
 
         this.onLogout = this.onLogout.bind(this);
         this.onPost = this.onPost.bind(this);
+        this.onProfile = this.onProfile.bind(this);
     }
 
     componentDidMount() {
@@ -48,6 +49,10 @@ export class _Root extends React.Component<RootProps> {
     onPost() {
         this.props.actions.navigation.to({type: 'new-post'});
     }
+
+    onProfile(username: string) {
+        this.props.actions.navigation.to({type: 'view-profile', username})
+    }
     
     render() {
         // TODO: If there's a token, but loading user fails, give an opportunity to log out
@@ -60,6 +65,7 @@ export class _Root extends React.Component<RootProps> {
                     <Header
                         user={this.props.user.currentUserResult.value}
                         onPost={this.onPost}
+                        onProfile={this.onProfile}
                         onLogout={this.onLogout}>
                     </Header>
                     <Container text className='page-body'>

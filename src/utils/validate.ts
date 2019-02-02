@@ -1,3 +1,5 @@
+import { Optional } from "./optional";
+import { isNull, isUndefined } from "lodash";
 
 
 export type Validator<T> = (v: any) => v is T;
@@ -49,4 +51,14 @@ export function isArray<T extends object>(schema: Validator<T>): (v: any) => v i
         }
         return true;
     }
+}
+
+export function isOptional<T>(schema: Validator<T>): (v: any) => v is Optional<T> {
+    return function(v: any): v is Optional<T> {
+        return isNull(v) || isUndefined(v) || schema(v);
+    }
+}
+
+export function hasContent(s: Optional<string>) {
+    return s && s.trim().length > 0;
 }

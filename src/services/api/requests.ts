@@ -1,7 +1,6 @@
 import { Result, isObject, isArray, Validator, } from '../../utils';
-import { ApiError, ApiRequest, NoTokenError, ApiErrors } from '../api-service';
+import { ApiError, ApiRequest, ApiErrors } from '../api-service';
 import * as models from './models';
-import { ApiErrorView } from '../../components/widgets/ErrorView';
 
 function parseError(type: string, error: any): ApiError {
     switch(type) {
@@ -43,6 +42,31 @@ function jsonDeserializer<T>(validator: Validator<T>): (response: Response) => P
         }
         return {type: 'failure', error: {type: 'connection'}};
     }
+}
+
+export type UserResponse = models.User;
+export type UserError = ApiError;
+export type UserResult = Result<UserResponse, UserError>;
+export function userRequest(username: string): ApiRequest<UserResult> {
+    return {
+        path: `/users/${username}/`,
+        query: {expand: 'profile'},
+        method: 'GET',
+        deserializer: jsonDeserializer(models.isUser)
+    };
+}
+
+export type UpdateProfileResponse = models.UserProfile;
+export type UpdateProfileError = ApiError;
+export type UpdateProfileResult = Result<UpdateProfileResponse, UpdateProfileError>;
+export function updateProfileRequest(params: {username: string, profile: models.UserProfile}): ApiRequest<UpdateProfileResult> {
+    return {
+        path: `/users/${params.username}/`,
+        method: 'PUT',
+        query: {expand: 'profile'},
+        body: {profile: params.profile},
+        deserializer: jsonDeserializer(models.isUserProfile)
+    };
 }
 
 export type CurrentUserResponse = models.CurrentUser;

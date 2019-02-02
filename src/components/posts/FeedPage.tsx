@@ -16,7 +16,6 @@ type FeedPageStateProps = ReturnType<typeof mapStateToProps>;
 type FeedPageDispatchProps = ReturnType<typeof mapDispatchToProps>;
 type FeedPageProps = FeedPageStateProps & FeedPageDispatchProps;
 
-
 export class _FeedPage extends React.Component<FeedPageProps> {
 
     constructor(props: FeedPageProps) {

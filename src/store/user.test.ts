@@ -1,8 +1,10 @@
-import { actions, submitLoginSaga, loadIfPossibleSaga, submitRegisterSaga } from "./user";
+import { actions, submitLoginSaga, loadIfPossibleSaga, submitRegisterSaga, updateProfileSaga, reducers } from "./user";
 import { put } from "redux-saga/effects";
 import { callMethod } from "../utils";
 import { loginRequest, currentUserRequest, registerRequest } from "../services/api/requests";
 import { services, ApiErrors, callApi } from "../services";
+import { FactoryBot } from "factory-bot-ts";
+import { UserProfile, User, CurrentUser } from "../services/api/models";
 
 describe('user sagas', () => {
     describe('submitRegisterSaga', () => {
@@ -104,5 +106,68 @@ describe('user sagas', () => {
             expect(effects.next(result).value).toEqual(put(actions.setCurrentUserResult(result as any)));
         });
 
+    });
+
+    describe('updateProfileSaga', () => {
+        it('sets loading on start', () => {
+            const user = FactoryBot.build<CurrentUser>('currentUser');
+            const effects: Generator = updateProfileSaga(actions.updateProfile({username: user.username, profile: user.profile}));
+            expect(effects.next().value).toEqual(put(actions.setUpdateProfileResult({type: 'loading'})));
+        });
+
+        it('sets loading on start', () => {
+            const user = FactoryBot.build<CurrentUser>('currentUser');
+            const effects: Generator = updateProfileSaga(actions.updateProfile({username: user.username, profile: user.profile}));
+            expect(effects.next().value).toEqual(put(actions.setUpdateProfileResult({type: 'loading'})));
+        });
+
+        it('updates with the result', () => {
+            const user = FactoryBot.build<CurrentUser>('currentUser');
+            const effects: Generator = updateProfileSaga(actions.updateProfile({username: user.username, profile: user.profile}));
+            effects.next();
+            effects.next();
+            const result = {type: 'failure' as 'failure', error: ApiErrors.connectionError};
+            expect(effects.next(result).value).toEqual(put(actions.setUpdateProfileResult(result)));
+        });
+
+        it('it ends after setting the value if the result is failure', () => {
+            const user = FactoryBot.build<CurrentUser>('currentUser');
+            const effects: Generator = updateProfileSaga(actions.updateProfile({username: user.username, profile: user.profile}));
+            effects.next();
+            effects.next();
+            const result = {type: 'failure' as 'failure', error: ApiErrors.connectionError};
+            effects.next(result);
+            expect(effects.next().done).toBe(true);
+        });
+
+        it('it updates the current user if the result is success', () => {
+            const user = FactoryBot.build<CurrentUser>('currentUser');
+            const effects: Generator = updateProfileSaga(actions.updateProfile({username: user.username, profile: user.profile}));
+            effects.next();
+            effects.next();
+            const result = {type: 'success' as 'success', value: user.profile};
+            effects.next(result);
+            expect(effects.next().value).toEqual(put(actions.setCurrentUserProfile(result.value)));
+        });
+    });
+});
+
+describe('user reducers', () => {
+    describe('setCurrentUserProfile', () => {
+        it('does not change the value if the current user is not set', () => {
+            const profile = FactoryBot.build<UserProfile>('userProfile');
+            const state = reducers({currentUserResult: undefined} as any, actions.setCurrentUserProfile(profile));
+            expect(state.currentUserResult).toBeUndefined();
+        });
+        it('does not change the value if the current user is set', () => {
+            const profile = FactoryBot.build<UserProfile>('userProfile');
+            const result = {type: 'success', value: {
+                profile: {
+                    bio: 'abc123'
+                }
+            }}
+            const state = reducers({currentUserResult: result} as any, actions.setCurrentUserProfile(profile));
+            expect((state.currentUserResult as any).value.profile).toEqual(profile);
+        });
     });
 });
