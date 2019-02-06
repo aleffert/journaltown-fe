@@ -5,7 +5,7 @@ import { connect } from 'react-redux';
 import { omit } from 'lodash';
 
 import { InitialLoader } from './user/InitialLoader';
-import { bindDispatch, pick } from '../utils';
+import { bindDispatch, pick, isSuccess, isLoading } from '../utils';
 import { AppState, actions } from '../store';
 import { isString } from 'util';
 import { Header } from './Header';
@@ -47,7 +47,7 @@ export class _Root extends React.Component<RootProps> {
     }
 
     onPost() {
-        this.props.actions.navigation.to({type: 'new-post'});
+        this.props.actions.navigation.to({type: 'post'});
     }
 
     onProfile(username: string) {
@@ -57,9 +57,9 @@ export class _Root extends React.Component<RootProps> {
     render() {
         // TODO: If there's a token, but loading user fails, give an opportunity to log out
         // TODO: Allow non-authed pages
-        return this.props.user.currentUserResult && this.props.user.currentUserResult.type !== "loading"
+        return this.props.user.currentUserResult && !isLoading(this.props.user.currentUserResult)
         ? (
-            this.props.user.currentUserResult.type === "success"
+            isSuccess(this.props.user.currentUserResult)
             ? (
                 <>
                     <Header
@@ -69,7 +69,7 @@ export class _Root extends React.Component<RootProps> {
                         onLogout={this.onLogout}>
                     </Header>
                     <Container text className='page-body'>
-                        <Routes/>
+                        <Routes username={this.props.user.currentUserResult.value.username}/>
                     </Container>
                 </>
             )

@@ -40,6 +40,7 @@ class ComposeReducers extends ImmerReducer<ComposeState> {
         this.draftState.body = '';
         this.draftState.createPostResult = undefined;
         this.draftState.existingPostResult = undefined;
+        this.draftState.updatePostResult = undefined;
     }
 
     // saga actions

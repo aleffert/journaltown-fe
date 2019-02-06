@@ -6,7 +6,10 @@ import { LocationDescriptorObject } from 'history';
 
 export type NavigationPath =
 | {type: 'main'}
-| {type: 'new-post'}
+| {type: 'post'}
+| {type: 'feed'}
+| {type: 'view-feed', username: string}
+| {type: 'view-posts', username: string}
 | {type: 'view-post', id: number, username: string}
 | {type: 'edit-post', id: number, username: string}
 | {type: 'view-profile', username: string}
@@ -22,16 +25,22 @@ export const reducers = createReducerFunction(NavigationReducers, {language: 'en
 
 export type NavigationAction = ReturnType<ObjectCodomain<typeof actions>>;
 
-export function renderNavigationAction(path: NavigationPath): LocationDescriptorObject {
+export function renderNavigationPath(path: NavigationPath): LocationDescriptorObject {
     switch(path.type) {
         case 'main':
             return {pathname: `/`};
-        case 'new-post':
-            return {pathname: `/posts/new`};
+        case 'post':
+            return {pathname: `/post`};
+        case 'feed':
+            return {pathname: `/feed`};
         case 'view-post':
-            return {pathname: `/u/${path.username}/posts/${path.id}`};
+            return {pathname: `/u/${path.username}/p/${path.id}`};
+        case 'view-feed':
+            return {pathname: `/u/${path.username}/feed`};
+        case 'view-posts':
+            return {pathname: `/u/${path.username}/`};
         case 'edit-post':
-            return {pathname: `/u/${path.username}/posts/${path.id}/edit`};
+            return {pathname: `/u/${path.username}/p/${path.id}/edit`};
         case 'view-profile':
             return {pathname: `/u/${path.username}/profile/`};
         case 'edit-profile':
@@ -40,7 +49,7 @@ export function renderNavigationAction(path: NavigationPath): LocationDescriptor
 }
 
 export function* navigate(action: NavigationAction) {
-    const path = renderNavigationAction(action.payload[0]);
+    const path = renderNavigationPath(action.payload[0]);
     yield put(push(path));
 }
 

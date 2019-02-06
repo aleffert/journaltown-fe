@@ -1,10 +1,10 @@
-import { createPostSaga, startEditingPostSaga, updatePostSaga, actions } from './compose';
+import { createPostSaga, startEditingPostSaga, updatePostSaga, actions, reducers } from './compose';
 import { FactoryBot } from 'factory-bot-ts';
 import { DraftPost, Post } from '../services/api/models';
 import { put } from 'redux-saga/effects';
 import { ApiErrors } from '../services';
 import { push } from 'connected-react-router';
-import { renderNavigationAction } from './navigation';
+import { renderNavigationPath } from './navigation';
 
 describe('compose sagas', () => {
     describe('createPostSaga', () => {
@@ -30,7 +30,7 @@ describe('compose sagas', () => {
             effects.next();
             effects.next();
             effects.next({type: 'success', value: post});
-            expect(effects.next().value).toEqual(put(push(renderNavigationAction({type: 'view-post', id: post.id, username: post.author.username}))));
+            expect(effects.next().value).toEqual(put(push(renderNavigationPath({type: 'view-post', id: post.id, username: post.author.username}))));
         });
 
         it('does not clear the draft state if the request fails', () => {
@@ -66,7 +66,7 @@ describe('compose sagas', () => {
             effects.next();
             effects.next();
             effects.next({type: 'success', value: post});
-            expect(effects.next().value).toEqual(put(push(renderNavigationAction({type: 'view-post', id: post.id, username: post.author.username}))));
+            expect(effects.next().value).toEqual(put(push(renderNavigationPath({type: 'view-post', id: post.id, username: post.author.username}))));
         });
 
         it('does not clear the draft state if the request fails', () => {
@@ -108,4 +108,17 @@ describe('compose sagas', () => {
             expect(effects.next({type: 'failed', error: ApiErrors.connectionError}).value).not.toEqual(put(actions.setTitle(post.title)));
         });
     });
+
+    describe('clear', () => {
+        const state = {
+            title: 'hiii',
+            body: 'whatever',
+            createPostResult: {type: 'loading' as 'loading'},
+            existingPostResult: {type: 'loading' as 'loading'},
+            updatePostResult: {type: 'loading' as 'loading'}
+        }
+        expect(reducers(state, actions.clear())).toEqual({
+            title: '', body: '', createPostResult: undefined, existingPostResult: undefined, updatePostResult: undefined
+        });
+    })
 });

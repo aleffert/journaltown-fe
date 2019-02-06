@@ -8,7 +8,7 @@ import { AsyncView } from '../widgets/AsyncView';
 import strings from '../../strings';
 import { L } from '../localization/L';
 import { Link } from 'react-router-dom';
-import { renderNavigationAction } from '../../store/navigation';
+import { renderNavigationPath } from '../../store/navigation';
 
 
 const mapStateToProps = (state: AppState) => pick(state, ['user']);
@@ -48,7 +48,7 @@ export class _ProfilePage extends React.Component<ProfilePageProps> {
                     <p>{bio}</p>
                 </List.Item> : null}
                 {currentUser
-                    ? <List.Item><Link to={renderNavigationAction({type: 'edit-profile', username: username})}><L>{strings.user.profile.edit}</L></Link></List.Item>
+                    ? <List.Item><Link to={renderNavigationPath({type: 'edit-profile', username: username})}><L>{strings.user.profile.edit}</L></Link></List.Item>
                     : null
                 }
             </List>

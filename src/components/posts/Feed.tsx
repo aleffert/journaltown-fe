@@ -1,37 +1,43 @@
 import React from 'react';
 
-import { bindDispatch, pick, isLoading } from '../../utils';
-import { actions, AppState } from '../../store';
+import { isLoading, isSuccess, safeGet } from '../../utils';
 import { FeedPost } from './FeedPost';
-import { connect } from 'react-redux';
 import { Container, Button, Grid, Message } from 'semantic-ui-react';
 import strings from '../../strings';
 import { L } from '../localization/L';
 import { sortPosts, oldestCreatedDate, newestModifiedDate, shouldShowLoadMore } from './feed-helpers';
+import { keyForFilters } from '../../store/feed';
+import { PostsFeedFilters } from '../../services/api/requests';
+import { AppState, actions } from '../../store';
 
-const mapStateToProps = (state: AppState) => pick(state, ['feed', 'user']);
-const mapDispatchToProps = bindDispatch(pick(actions, ['feed', 'history', 'delete']));
+type FeedStateProps = Pick<AppState, 'feed' | 'user'>
+type FeedeDispatchProps = {actions: Pick<typeof actions, 'feed' | 'user' | 'delete'>}
+export type FeedProps = {
+    filters: PostsFeedFilters
+} & FeedStateProps & FeedeDispatchProps;
 
-type FeedPageStateProps = ReturnType<typeof mapStateToProps>;
-type FeedPageDispatchProps = ReturnType<typeof mapDispatchToProps>;
-type FeedPageProps = FeedPageStateProps & FeedPageDispatchProps;
+export class Feed extends React.Component<FeedProps> {
 
-export class _FeedPage extends React.Component<FeedPageProps> {
-
-    constructor(props: FeedPageProps) {
+    constructor(props: FeedProps) {
         super(props);
         this.onLoadMore = this.onLoadMore.bind(this);
         this.onDelete = this.onDelete.bind(this);
     }
 
+    filters() {
+        return isSuccess(this.props.user.currentUserResult) ? {username: this.props.user.currentUserResult.value.username} : {};
+    }
+
     componentDidMount() {
+        const filters = this.filters();
         const since = oldestCreatedDate(Object.values(this.props.feed.posts));
-        this.props.actions.feed.loadChangedPosts({since});
+        this.props.actions.feed.loadChangedPosts({filters, since});
     }
 
     onLoadMore() {
+        const filters = this.filters();
         const since = newestModifiedDate(Object.values(this.props.feed.posts));
-        this.props.actions.feed.loadNextPosts({since});
+        this.props.actions.feed.loadNextPosts({filters, since});
     }
 
     onDelete(postId: number) {
@@ -41,8 +47,10 @@ export class _FeedPage extends React.Component<FeedPageProps> {
     render() {
         const currentUser = this.props.user.currentUserResult;
         const posts = sortPosts(this.props.feed.posts);
-        const showLoadMore = shouldShowLoadMore(this.props.feed.nextPostsResult);
-        const loading = isLoading(this.props.feed.nextPostsResult);
+        const filters = this.filters();
+        const nextPostsResult = safeGet(this.props.feed.feeds[keyForFilters(filters)], 'nextPostsResult');
+        const showLoadMore = shouldShowLoadMore(nextPostsResult)
+        const loading = isLoading(nextPostsResult);
         return <Container>
             <Grid textAlign="center" divided='vertically'>
             {posts.map(post =>
@@ -62,5 +70,3 @@ export class _FeedPage extends React.Component<FeedPageProps> {
         </Container>;
     }
 }
-
-export const FeedPage = connect(mapStateToProps, mapDispatchToProps)(_FeedPage)

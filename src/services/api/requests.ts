@@ -177,12 +177,15 @@ export function deletePostRequest(postId: number): ApiRequest<DeletePostResult> 
 export type PostsResponse = models.Post[];
 export type PostsError = ApiError;
 export type PostsResult = Result<PostsResponse, PostsError>;
+export type PostsFeedFilters = {
+    username ?: string
+};
 export type PostsFilters = {
     last_modified__lt?: string,
     last_modified__gt?: string,
     created_at__lt?: string,
     created_at__gt?: string
-}
+} & PostsFeedFilters
 export function postsRequest(filters: PostsFilters): ApiRequest<PostsResult> {
     return {
         path: '/posts/',

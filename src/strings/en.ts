@@ -40,7 +40,8 @@ export default {
     header: {
         profile: 'Profile',
         logout: 'Logout',
-        post: 'New Post'
+        post: 'New Post',
+        home: 'Home'
     },
     compose: {
         title: {

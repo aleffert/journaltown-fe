@@ -1,7 +1,7 @@
 import React from 'react';
 
 import { Post } from "../../services/api/models";
-import { renderNavigationAction, NavigationPath } from '../../store/navigation';
+import { renderNavigationPath, NavigationPath } from '../../store/navigation';
 import strings from '../../strings';
 import { L } from '../localization/L';
 import { Icon, List, SemanticICONS } from "semantic-ui-react";
@@ -55,7 +55,7 @@ export const PostActions = (props: PostActionsProps) => {
             const Wrapper = (props: {children: JSX.Element[]}) => {
                 switch(action.type) {
                     case 'link':
-                        return <Link id={`action-${action.key}`} to={renderNavigationAction(action.link)}>{props.children}</Link>
+                        return <Link id={`action-${action.key}`} to={renderNavigationPath(action.link)}>{props.children}</Link>
                     case 'callback':
                         return <a id={`action-${action.key}`} onClick={action.callback}>{props.children}</a>
                 }
