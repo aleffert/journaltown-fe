@@ -38,7 +38,7 @@ export class _CreateAccountForm extends React.Component<CreateAccountFormProps> 
         this.props.onSubmit(this.props.createAccount.username);
     }
 
-    onUsernameChange(e: any, d: InputOnChangeData) {
+    onUsernameChange(_: any, d: InputOnChangeData) {
         this.props.actions.createAccount.checkAvailability({username: d.value});
     }
 

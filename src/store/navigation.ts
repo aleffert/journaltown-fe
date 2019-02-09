@@ -1,8 +1,8 @@
 import { ImmerReducer, createActionCreators, createReducerFunction } from 'immer-reducer';
 import { takeEvery, put } from 'redux-saga/effects';
-import { ObjectCodomain } from '../utils';
+import { ObjectCodomain, Omit } from '../utils';
 import { push } from 'connected-react-router';
-import { LocationDescriptorObject } from 'history';
+import { isNumber } from 'util';
 
 export type NavigationPath =
 | {type: 'main'}
@@ -25,27 +25,49 @@ export const reducers = createReducerFunction(NavigationReducers, {language: 'en
 
 export type NavigationAction = ReturnType<ObjectCodomain<typeof actions>>;
 
-export function renderNavigationPath(path: NavigationPath): LocationDescriptorObject {
+type Stringify<T> = T extends number ? string : T
+type Templated<T extends object> = {[K in keyof T]: Stringify<T[K]>}
+
+export function renderNavigationTemplate(path: Templated<NavigationPath>): string {
     switch(path.type) {
         case 'main':
-            return {pathname: `/`};
+            return `/`;
         case 'post':
-            return {pathname: `/post`};
+            return `/post`;
         case 'feed':
-            return {pathname: `/feed`};
+            return `/feed`;
         case 'view-post':
-            return {pathname: `/u/${path.username}/p/${path.id}`};
+            return `/u/${path.username}/p/${path.id}`;
         case 'view-feed':
-            return {pathname: `/u/${path.username}/feed`};
+            return `/u/${path.username}/feed`;
         case 'view-posts':
-            return {pathname: `/u/${path.username}/`};
+            return `/u/${path.username}/`;
         case 'edit-post':
-            return {pathname: `/u/${path.username}/p/${path.id}/edit`};
+            return `/u/${path.username}/p/${path.id}/edit`;
         case 'view-profile':
-            return {pathname: `/u/${path.username}/profile/`};
+            return `/u/${path.username}/profile/`;
         case 'edit-profile':
-            return {pathname: `/u/${path.username}/profile/edit`};
+            return `/u/${path.username}/profile/edit`;
     }
+}
+
+function stringifyValues<T extends object>(object : T): Templated<T> {
+    const result = {} as any;
+    for(const key in object) {
+        const value = object[key];
+        if(isNumber(value)) {
+            result[key] = value.toString();
+        }
+        else {
+            result[key] = value;
+        }
+    }
+
+    return result;
+}
+
+export function renderNavigationPath(path: NavigationPath) {
+    return renderNavigationTemplate(stringifyValues(path));
 }
 
 export function* navigate(action: NavigationAction) {

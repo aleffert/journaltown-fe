@@ -24,18 +24,14 @@ export class Feed extends React.Component<FeedProps> {
         this.onDelete = this.onDelete.bind(this);
     }
 
-    filters() {
-        return isSuccess(this.props.user.currentUserResult) ? {username: this.props.user.currentUserResult.value.username} : {};
-    }
-
     componentDidMount() {
-        const filters = this.filters();
+        const filters = this.props.filters;
         const since = oldestCreatedDate(Object.values(this.props.feed.posts));
         this.props.actions.feed.loadChangedPosts({filters, since});
     }
 
     onLoadMore() {
-        const filters = this.filters();
+        const filters = this.props.filters;
         const since = newestModifiedDate(Object.values(this.props.feed.posts));
         this.props.actions.feed.loadNextPosts({filters, since});
     }
@@ -47,7 +43,7 @@ export class Feed extends React.Component<FeedProps> {
     render() {
         const currentUser = this.props.user.currentUserResult;
         const posts = sortPosts(this.props.feed.posts);
-        const filters = this.filters();
+        const filters = this.props.filters;
         const nextPostsResult = safeGet(this.props.feed.feeds[keyForFilters(filters)], 'nextPostsResult');
         const showLoadMore = shouldShowLoadMore(nextPostsResult)
         const loading = isLoading(nextPostsResult);

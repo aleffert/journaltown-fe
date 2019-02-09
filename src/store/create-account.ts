@@ -60,7 +60,7 @@ export function* checkAvailabilitySaga(action: ReturnType<typeof actions.checkAv
     }
 }
 
-export function* sagas() {
-    yield takeLatest(actions.checkAvailability, checkAvailabilitySaga);
+export function* saga() {
+    yield takeLatest(actions.checkAvailability.type, checkAvailabilitySaga);
     yield takeLatest(actions.submitCreateAccount.type, submitCreateAccountSaga);
 }
