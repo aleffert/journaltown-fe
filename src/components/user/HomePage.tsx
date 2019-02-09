@@ -20,7 +20,9 @@ class _HomePage extends React.Component<HomePageProps> {
             return <List>
                 <List.Item>
                     <Link to={renderNavigationPath({type: 'view-feed', username: currentUser.username})}>See friends posts</Link>
-                    <Link to={renderNavigationPath({type: 'view-feed', username: currentUser.username})}>See your posts</Link>
+                </List.Item>
+                <List.Item>
+                    <Link to={renderNavigationPath({type: 'view-posts', username: currentUser.username})}>See your posts</Link>
                 </List.Item>
             </List>
         }

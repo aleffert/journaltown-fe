@@ -45,6 +45,7 @@ export class Feed extends React.Component<FeedProps> {
         const posts = sortPosts(this.props.feed.posts);
         const filters = this.props.filters;
         const nextPostsResult = safeGet(this.props.feed.feeds[keyForFilters(filters)], 'nextPostsResult');
+        // TODO: Don't show load more area at all unless we've done an initial load
         const showLoadMore = shouldShowLoadMore(nextPostsResult)
         const loading = isLoading(nextPostsResult);
         return <Container>
