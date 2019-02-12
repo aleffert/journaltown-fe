@@ -1,4 +1,4 @@
-import { Validates, isString, isObject, isOptional } from '../../utils/';
+import { Validates, isString, isObject, isOptional, isArray } from '../../utils/';
 import { isNumber } from 'util';
 
 export const isUserProfile = isObject({
@@ -27,10 +27,17 @@ export const isDraftPost = isObject({
 });
 export type DraftPost = Validates<typeof isDraftPost>;
 
+export const isRelatedUser = isObject({
+    username: isString
+});
+export type RelatedUser = Validates<typeof isRelatedUser>;
+
 export const isUser = isObject({
     id: isNumber,
     username: isString,
-    profile: isOptional(isUserProfile)
+    profile: isOptional(isUserProfile),
+    followers: isOptional(isArray(isRelatedUser)),
+    following: isOptional(isArray(isRelatedUser))
 });
 
 export type User = Validates<typeof isUser>;

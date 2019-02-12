@@ -49,7 +49,7 @@ export class Feed extends React.Component<FeedProps> {
         const showLoadMore = shouldShowLoadMore(nextPostsResult)
         const loading = isLoading(nextPostsResult);
         return <Container>
-            <Grid textAlign="center" divided='vertically'>
+            <Grid padded="horizontally" textAlign="center" divided='vertically'>
             {posts.map(post =>
                 <Grid.Row key={post.id}>
                     <FeedPost post={post} currentUser={currentUser} onDelete={() => this.onDelete(post.id)}/>

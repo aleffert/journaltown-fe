@@ -170,4 +170,56 @@ describe('user reducers', () => {
             expect((state.currentUserResult as any).value.profile).toEqual(profile);
         });
     });
+
+    describe('addFollower', () => {
+        it('adds to the list of followers for the followee', () => {
+            const followeeUser = FactoryBot.build<User>('user');
+            const followerUser = FactoryBot.build<User>('user');
+            const followeeResult = {type: 'success', value: followeeUser};
+            const followerResult = {type: 'success', value: followerUser};
+            const followeeUsername = followeeUser.username;
+            const followerUsername = followerUser.username;
+            const baseState = {
+                profiles: {
+                    [followeeUser.username]: followeeResult,
+                    [followerUser.username]: followerResult
+                }
+            } as any;
+            const state = reducers(baseState, actions.addFollower({followeeUsername, followerUsername}));
+            expect((state.profiles[followeeUser.username] as any).value.followers).toEqual([{username: followerUser.username}]);
+        });
+
+        it('adds to the list of followees for the follower', () => {
+            const followeeUser = FactoryBot.build<User>('user');
+            const followerUser = FactoryBot.build<User>('user');
+            const followeeResult = {type: 'success', value: followeeUser};
+            const followerResult = {type: 'success', value: followerUser};
+            const followeeUsername = followeeUser.username;
+            const followerUsername = followerUser.username;
+            const baseState = {
+                profiles: {
+                    [followeeUser.username]: followeeResult,
+                    [followerUser.username]: followerResult
+                }
+            } as any;
+            const state = reducers(baseState, actions.addFollower({followeeUsername, followerUsername}));
+            expect((state.profiles[followerUser.username] as any).value.following).toEqual([{username: followeeUser.username}]);
+        });
+
+        it('adds to the both lists if the user follows themselves', () => {
+            const user = FactoryBot.build<User>('user');
+            const result = {type: 'success', value: user};
+            const followeeUsername = user.username;
+            const followerUsername = user.username;
+            const baseState = {
+                profiles: {
+                    [user.username]: result,
+                }
+            } as any;
+            const state = reducers(baseState, actions.addFollower({followeeUsername, followerUsername}));
+            expect((state.profiles[user.username] as any).value.following).toEqual([{username: user.username}]);
+            expect((state.profiles[user.username] as any).value.followers).toEqual([{username: user.username}]);
+        });
+
+    });
 });

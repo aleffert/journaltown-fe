@@ -13,7 +13,7 @@ type UserState = {
     registerResult: Async<requests.LoginResult>,
     validating: boolean,
     currentUserResult: Async<requests.CurrentUserResult>,
-    users: {[username: string]: Async<requests.UserResult>},
+    profiles: {[username: string]: Async<requests.UserResult>},
     draftProfile: UserProfile,
     updateProfileResult: Async<requests.UpdateProfileResult>
 };
@@ -39,7 +39,7 @@ class UserReducers extends ImmerReducer<UserState> {
 
     setUserResult(params: {username: string, value: Async<requests.UserResult>}) {
         // TODO: garbage collect
-        this.draftState.users[params.username] = params.value;
+        this.draftState.profiles[params.username] = params.value;
     }
 
     setDraftProfile(value: UserState['draftProfile']) {
@@ -53,6 +53,40 @@ class UserReducers extends ImmerReducer<UserState> {
     setCurrentUserProfile(value: UserProfile) {
         if(isSuccess(this.draftState.currentUserResult)) {
             this.draftState.currentUserResult.value.profile = value;
+        }
+    }
+
+    addFollower(params: {followeeUsername: string, followerUsername: string}) {
+        const {followeeUsername, followerUsername} = params;
+        const followeeResult = this.draftState.profiles[followeeUsername];
+        if(isSuccess(followeeResult)) {
+            const updatedFollowers = new Array(...(followeeResult.value.followers || []));
+            if(!updatedFollowers.find(u => u.username === followerUsername)) {
+                updatedFollowers.push({username: followerUsername});
+            }
+            followeeResult.value.followers = updatedFollowers;
+        }
+        const followerResult = this.draftState.profiles[followerUsername];
+        if(isSuccess(followerResult)) {
+            const updatedFollowing = new Array(...(followerResult.value.following || []));
+            if(!updatedFollowing.find(u => u.username === followeeUsername)) {
+                updatedFollowing.push({username: followeeUsername});
+            }
+            followerResult.value.following = updatedFollowing;
+        }
+    }
+
+    removeFollower(params: {followeeUsername: string, followerUsername: string}) {
+        const {followeeUsername, followerUsername} = params;
+        const followeeResult = this.draftState.profiles[followeeUsername];
+        const followerResult = this.draftState.profiles[followerUsername];
+        if(isSuccess(followeeResult)) {
+            const updatedFollowers = (followeeResult.value.followers || []).filter(u => u.username !== followerUsername);
+            followeeResult.value.followers = updatedFollowers;
+        }
+        if(isSuccess(followerResult)) {
+            const updatedFollowing = (followerResult.value.following || []).filter(u => u.username !== followeeUsername);
+            followerResult.value.following = updatedFollowing;
         }
     }
 
@@ -71,7 +105,7 @@ export const reducers = createReducerFunction(UserReducers, {
     registerResult: null,
     validating: false,
     currentUserResult: null,
-    users: {},
+    profiles: {},
     draftProfile: {bio: undefined},
     updateProfileResult: undefined
 });

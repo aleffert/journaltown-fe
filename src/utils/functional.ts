@@ -27,3 +27,14 @@ export function safeGet<T, K extends keyof T>(value: Optional<T>, field: K): Opt
     }
 
 }
+
+type Query = {[key: string]: Optional<string | string[]>};
+type AllStrings<T> = {[key in keyof T]: string}
+export function commafy<T extends Query>(object: T): AllStrings<Query> {
+    const result = {} as any;
+    for(const key of Object.keys(object)) {
+        const value = object[key];
+        result[key] = Array.isArray(value) ? value.join(',') : value;
+    }
+    return result;
+}

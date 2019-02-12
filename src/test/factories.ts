@@ -1,6 +1,6 @@
 import * as faker from 'faker';
 import { FactoryBot } from 'factory-bot-ts';
-import { Post, CurrentUser, User, DraftPost, UserProfile } from '../services/api/models';
+import { Post, CurrentUser, User, DraftPost, UserProfile, RelatedUser } from '../services/api/models';
 import { DateTime } from 'luxon';
 
 FactoryBot.define<CurrentUser>('currentUser', {
@@ -10,8 +10,12 @@ FactoryBot.define<CurrentUser>('currentUser', {
     profile: (() => FactoryBot.build<UserProfile>('userProfile')) as any
 });
 
+FactoryBot.define<RelatedUser>('relatedUser', {
+    username: faker.name.firstName as any,
+});
+
 FactoryBot.define<User>('user', {
-    username: faker.name.findName as any,
+    username: faker.name.firstName as any,
     id: (() => FactoryBot.seq(s => s)) as any,
     profile: (() => FactoryBot.build<UserProfile>('userProfile')) as any
 });

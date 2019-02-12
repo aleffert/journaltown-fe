@@ -23,3 +23,12 @@ export function isSuccess<V, E>(result: AsyncResult<V, E>): result is SuccessRes
 export function isFailure<V, E>(result: AsyncResult<V, E>): result is FailureResult<E> {
     return result && result.type == 'failure' || false;
 }
+
+export function resultMap<V, W, E>(result: AsyncResult<V, E>, f: (x: V) => W): AsyncResult<W, E> {
+    if(isSuccess(result)) {
+        return {type: 'success', value: f(result.value)};
+    }
+    else {
+        return result;
+    }
+}

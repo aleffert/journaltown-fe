@@ -1,25 +1,41 @@
 import React from 'react';
 import { mount } from "enzyme";
-import { _ProfilePage } from "./ProfilePage";
+import { ProfilePage } from "./ProfilePage";
+import { Provider } from 'react-redux';
 import { MemoryRouter } from "react-router";
 import { merge } from 'lodash';
 import { FactoryBot } from 'factory-bot-ts';
 import { User, CurrentUser } from '../../services/api/models';
 import strings from '../../strings';
+import { createStore } from 'redux';
 
 describe('ProfilePage', () => {
+
+    function makeTestStore(overrides: any) {
+        return createStore((_: any, a: any) => {
+            return merge({}, {
+                user: {
+                    profiles: {}
+                },
+                follows: {
+                    values: {},
+                    results: {}
+                },
+                actions: {
+                    user: {
+                        loadUser: () => {}
+                    },
+                    follows: {
+                        loadUserFollowing: () => {}
+                    }
+                }
+            }, overrides) as any;
+        });
+    };
+
     const baseProps = {
         match: {
-            params: {
-            }
-        },
-        user: {
-            users: {}
-        },
-        actions: {
-            user: {
-                loadUser: () => {}
-            }
+            params: {}
         }
     } as any;
 
@@ -28,15 +44,19 @@ describe('ProfilePage', () => {
         const currentUser = FactoryBot.build<CurrentUser>('currentUser', user as any);
         const props = merge({}, baseProps, {
             match: {params: {username: user.username}},
+        });
+        const store = makeTestStore({
             user: {
-                users: {[user.username]: {type: 'success', value: user}},
+                profiles: {[user.username]: {type: 'success', value: user}},
                 currentUserResult: {type: 'success', value: currentUser}
             }
         });
         const w = mount(
-            <MemoryRouter>
-                <_ProfilePage {...props}></_ProfilePage>
-            </MemoryRouter>
+            <Provider store={store}>
+                <MemoryRouter>
+                    <ProfilePage {...props}></ProfilePage>
+                </MemoryRouter>
+            </Provider>
         );
         expect(w.html()).toContain(currentUser.email);
     });
@@ -45,15 +65,19 @@ describe('ProfilePage', () => {
         const currentUser = FactoryBot.build<CurrentUser>('currentUser');
         const props = merge({}, baseProps, {
             match: {params: {username: user.username}},
+        });
+        const store = makeTestStore({
             user: {
-                users: {[user.username]: {type: 'success', value: user}},
+                profiles: {[user.username]: {type: 'success', value: user}},
                 currentUserResult: {type: 'success', value: currentUser}
             }
         });
         const w = mount(
-            <MemoryRouter>
-                <_ProfilePage {...props}></_ProfilePage>
-            </MemoryRouter>
+            <Provider store={store}>
+                <MemoryRouter>
+                    <ProfilePage {...props}></ProfilePage>
+                </MemoryRouter>
+            </Provider>
         );
         expect(w.html()).not.toContain(currentUser.email);
     });
@@ -62,15 +86,19 @@ describe('ProfilePage', () => {
         const currentUser = FactoryBot.build<CurrentUser>('currentUser');
         const props = merge({}, baseProps, {
             match: {params: {username: user.username}},
+        });
+        const store = makeTestStore({
             user: {
-                users: {[user.username]: {type: 'success', value: user}},
+                profiles: {[user.username]: {type: 'success', value: user}},
                 currentUserResult: {type: 'success', value: currentUser}
             }
         });
         const w = mount(
-            <MemoryRouter>
-                <_ProfilePage {...props}></_ProfilePage>
-            </MemoryRouter>
+            <Provider store={store}>
+                <MemoryRouter>
+                    <ProfilePage {...props}></ProfilePage>
+                </MemoryRouter>
+            </Provider>
         );
         expect(w.html()).toContain(currentUser.profile.bio);
         expect(w.html()).toContain(strings.user.profile.biography['en']);
@@ -82,15 +110,19 @@ describe('ProfilePage', () => {
         const currentUser = FactoryBot.build<CurrentUser>('currentUser');
         const props = merge({}, baseProps, {
             match: {params: {username: user.username}},
+        });
+        const store = makeTestStore({
             user: {
-                users: {[user.username]: {type: 'success', value: user}},
+                profiles: {[user.username]: {type: 'success', value: user}},
                 currentUserResult: {type: 'success', value: currentUser}
             }
         });
         const w = mount(
-            <MemoryRouter>
-                <_ProfilePage {...props}></_ProfilePage>
-            </MemoryRouter>
+            <Provider store={store}>
+                <MemoryRouter>
+                    <ProfilePage {...props}></ProfilePage>
+                </MemoryRouter>
+            </Provider>
         );
         expect(w.html()).not.toContain(strings.user.profile.biography['en']);
     });

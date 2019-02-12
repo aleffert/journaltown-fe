@@ -50,10 +50,50 @@ export type UserResult = Result<UserResponse, UserError>;
 export function userRequest(username: string): ApiRequest<UserResult> {
     return {
         path: `/users/${username}/`,
-        query: {expand: 'profile'},
         method: 'GET',
+        query: {expand: 'profile,followers,following'},
         deserializer: jsonDeserializer(models.isUser)
     };
+}
+
+export type FollowsResponse = models.RelatedUser[];
+export type FollowsError = ApiError;
+export type FollowsResult = Result<FollowsResponse, FollowsError>;
+export type FollowsFilters = {
+    username?: string
+    username__in?: string[]
+};
+export function followsRequest(params: {followee: string, filters: FollowsFilters}): ApiRequest<FollowsResult> {
+    return {
+        path: `/users/${params.followee}/follows/`,
+        method: 'GET',
+        query: params.filters,
+        deserializer: jsonDeserializer(isArray(models.isRelatedUser))
+    }
+}
+
+export type AddUserFollowsResponse = models.RelatedUser[];
+export type AddUserFollowsError = ApiError;
+export type AddUserFollowsResult = Result<AddUserFollowsResponse, AddUserFollowsError>;
+export function addUserFollowsRequest(params: {follower: string, followee: string}): ApiRequest<AddUserFollowsResult> {
+    return {
+        path: `/users/${params.follower}/follows/`,
+        method: 'PUT',
+        body:{username: params.followee},
+        deserializer: jsonDeserializer(isArray(models.isRelatedUser))
+    }
+}
+
+export type RemoveUserFollowsResponse = {};
+export type RemoveUserFollowsError = ApiError;
+export type RemoveUserFollowsResult = Result<RemoveUserFollowsResponse, RemoveUserFollowsError>;
+export function removeUserFollowsRequest(params: {follower: string, followee: string}): ApiRequest<RemoveUserFollowsResult> {
+    return {
+        path: `/users/${params.follower}/follows/`,
+        method: 'DELETE',
+        body:{username: params.followee},
+        deserializer: noContentDeserializer
+    }
 }
 
 export type UpdateProfileResponse = models.UserProfile;

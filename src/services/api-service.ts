@@ -1,6 +1,6 @@
 import * as qs from 'query-string';
 import { StorageService } from './storage-service';
-import { Optional } from '../utils';
+import { Optional, commafy } from '../utils';
 import { pickBy } from 'lodash';
 
 declare global {
@@ -28,7 +28,7 @@ export type ApiError = UnknownError | ConnectionError | NotFoundError | NoTokenE
 export type ApiRequest<Result> = {
     path: string,
     method: 'GET' | 'POST' | 'PUT' | 'DELETE',
-    query?: {[K: string]: Optional<string>},
+    query?: {[K: string]: Optional<string | string[]>},
     body?: object,
     deserializer(response: Response): Promise<Result>
 }
@@ -44,7 +44,7 @@ export class ApiService {
     }
 
     async request<Result>(request: ApiRequest<Result>): Promise<Result | { type: 'failure', error: ConnectionError}> {
-        const query = request.query ? qs.stringify(pickBy(request.query)) : '';
+        const query = request.query ? qs.stringify(commafy(pickBy(request.query))) : '';
         const url = new URL(`${request.path}?${query}`, this.base);
         const headers: {[K: string]: string} = {
             'Content-Type': 'application/json'

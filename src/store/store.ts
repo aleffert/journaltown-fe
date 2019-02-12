@@ -7,6 +7,7 @@ import * as CreateAccount from './create-account';
 import * as Compose from './compose';
 import * as Delete from './delete';
 import * as Feed from './feed';
+import * as Follows from './follows';
 import * as Post from './post';
 import * as Navigation from './navigation';
 import * as User from './user';
@@ -16,6 +17,7 @@ const modules = {
     createAccount: CreateAccount,
     delete: Delete,
     feed: Feed,
+    follows: Follows,
     navigation: Navigation,
     post: Post,
     user: User,
