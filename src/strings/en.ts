@@ -10,7 +10,15 @@ export default {
             biography: "Biography",
             fieldDescriptions: {
                 bio: 'Bio (limit 10000 characters)'
-            }
+            },
+            followers: "Followers",
+            following: "Following"
+        },
+        follows: {
+            follow: "Follow",
+            unfollow: "Unfollow",
+            followsYou: "Is following you",
+            doesNotFollowYou: "Is not following you",
         }
     },
     login: {

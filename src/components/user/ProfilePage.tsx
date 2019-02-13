@@ -77,9 +77,9 @@ export class _ProfilePage extends React.Component<ProfilePageProps> {
                     : null
                 }
                 <List.Item>
-                <Header as="h3">Followers</Header>
+                <Header as="h3"><L>{strings.user.profile.followers}</L></Header>
                 {u.followers && u.followers.length > 0 ? <List horizontal bulleted>{u.followers.map(u => <List.Item key={u.username}><Link to={renderNavigationPath({type: 'view-profile', username: u.username})}>{u.username}</Link></List.Item>)}</List> : "None"}
-                <Header as="h3">Following</Header>
+                <Header as="h3"><L>{strings.user.profile.following}</L></Header>
                 {u.following && u.following.length > 0 ? <List horizontal bulleted>{u.following.map(u => <List.Item key={u.username}><Link to={renderNavigationPath({type: 'view-profile', username: u.username})}>{u.username}</Link></List.Item>)}</List> : "None"}
                 </List.Item>
             </List>

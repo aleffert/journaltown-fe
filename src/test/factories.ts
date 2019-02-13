@@ -4,18 +4,18 @@ import { Post, CurrentUser, User, DraftPost, UserProfile, RelatedUser } from '..
 import { DateTime } from 'luxon';
 
 FactoryBot.define<CurrentUser>('currentUser', {
-    id: (() => FactoryBot.seq(s => s)) as any,
-    username: faker.name.firstName as any,
+    id: FactoryBot.seq(s => s) as any,
+    username: (() => FactoryBot.seq(s => `${faker.name.firstName()}_${s}`)) as any,
     email: faker.internet.exampleEmail as any,
     profile: (() => FactoryBot.build<UserProfile>('userProfile')) as any
 });
 
 FactoryBot.define<RelatedUser>('relatedUser', {
-    username: faker.name.firstName as any,
+    username: (() => FactoryBot.seq(s => `${faker.name.firstName()}_${s}`)) as any,
 });
 
 FactoryBot.define<User>('user', {
-    username: faker.name.firstName as any,
+    username: (() => FactoryBot.seq(s => `${faker.name.firstName()}_${s}`)) as any,
     id: (() => FactoryBot.seq(s => s)) as any,
     profile: (() => FactoryBot.build<UserProfile>('userProfile')) as any
 });

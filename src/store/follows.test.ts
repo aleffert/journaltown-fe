@@ -1,6 +1,105 @@
-import {actions, reducers} from './follows';
+import { actions, reducers, loadUserFollowingSaga, addUserFollowingSaga, removeUserFollowingSaga } from './follows';
 import { FactoryBot } from 'factory-bot-ts';
-import { RelatedUser } from '../services/api/models';
+import { RelatedUser, CurrentUser, User } from '../services/api/models';
+import { expectSaga } from 'redux-saga-test-plan';
+import * as U from './user';
+
+describe('follows sagas', () => {
+    describe('loadUserFollowingSaga', () => {
+        const current = FactoryBot.build<CurrentUser>('currentUser');
+        const target = FactoryBot.build<User>('user');
+        const action = actions.loadUserFollowing({currentUsername: current.username, username: target.username});
+
+        it('sets the status to loading', async () => {
+            const result = {type: 'loading' as 'loading'};
+            await expectSaga(loadUserFollowingSaga, action)
+                .provide({call: () => ({type: 'success', value: [target]})})
+                .put(actions.setUserResults({usernames: [target.username], result}))
+                .run();
+        });
+
+        it('it passes the right arguments to the api', async () => {
+            await expectSaga(loadUserFollowingSaga, action)
+                .provide({call: () => ({type: 'success', value: [target]})})
+                .call.like({args: [{query: {username: target.username}}]})
+                .run();
+        });
+
+        it('it puts the result value', async () => {
+            const result = {type: 'success' as 'success', value: [target]};
+            await expectSaga(loadUserFollowingSaga, action)
+                .provide({call: () => result})
+                .put(actions.setUserResults({usernames: [target.username], result}))
+                .run();
+        });
+    });
+
+    describe('addUserFollowingSaga', () => {
+        const current = FactoryBot.build<CurrentUser>('currentUser');
+        const target = FactoryBot.build<User>('user');
+        const action = actions.addUserFollowing({currentUsername: current.username, username: target.username});
+        it('sets the status to loading for the given user', async () => {
+            const result = {type: 'loading' as 'loading'};
+            await expectSaga(addUserFollowingSaga, action)
+                .provide({call: () => ({type: 'success', value: [target]})})
+                .put(actions.setUserResults({usernames: [target.username], result}))
+                .run();
+
+        });
+
+        it('passes the right arguments to the api', async () => {
+            await expectSaga(addUserFollowingSaga, action)
+                .provide({call: () => ({type: 'success', value: [target]})})
+                .call.like({args: [{body: {username: target.username}}]})
+                .run();
+        });
+
+        it('it puts the result value', async () => {
+            const result = {type: 'success' as 'success', value: [target]};
+            await expectSaga(addUserFollowingSaga, action)
+                .provide({call: () => result})
+                .put(actions.setUserResults({usernames: [target.username], result}))
+                .put(U.actions.addFollower({followerUsername: current.username, followeeUsername: target.username}))
+                .run();
+        });
+    });
+
+    describe('deleteUserFollowingSaga', () => {
+        const current = FactoryBot.build<CurrentUser>('currentUser');
+        const target = FactoryBot.build<User>('user');
+        const action = actions.removeUserFollowing({currentUsername: current.username, username: target.username});
+
+        it('sets the status to loading for the given user', async () => {
+            const result = {type: 'loading' as 'loading'};
+            await expectSaga(removeUserFollowingSaga, action)
+                .provide({call: () => ({type: 'success', value: {}})})
+                .put(actions.setUserResults({usernames: [target.username], result}))
+                .run();
+        });
+
+        it('passes the right arguments to the api', async () => {
+            await expectSaga(removeUserFollowingSaga, action)
+                .provide({call: () => ({type: 'success', value: {}})})
+                .call.like({args: [{body: {username: target.username}}]})
+                .run();
+        });
+
+        it('on success it removes the follow from the store', async () => {
+            await expectSaga(removeUserFollowingSaga, action)
+                .provide({call: () => ({type: 'success', value: {}})})
+                .put(U.actions.removeFollower({followerUsername: current.username, followeeUsername: target.username}))
+                .run();
+        });
+
+        it('on failure it does not remove the follow from the store', async () => {
+            await expectSaga(removeUserFollowingSaga, action)
+                .provide({call: () => ({type: 'failure', value: {}})})
+                .not.put(U.actions.removeFollower({followerUsername: current.username, followeeUsername: target.username}))
+                .run();
+
+        });
+    });
+});
 
 describe('follows reducers', () => {
     it('sets a value on success when there is a related user', () => {

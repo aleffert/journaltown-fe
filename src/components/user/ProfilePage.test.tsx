@@ -7,13 +7,13 @@ import { merge } from 'lodash';
 import { FactoryBot } from 'factory-bot-ts';
 import { User, CurrentUser } from '../../services/api/models';
 import strings from '../../strings';
-import { createStore } from 'redux';
+import configureMockStore from 'redux-mock-store';
 
 describe('ProfilePage', () => {
 
     function makeTestStore(overrides: any) {
-        return createStore((_: any, a: any) => {
-            return merge({}, {
+        return configureMockStore([])(
+            merge({}, {
                 user: {
                     profiles: {}
                 },
@@ -29,9 +29,8 @@ describe('ProfilePage', () => {
                         loadUserFollowing: () => {}
                     }
                 }
-            }, overrides) as any;
-        });
-    };
+            }, overrides) as any
+        )};
 
     const baseProps = {
         match: {

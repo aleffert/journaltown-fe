@@ -5,149 +5,153 @@ import { loginRequest, currentUserRequest, registerRequest } from "../services/a
 import { services, ApiErrors, callApi } from "../services";
 import { FactoryBot } from "factory-bot-ts";
 import { UserProfile, User, CurrentUser } from "../services/api/models";
+import { expectSaga } from "redux-saga-test-plan";
 
 describe('user sagas', () => {
     describe('submitRegisterSaga', () => {
-        it('marks the state as loading on start', () => {
-            const email = 'test@example.com';
-            const effects: Generator = submitRegisterSaga(actions.submitRegister({email}));
-            expect(effects.next().value).toEqual(put(actions.setRegisterResult({type: 'loading'})));
+        const email = 'test@example.com';
+        const action = actions.submitRegister({email});
+        it('marks the state as loading on start', async () => {
+            await expectSaga(submitRegisterSaga, action)
+                .provide({call: () => ({type: 'loading'})})
+                .put(actions.setRegisterResult({type: 'loading'}))
+                .run();
         });
 
-        it('passes the given email to the api', () => {
-            const email = 'test@example.com';
-            const effects: Generator = submitRegisterSaga(actions.submitRegister({email}));
-            effects.next();
-            expect(effects.next().value.CALL.body).toEqual((callApi(registerRequest({email})) as any).CALL.body);
+        it('passes the given email to the api', async () => {
+            await expectSaga(submitRegisterSaga, action)
+                .provide({call: () => ({type: 'loading'})})
+                .call.like({args: [{body: {email}}]})
+                .run();
         });
 
-        it('marks the state with the result of the api call', () => {
-            const email = 'test@example.com';
-            const effects: Generator = submitRegisterSaga(actions.submitRegister({email}));
-            const result = {type: 'success', value: {}};
-            effects.next();
-            effects.next();
-            expect(effects.next(result).value).toEqual(put(actions.setRegisterResult(result as any)));
+        it('marks the state with the result of the api call', async () => {
+            const result = {type: 'success' as 'success', value: {}};
+            await expectSaga(submitRegisterSaga, action)
+                .provide({call: () => result})
+                .put(actions.setRegisterResult(result))
+                .run();
         });
     });
 
     describe('submitLoginSaga', () => {
-        it('marks the state as loading on start', () => {
-            const email = 'test@example.com';
-            const effects: Generator = submitLoginSaga(actions.submitLogin({email}));
-            expect(effects.next().value).toEqual(put(actions.setLoginResult({type: 'loading'})));
+        const email = 'test@example.com';
+        const action = actions.submitLogin({email});
+        it('marks the state as loading on start', async () => {
+            await expectSaga(submitLoginSaga, action)
+                .provide({call: () => ({type: 'loading'})})
+                .put(actions.setLoginResult({type: 'loading'}))
+                .run();
         });
 
-        it('passes the given email to the api', () => {
-            const email = 'test@example.com';
-            const effects: Generator = submitLoginSaga(actions.submitLogin({email}));
-            effects.next();
-            expect(effects.next().value.CALL.body).toEqual((callApi(loginRequest({email})) as any).CALL.body);
+        it('passes the given email to the api', async () => {
+            await expectSaga(submitLoginSaga, action)
+                .provide({call: () => ({type: 'loading'})})
+                .call.like({args: [{body: {email}}]})
+                .run();
         });
 
-        it('marks the state with the result of the api call', () => {
-            const email = 'test@example.com';
-            const effects: Generator = submitLoginSaga(actions.submitLogin({email}));
-            const result = {type: 'success', value: {username: 'whatever', email}};
-            effects.next();
-            effects.next();
-            expect(effects.next(result).value).toEqual(put(actions.setLoginResult(result as any)));
+        it('marks the state with the result of the api call', async () => {
+            const result = {type: 'success' as 'success', value: {}};
+            await expectSaga(submitLoginSaga, action)
+                .provide({call: () => result})
+                .put(actions.setLoginResult(result))
+                .run();
         });
     });
 
     describe('loadIfPossibleSaga', () => {
-        it('does not validate a token if we do not have one', () => {
-            const effects: Generator = loadIfPossibleSaga(actions.loadIfPossible({token: undefined}));
-            expect(effects.next().value).not.toEqual(put(actions.setValidating(true)));
+        const token = 'abc123';
+        it('does not validate a token if we do not have one', async () => {
+            await expectSaga(loadIfPossibleSaga, actions.loadIfPossible({token: undefined}))
+                .provide({call: () => {}})
+                .not.put(actions.setValidating(true))
+                .run();
         });
 
-        it('does start validating a token if we do have one', () => {
-            const token = 'abc123';
-            const effects: Generator = loadIfPossibleSaga(actions.loadIfPossible({token}));
-            expect(effects.next().value).toEqual(put(actions.setValidating(true)));
+        it('does start validating a token if we do have one', async () => {
+            await expectSaga(loadIfPossibleSaga, actions.loadIfPossible({token}))
+                .provide({call: () => ({type: 'loading'})})
+                .put(actions.setValidating(true))
+                .run();
         });
 
-        it('if validation succeeds we store the token', () => {
-            const token = 'abc123';
-            const effects: Generator = loadIfPossibleSaga(actions.loadIfPossible({token}));
-            effects.next();
-            effects.next();
+        it('if validation succeeds we store the token', async () => {
             const result = {type: 'success', value: {token: token}};
-            expect(effects.next(result).value.CALL.args).toEqual(callMethod(services.storage, o => o.setToken, token).CALL.args);
+            await expectSaga(loadIfPossibleSaga, actions.loadIfPossible({token}))
+                .provide({call: () => result})
+                .call.like({args: [token]})
+                .run();
         });
 
-        it('if validation succeeds we do not store the token', () => {
-            const token = 'abc123';
-            const effects: Generator = loadIfPossibleSaga(actions.loadIfPossible({token}));
-            effects.next();
-            effects.next();
+        it('if validation fails we do not store the token', async () => {
             const result = {type: 'failure', error: {}};
-            expect(effects.next(result).value.CALL).toBeFalsy();
+            await expectSaga(loadIfPossibleSaga, actions.loadIfPossible({token}))
+                .provide({call: () => result})
+                .not.call.like({args: [token]})
+                .run();
         });
 
-        it('if we do not have a token we do not try to load the current user', () => {
-            const effects: Generator = loadIfPossibleSaga(actions.loadIfPossible({token: undefined}));
-            effects.next();
-            expect(effects.next().value).toEqual(put(actions.setCurrentUserResult({type: 'failure', error: ApiErrors.noTokenError})));
+        it('if we do not have a token we do not try to load the current user', async () => {
+            const result = {type: 'failure' as 'failure', error: ApiErrors.noTokenError};
+            await expectSaga(loadIfPossibleSaga, actions.loadIfPossible({token: undefined}))
+                .provide({call: () => result})
+                .put(actions.setCurrentUserResult(result))
+                .run();
         });
 
-        it('if we have a token we try to load the current user', () => {
-            const effects: Generator = loadIfPossibleSaga(actions.loadIfPossible({token: undefined}));
-            effects.next();
-            expect(effects.next('token').value).toEqual(put(actions.setCurrentUserResult({type: 'loading'})));
+        it('if we have a token we try to load the current user', async () => {
+            const result = {type: 'success' as 'success', value: 'whatever'};
+            await expectSaga(loadIfPossibleSaga, actions.loadIfPossible({token}))
+                .provide({call: () => result})
+                .put(actions.setCurrentUserResult({type: 'loading'}))
+                .run();
         });
 
-        it('if we have a token we request the current user', () => {
-            const effects: Generator = loadIfPossibleSaga(actions.loadIfPossible({token: undefined}));
-            effects.next();
-            expect(effects.next('token').value).toEqual(put(actions.setCurrentUserResult({type: 'loading'})));
-            expect(effects.next().value.CALL.body).toEqual((callApi(currentUserRequest()) as any).CALL.body);
-            const result = {type: 'success', value: {username: 'whatever', email: 'whatever'}};
-            expect(effects.next(result).value).toEqual(put(actions.setCurrentUserResult(result as any)));
+        it('if we have a token we request the current user', async () => {
+            const currentUser = FactoryBot.build<CurrentUser>('currentUser');
+            const result = {type: 'success' as 'success', value: currentUser};
+            await expectSaga(loadIfPossibleSaga, actions.loadIfPossible({token}))
+                .provide({call: () => result})
+                .put(actions.setCurrentUserResult(result))
+                .run();
         });
 
     });
 
     describe('updateProfileSaga', () => {
-        it('sets loading on start', () => {
-            const user = FactoryBot.build<CurrentUser>('currentUser');
-            const effects: Generator = updateProfileSaga(actions.updateProfile({username: user.username, profile: user.profile}));
-            expect(effects.next().value).toEqual(put(actions.setUpdateProfileResult({type: 'loading'})));
+        const user = FactoryBot.build<CurrentUser>('currentUser');
+        const action = actions.updateProfile({username: user.username, profile: user.profile})
+        it('sets loading on start', async () => {
+            await expectSaga(updateProfileSaga, action)
+                .provide({call: () => ({type: 'loading'})})
+                .put(actions.setUpdateProfileResult({type: 'loading'}))
+                .run();
         });
 
-        it('sets loading on start', () => {
-            const user = FactoryBot.build<CurrentUser>('currentUser');
-            const effects: Generator = updateProfileSaga(actions.updateProfile({username: user.username, profile: user.profile}));
-            expect(effects.next().value).toEqual(put(actions.setUpdateProfileResult({type: 'loading'})));
-        });
-
-        it('updates with the result', () => {
-            const user = FactoryBot.build<CurrentUser>('currentUser');
-            const effects: Generator = updateProfileSaga(actions.updateProfile({username: user.username, profile: user.profile}));
-            effects.next();
-            effects.next();
+        it('updates with the result', async () => {
             const result = {type: 'failure' as 'failure', error: ApiErrors.connectionError};
-            expect(effects.next(result).value).toEqual(put(actions.setUpdateProfileResult(result)));
+            await expectSaga(updateProfileSaga, action)
+                .provide({call: () => result})
+                .put(actions.setUpdateProfileResult(result))
+                .run();
         });
 
-        it('it ends after setting the value if the result is failure', () => {
-            const user = FactoryBot.build<CurrentUser>('currentUser');
-            const effects: Generator = updateProfileSaga(actions.updateProfile({username: user.username, profile: user.profile}));
-            effects.next();
-            effects.next();
+        it('it does not update the current user if the result is failure', async () => {
             const result = {type: 'failure' as 'failure', error: ApiErrors.connectionError};
-            effects.next(result);
-            expect(effects.next().done).toBe(true);
+            await expectSaga(updateProfileSaga, action)
+                .provide({call: () => result})
+                .not.put.like({action: {type: actions.setCurrentUserProfile.type}})
+                .run();
         });
 
-        it('it updates the current user if the result is success', () => {
-            const user = FactoryBot.build<CurrentUser>('currentUser');
-            const effects: Generator = updateProfileSaga(actions.updateProfile({username: user.username, profile: user.profile}));
-            effects.next();
-            effects.next();
+        it('it updates the current user if the result is success', async () => {
+            // const result = {type: 'failure' as 'failure', error: ApiErrors.connectionError};
             const result = {type: 'success' as 'success', value: user.profile};
-            effects.next(result);
-            expect(effects.next().value).toEqual(put(actions.setCurrentUserProfile(result.value)));
+            await expectSaga(updateProfileSaga, action)
+                .provide({call: () => result})
+                .put(actions.setCurrentUserProfile(result.value))
+                .run();
         });
     });
 });

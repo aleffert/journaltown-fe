@@ -4,6 +4,8 @@ import { User, CurrentUser } from '../../services/api/models';
 import { isLoading, pick, bindDispatch, Optional } from '../../utils';
 import { AppState, actions } from '../../store';
 import { connect, ConnectedComponentClass } from 'react-redux';
+import strings from '../../strings';
+import { L } from '../localization/L';
 
 const mapStateToProps = (state: AppState) => pick(state, ['follows']);
 const mapDispatchToProps = bindDispatch(pick(actions, ['follows']));
@@ -39,11 +41,11 @@ export class _FollowsUserView extends React.Component<FollowsUserViewProps> {
             const targetUser = this.props.targetUser;
             const follows = this.props.follows.values[targetUser.username] || false;
             const loading = isLoading(this.props.follows.results[targetUser.username]);
-
-            const text = follows ? "Unfollow" : "Follow";
-            return <Button secondary={true} loading={loading} 
-                onClick={() => this.onToggleFollow(!this.props.follows, currentUser.username, targetUser.username)}>{text}
-            </Button>
+            const text = follows ? strings.user.follows.unfollow : strings.user.follows.follow;
+            const onToggleFollow = () => this.onToggleFollow(
+                !follows, currentUser.username, targetUser.username
+            );
+            return <Button className="follow-toggle-button" secondary={true} loading={loading} onClick={onToggleFollow}><L>{text}</L> </Button>
         }
         else {
             return null;

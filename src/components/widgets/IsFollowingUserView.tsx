@@ -1,4 +1,6 @@
 import React from 'react';
+import strings from '../../strings';
+import { L } from '../localization/L';
 
 type IsFollowingUserViewProps = {
     following: boolean,
@@ -8,10 +10,10 @@ type IsFollowingUserViewProps = {
 export class IsFollowingUserView extends React.Component<IsFollowingUserViewProps> {
     render() {
         if(this.props.following) {
-            return "Is following you";
+            return <L>{strings.user.follows.followsYou}</L>
         }
         else {
-            return "Does not follow you";
+            return <L>{strings.user.follows.doesNotFollowYou}</L>
         }
     }
 }

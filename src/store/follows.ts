@@ -44,14 +44,14 @@ export const reducers = createReducerFunction(FollowsReducers, {
     results: {}, values: {}
 });
 
-function* loadUserFollowingSaga(action: ReturnType<typeof actions.loadUserFollowing>) {
+export function* loadUserFollowingSaga(action: ReturnType<typeof actions.loadUserFollowing>) {
     const {username, currentUsername} = action.payload[0];
     yield put(actions.setUserResults({usernames: [username], result: {type: 'loading'}}));
     const result = yield callApi(followsRequest({followee: currentUsername, filters: {username}}));
     yield put(actions.setUserResults({usernames: [username], result: result}));
 }
 
-function* addUserFollowingSaga(action: ReturnType<typeof actions.addUserFollowing>) {
+export function* addUserFollowingSaga(action: ReturnType<typeof actions.addUserFollowing>) {
     const {username, currentUsername} = action.payload[0];
     yield put(actions.setUserResults({usernames: [username], result: {type: 'loading'}}));
     const result = yield callApi(addUserFollowsRequest({follower: currentUsername, followee: username}));
@@ -59,7 +59,7 @@ function* addUserFollowingSaga(action: ReturnType<typeof actions.addUserFollowin
     yield put(User.actions.addFollower({followerUsername: currentUsername, followeeUsername: username}));
 }
 
-function* removeUserFollowingSaga(action: ReturnType<typeof actions.removeUserFollowing>) {
+export function* removeUserFollowingSaga(action: ReturnType<typeof actions.removeUserFollowing>) {
     const {username, currentUsername} = action.payload[0];
     yield put(actions.setUserResults({usernames: [username], result: {type: 'loading'}}));
     const result = yield callApi(removeUserFollowsRequest({follower: currentUsername, followee: username}));
