@@ -13,8 +13,8 @@ const mapDispatchToProps = bindDispatch(pick(actions, ['follows']));
 type FollowsUserViewStateProps = ReturnType<typeof mapStateToProps>;
 type FollowsUserViewDispatchProps = ReturnType<typeof mapDispatchToProps>;
 type FollowsUserViewBaseProps = {
-    targetUser: User
-    currentUser: Optional<CurrentUser>
+    targetUsername: string
+    currentUsername: Optional<string>
 };
 
 type FollowsUserViewProps = FollowsUserViewBaseProps & FollowsUserViewStateProps & FollowsUserViewDispatchProps
@@ -26,6 +26,24 @@ export class _FollowsUserView extends React.Component<FollowsUserViewProps> {
         this.onToggleFollow = this.onToggleFollow.bind(this);
     }
 
+    loadUser() {
+        if(this.props.currentUsername) {
+            this.props.actions.follows.loadUserFollowing({
+                currentUsername: this.props.currentUsername, username: this.props.targetUsername
+            });
+        }
+    }
+
+    componentDidMount() {
+        this.loadUser();
+    }
+
+    componentDidUpdate(prevProps: FollowsUserViewProps) {
+        if (this.props.targetUsername !== prevProps.targetUsername) {
+          this.loadUser();
+        }
+      }
+
     onToggleFollow(follow: boolean, currentUsername: string, username: string) {
         if(follow) {
             this.props.actions.follows.addUserFollowing({username, currentUsername});
@@ -36,14 +54,14 @@ export class _FollowsUserView extends React.Component<FollowsUserViewProps> {
     }
 
     render() {
-        if(this.props.currentUser) {
-            const currentUser = this.props.currentUser;
-            const targetUser = this.props.targetUser;
-            const follows = this.props.follows.values[targetUser.username] || false;
-            const loading = isLoading(this.props.follows.results[targetUser.username]);
+        if(this.props.currentUsername) {
+            const currentUsername = this.props.currentUsername;
+            const targetUsername = this.props.targetUsername;
+            const follows = this.props.follows.values[targetUsername] || false;
+            const loading = isLoading(this.props.follows.results[targetUsername]);
             const text = follows ? strings.user.follows.unfollow : strings.user.follows.follow;
             const onToggleFollow = () => this.onToggleFollow(
-                !follows, currentUser.username, targetUser.username
+                !follows, currentUsername, targetUsername
             );
             return <Button className="follow-toggle-button" secondary={true} loading={loading} onClick={onToggleFollow}><L>{text}</L> </Button>
         }

@@ -1,6 +1,6 @@
 import React from 'react';
 import strings from '../../strings';
-import { mount } from 'enzyme';
+import { mount, render } from 'enzyme';
 import { Provider } from 'react-redux';
 import { merge } from 'lodash';
 import { FollowsUserView } from './FollowsUserView';
@@ -11,7 +11,7 @@ import configureMockStore from 'redux-mock-store';
 import * as Follows from '../../store/follows';
 
 
-describe('FollowingUserView', () => {
+describe('FollowsUserView', () => {
     function makeTestStore(overrides: any) {
         return configureMockStore([])(
             merge({}, {}, overrides) as any
@@ -30,7 +30,7 @@ describe('FollowingUserView', () => {
             }
         });
         const w = mount(<Provider store={store}>
-            <FollowsUserView targetUser={user} currentUser={currentUser}/>
+            <FollowsUserView targetUsername={user.username} currentUsername={currentUser.username}/>
         </Provider>);
         expect(w.text()).toContain(strings.user.follows.unfollow['en']);
     });
@@ -43,7 +43,7 @@ describe('FollowingUserView', () => {
             }
         });
         const w = mount(<Provider store={store}>
-            <FollowsUserView targetUser={user} currentUser={currentUser}/>
+            <FollowsUserView targetUsername={user.username} currentUsername={currentUser.username}/>
         </Provider>);
         expect(w.text()).toContain(strings.user.follows.follow['en']);
     });
@@ -58,7 +58,7 @@ describe('FollowingUserView', () => {
             }
         });
         const w = mount(<Provider store={store}>
-            <FollowsUserView targetUser={user} currentUser={currentUser}/>
+            <FollowsUserView targetUsername={user.username} currentUsername={currentUser.username}/>
         </Provider>);
         expect(w.text()).toContain(strings.user.follows.follow['en']);
     });
@@ -75,7 +75,7 @@ describe('FollowingUserView', () => {
             }
         });
         const w = mount(<Provider store={store}>
-            <FollowsUserView targetUser={user} currentUser={currentUser}/>
+            <FollowsUserView targetUsername={user.username} currentUsername={currentUser.username}/>
         </Provider>);
         expect((w.find(Button).props().loading)).toBe(true);
     });
@@ -90,12 +90,12 @@ describe('FollowingUserView', () => {
             },
         });
         const w = mount(<Provider store={store}>
-            <FollowsUserView targetUser={user} currentUser={currentUser}/>
+            <FollowsUserView targetUsername={user.username} currentUsername={currentUser.username}/>
         </Provider>);
         w.find('.follow-toggle-button').hostNodes().simulate('click');
-        expect(store.getActions()).toEqual([
+        expect(store.getActions()).toContainEqual(
             Follows.actions.removeUserFollowing({username: user.username, currentUsername: currentUser.username})
-        ]);
+        );
     });
 
     it('emits add action on click when not already followed', () => {
@@ -108,11 +108,65 @@ describe('FollowingUserView', () => {
             },
         });
         const w = mount(<Provider store={store}>
-            <FollowsUserView targetUser={user} currentUser={currentUser}/>
+            <FollowsUserView targetUsername={user.username} currentUsername={currentUser.username}/>
         </Provider>);
         w.find('.follow-toggle-button').hostNodes().simulate('click');
-        expect(store.getActions()).toEqual([
+        expect(store.getActions()).toContainEqual(
             Follows.actions.addUserFollowing({username: user.username, currentUsername: currentUser.username})
-        ]);
+        );
+    });
+
+    it('returns null if there is no current user', () => {
+        const store = makeTestStore({
+            follows: {
+                values: {
+                    [user.username]: false
+                },
+                results: {}
+            },
+        });
+        const w = render(<Provider store={store}>
+            <FollowsUserView targetUsername={user.username} currentUsername={null}/>
+        </Provider>);
+        expect(w.html()).toBe(null);
+    });
+
+    it('loads follow info on mount', () => {
+        const store = makeTestStore({
+            follows: {
+                values: {
+                    [user.username]: false
+                },
+                results: {}
+            },
+        });
+        const w = mount(<Provider store={store}>
+            <FollowsUserView targetUsername={user.username} currentUsername={currentUser.username}/>
+        </Provider>);
+        expect(store.getActions()).toContainEqual(
+            Follows.actions.loadUserFollowing({username: user.username, currentUsername: currentUser.username})
+        );
+    });
+
+    it('loads follow if the target user changes', () => {
+        const store = makeTestStore({
+            follows: {
+                values: {
+                    [user.username]: false
+                },
+                results: {}
+            },
+        });
+        const w = mount(<Provider store={store}>
+            <FollowsUserView targetUsername={user.username} currentUsername={currentUser.username}/>
+        </Provider>);
+
+        const otherUser = FactoryBot.build<User>('user');
+        w.setProps({children:
+            <FollowsUserView targetUsername={otherUser.username} currentUsername={currentUser.username}/>
+        });
+        expect(store.getActions()).toContainEqual(
+            Follows.actions.loadUserFollowing({username: otherUser.username, currentUsername: currentUser.username})
+        );
     });
 });

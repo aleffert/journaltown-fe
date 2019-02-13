@@ -1,8 +1,5 @@
 import { actions, submitLoginSaga, loadIfPossibleSaga, submitRegisterSaga, updateProfileSaga, reducers } from "./user";
-import { put } from "redux-saga/effects";
-import { callMethod } from "../utils";
-import { loginRequest, currentUserRequest, registerRequest } from "../services/api/requests";
-import { services, ApiErrors, callApi } from "../services";
+import { ApiErrors } from "../services";
 import { FactoryBot } from "factory-bot-ts";
 import { UserProfile, User, CurrentUser } from "../services/api/models";
 import { expectSaga } from "redux-saga-test-plan";
@@ -146,7 +143,6 @@ describe('user sagas', () => {
         });
 
         it('it updates the current user if the result is success', async () => {
-            // const result = {type: 'failure' as 'failure', error: ApiErrors.connectionError};
             const result = {type: 'success' as 'success', value: user.profile};
             await expectSaga(updateProfileSaga, action)
                 .provide({call: () => result})

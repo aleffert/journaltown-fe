@@ -29,10 +29,6 @@ export class _ProfilePage extends React.Component<ProfilePageProps> {
         const username = this.props.match.params.username;
         const profile = this.props.user.profiles[username];
         this.props.actions.user.loadUser({username, current: profile});
-        if(isSuccess(this.props.user.currentUserResult)) {
-            const currentUsername = this.props.user.currentUserResult.value.username;
-            this.props.actions.follows.loadUserFollowing({username, currentUsername});
-        }
     }
 
     componentDidMount() {
@@ -62,7 +58,7 @@ export class _ProfilePage extends React.Component<ProfilePageProps> {
                     <IsFollowingUserView following={!!following} username={u.username}/>
                 </List.Item>
                 <List.Item>
-                    <FollowsUserView currentUser={currentUser} targetUser={u}/>
+                    <FollowsUserView currentUsername={safeGet(currentUser, 'username')} targetUsername={u.username}/>
                 </List.Item>
                 {currentUser
                 ? currentUser.email
