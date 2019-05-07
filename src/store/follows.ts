@@ -1,7 +1,7 @@
 import { ImmerReducer, createActionCreators, createReducerFunction } from 'immer-reducer';
 import { takeEvery, put } from 'redux-saga/effects';
 import { callApi } from "../services";
-import { AsyncResult, isSuccess, Optional, resultMap } from '../utils';
+import { AsyncResult, isSuccess, Optional } from '../utils';
 import { RelatedUser } from '../services/api/models';
 import { followsRequest, addUserFollowsRequest, removeUserFollowsRequest } from '../services/api/requests';
 import * as User from './user';

@@ -14,6 +14,8 @@ export function AsyncView<T>(props: AsyncViewProps<T>): JSX.Element {
     if(!props.result) {
         return <InitialLoader/>
     }
+    // Remove once we're on react-scripts ^3.0.1
+    // eslint-disable-next-line
     switch(props.result.type) {
         case 'loading':
             return <InitialLoader/>;

@@ -5,6 +5,7 @@ import { ComposePostPage } from './posts/ComposePostPage';
 import { EditPostPage } from './posts/EditPostPage';
 import { PostPage } from './posts/PostPage';
 import { ProfilePage } from './user/ProfilePage';
+import { CreateGroupPage } from './user/CreateGroupPage';
 import { EditProfilePage } from './user/EditProfilePage';
 import { HomePage } from './user/HomePage';
 import { UserPostsPage } from './posts/UserPostsPage';
@@ -24,6 +25,7 @@ export const Routes = (props: RoutesProps) => (
         <Route exact path={r({type: "view-feed", username: ":username"})} component={UserFeedPage}/>
         <Route exact path={r({type: "view-post", username: ":username", id: ":postId"})} component={PostPage}/>
         <Route exact path={r({type: "edit-post", username: ":username", id: ":postId"})} component={EditPostPage}/>
+        <Route exact path={r({type: "create-group", username: ":username"})} component={CreateGroupPage}/>
         <Route exact path={r({type: "view-profile", username: ":username"})} component={ProfilePage}/>
         <Route exact path={r({type: "edit-profile", username: ":username"})} component={EditProfilePage}/>
         <Route exact path={r({type: "main"})} component={HomePage}/>

@@ -1,6 +1,5 @@
 import React from 'react';
 import { Button } from 'semantic-ui-react';
-import { User, CurrentUser } from '../../services/api/models';
 import { isLoading, pick, bindDispatch, Optional } from '../../utils';
 import { AppState, actions } from '../../store';
 import { connect, ConnectedComponentClass } from 'react-redux';

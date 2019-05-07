@@ -18,6 +18,6 @@ export const LC = LanguageContext.Consumer;
 
 
 export function withLanguage<CProps extends LanguageProps, C extends React.ComponentClass<CProps> | React.FunctionComponent<CProps>>(C: C) {
-    const _C = C as any;
-    return (props: Omit<CProps, 'language'>) => <LC>{(l: Language) => <_C language={l} {...props}/>}</LC>
+    const AnyC = C as any;
+    return (props: Omit<CProps, 'language'>) => <LC>{(l: Language) => <AnyC language={l} {...props}/>}</LC>
 }

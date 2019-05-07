@@ -1,9 +1,10 @@
 import React from 'react';
 import { AppState, actions } from '../../store';
 import { pick, bindDispatch, safeGet, hasContent, isSuccess } from '../../utils';
+import { orderBy } from 'lodash';
 import { RouteComponentProps } from 'react-router';
 import { connect } from 'react-redux';
-import { List, Header } from 'semantic-ui-react';
+import { List, Header, Button } from 'semantic-ui-react';
 import { AsyncView } from '../widgets/AsyncView';
 import strings from '../../strings';
 import { L } from '../localization/L';
@@ -14,7 +15,7 @@ import { FollowsUserView } from '../widgets/FollowsUserView';
 
 
 const mapStateToProps = (state: AppState) => pick(state, ['user', 'follows']);
-const mapDispatchToProps = bindDispatch(pick(actions, ['user', 'follows']));
+const mapDispatchToProps = bindDispatch(pick(actions, ['user', 'follows', 'navigation']));
 
 type ProfilePageStateProps = ReturnType<typeof mapStateToProps>;
 type ProfilePageDispatchProps = ReturnType<typeof mapDispatchToProps>;
@@ -24,6 +25,11 @@ type ProfilePageProps =
     & RouteComponentProps<{username: string}>;
 
 export class _ProfilePage extends React.Component<ProfilePageProps> {
+
+    constructor(props: ProfilePageProps) {
+        super(props);
+        this.onNewGroup = this.onNewGroup.bind(this);
+    }
 
     loadUser() {
         const username = this.props.match.params.username;
@@ -37,9 +43,13 @@ export class _ProfilePage extends React.Component<ProfilePageProps> {
 
     componentDidUpdate(prevProps: ProfilePageProps) {
         if (this.props.match.params.username !== prevProps.match.params.username) {
-          this.loadUser();
+            this.loadUser();
         }
-      }
+    }
+
+    onNewGroup() {
+        this.props.actions.navigation.to({type: 'create-group', username: this.props.match.params.username});
+    }
 
     render() {
         const user = this.props.user.profiles[this.props.match.params.username];
@@ -78,6 +88,15 @@ export class _ProfilePage extends React.Component<ProfilePageProps> {
                 <Header as="h3"><L>{strings.user.profile.following}</L></Header>
                 {u.following && u.following.length > 0 ? <List horizontal bulleted>{u.following.map(u => <List.Item key={u.username}><Link to={renderNavigationPath({type: 'view-profile', username: u.username})}>{u.username}</Link></List.Item>)}</List> : "None"}
                 </List.Item>
+                {currentUser
+                ?
+                    <List.Item>
+                        <Header as="h3"><L>{strings.user.profile.groups}</L></Header>
+                        {currentUser.groups.length > 0 ? <List horizontal bulleted>{orderBy(currentUser.groups, 'name').map(group => <List.Item key={group.id}>{group.name}</List.Item>)}</List>: "You have no friend groups"}
+                        <div><Button secondary onClick={this.onNewGroup}>New Group</Button></div>
+                    </List.Item>
+                : null
+                }
             </List>
         }}</AsyncView>
     }

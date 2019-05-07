@@ -12,13 +12,21 @@ export default {
                 bio: 'Bio (limit 10000 characters)'
             },
             followers: "Followers",
-            following: "Following"
+            following: "Following",
+            groups: "Friend Groups"
         },
         follows: {
             follow: "Follow",
             unfollow: "Unfollow",
             followsYou: "Is following you",
             doesNotFollowYou: "Is not following you",
+        }
+    },
+    groups: {
+        form: {
+            placeholders: {
+                name: "My New Group"
+            }
         }
     },
     login: {
@@ -85,6 +93,7 @@ export default {
     errors: {
         unknown: "An error occurred. Try again later.",
         notFound: "Page wasn't found! Maybe you don't permission to it or you mistyped the URL?",
-        connectionError: "We had trouble loading the page. Try again later."
+        connectionError: "We had trouble loading the page. Try again later.",
+        groupAlreadyExists: "You already have a group with that name."
     }
 };

@@ -39,7 +39,7 @@ export function sortPosts(posts: {[id: number]: Post}) {
 
 export function canEditPost(post: Post, currentUser: Async<CurrentUserResult>) {
     if(currentUser && currentUser.type === "success") {
-        return currentUser.value.id == post.author.id;
+        return currentUser.value.id === post.author.id;
     }
     return false;
 }

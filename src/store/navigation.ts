@@ -1,6 +1,6 @@
 import { ImmerReducer, createActionCreators, createReducerFunction } from 'immer-reducer';
 import { takeEvery, put } from 'redux-saga/effects';
-import { ObjectCodomain, Omit } from '../utils';
+import { ObjectCodomain } from '../utils';
 import { push } from 'connected-react-router';
 import { isNumber } from 'util';
 
@@ -14,6 +14,7 @@ export type NavigationPath =
 | {type: 'edit-post', id: number, username: string}
 | {type: 'view-profile', username: string}
 | {type: 'edit-profile', username: string}
+| {type: 'create-group', username: string}
 
 class NavigationReducers extends ImmerReducer<{}> {
     to(_: NavigationPath) {}
@@ -29,6 +30,8 @@ type Stringify<T> = T extends number ? string : T
 type Templated<T extends object> = {[K in keyof T]: Stringify<T[K]>}
 
 export function renderNavigationTemplate(path: Templated<NavigationPath>): string {
+    // Remove once we're on react-scripts ^3.0.1
+    // eslint-disable-next-line
     switch(path.type) {
         case 'main':
             return `/`;
@@ -48,6 +51,8 @@ export function renderNavigationTemplate(path: Templated<NavigationPath>): strin
             return `/u/${path.username}/profile/`;
         case 'edit-profile':
             return `/u/${path.username}/profile/edit`;
+        case 'create-group':
+            return `/u/${path.username}/groups/create`;
     }
 }
 

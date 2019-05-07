@@ -3,7 +3,7 @@ import { RouteComponentProps } from 'react-router';
 import { Feed, FeedProps } from './Feed';
 import { connect } from 'react-redux';
 import { AppState, actions } from '../../store';
-import { bindDispatch, pick, Omit } from '../../utils';
+import { bindDispatch, pick } from '../../utils';
 
 const mapStateToProps = (state: AppState) => pick(state, ['feed', 'user']);
 const mapDispatchToProps = bindDispatch(pick(actions, ['feed', 'history', 'delete']));

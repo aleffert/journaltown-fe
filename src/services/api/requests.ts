@@ -10,6 +10,8 @@ function parseError(type: string, error: any): ApiError {
             return {type: 'invalid-fields', errors: error};
         case 'email-in-use':
             return {type: 'email-in-use', message: error};
+        case 'name-in-use':
+            return {type: 'name-in-use', errors: error};
         default:
             return ApiErrors.unknownError;
     }
@@ -19,14 +21,13 @@ async function noContentDeserializer(response: Response): Promise<Result<{}, Api
     if(response.ok) {
         return {type: 'success', value: {}};
     }
-    else if(response.status == 404) {
+    else if(response.status === 404) {
         return {type: 'failure', error: {type: 'not-found'}};
     }
-    else if (response.status == 400) {
+    else {
         const json = await response.json();
         return {type: 'failure', error: parseError(json.type, json.errors)};
     }
-    return {type: 'failure', error: {type: 'connection'}};
 }
 
 function jsonDeserializer<T>(validator: Validator<T>): (response: Response) => Promise<Result<T, ApiError>> {
@@ -37,10 +38,14 @@ function jsonDeserializer<T>(validator: Validator<T>): (response: Response) => P
                 return {type: 'success', value: json};
             }
         }
-        else if(response.status == 404) {
+        else if(response.status === 404) {
             return {type: 'failure', error: {type: 'not-found'}};
         }
-        return {type: 'failure', error: {type: 'connection'}};
+        else {
+            const json = await response.json();
+            return {type: 'failure', error: parseError(json.type, json.errors)};
+        }
+        return {type: 'failure', error: {type: 'unknown'}};
     }
 }
 
@@ -245,4 +250,28 @@ export function postRequest(id: number): ApiRequest<PostResult> {
         deserializer: jsonDeserializer(models.isPost)
     };
 
+}
+
+export type CreateGroupResponse = models.FriendGroup;
+export type CreateGroupError = ApiError;
+export type CreateGroupResult = Result<CreateGroupResponse, CreateGroupError>;
+export function createGroupRequest(params: {username: string, groupName: string}): ApiRequest<CreateGroupResult> {
+    return {
+        path: `/users/${params.username}/groups/`,
+        method: 'POST',
+        body: {name: params.groupName},
+        deserializer: jsonDeserializer(models.isFriendGroup)
+    };
+}
+
+export type SetGroupMembersResponse = models.RelatedUser[];
+export type SetGroupMembersError = ApiError;
+export type SetGroupMembersResult = Result<SetGroupMembersResponse, SetGroupMembersError>;
+export function setGroupMembersRequest(params: {username: string, groupId: number, members: string[]}): ApiRequest<SetGroupMembersResult> {
+    return {
+        path: `/users/${params.username}/groups/${params.groupId}/members/`,
+        method: 'PUT',
+        body: {usernames: params.members},
+        deserializer: jsonDeserializer(isArray(models.isRelatedUser))
+    };
 }

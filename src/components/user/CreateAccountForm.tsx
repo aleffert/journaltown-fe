@@ -55,6 +55,8 @@ export class _CreateAccountForm extends React.Component<CreateAccountFormProps> 
         if(!this.props.createAccount.username || !this.props.createAccount.checkAvailabilityResult) {
             return strings.login.createAccount;
         }
+        // Remove once we're on react-scripts ^3.0.1
+        // eslint-disable-next-line
         switch(this.props.createAccount.checkAvailabilityResult.type) {
             case 'success':
                 return strings.login.createAccount;
@@ -68,7 +70,7 @@ export class _CreateAccountForm extends React.Component<CreateAccountFormProps> 
     render() {
         const checkingAvailability = isLoading(this.props.createAccount.checkAvailabilityResult);
         const loading = isLoading(this.props.createAccount.createAccountResult) || checkingAvailability;
-        const submitDisabled = loading || this.props.createAccount.username.length == 0 || isFailure(this.props.createAccount.checkAvailabilityResult);
+        const submitDisabled = loading || this.props.createAccount.username.length === 0 || isFailure(this.props.createAccount.checkAvailabilityResult);
 
         return <div>
             <FullScreen>

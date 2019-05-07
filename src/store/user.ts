@@ -4,7 +4,7 @@ import { put, takeEvery, takeLatest, call } from 'redux-saga/effects';
 import { isString, callMethod, Optional, Async, isSuccess } from '../utils';
 import * as requests from '../services/api/requests';
 import { services, ApiErrors, callApi } from '../services';
-import { UserProfile } from '../services/api/models';
+import { UserProfile, FriendGroup } from '../services/api/models';
 
 // redux
 
@@ -87,6 +87,12 @@ class UserReducers extends ImmerReducer<UserState> {
         if(isSuccess(followerResult)) {
             const updatedFollowing = (followerResult.value.following || []).filter(u => u.username !== followeeUsername);
             followerResult.value.following = updatedFollowing;
+        }
+    }
+
+    addGroup(group: FriendGroup) {
+        if(isSuccess(this.draftState.currentUserResult)) {
+            this.draftState.currentUserResult.value.groups.push(group);
         }
     }
 

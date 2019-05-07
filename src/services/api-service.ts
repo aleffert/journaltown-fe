@@ -14,6 +14,7 @@ export type NoTokenError = {type: 'no-token'};
 export type NotFoundError = {type: 'not-found'};
 export type InvalidFieldsError = {type: 'invalid-fields', errors: {name: string, message: string}[]};
 export type MissingFieldsError = {type: 'missing-fields', errors: {name: string, message: string}[]};
+export type NameInUseError = {type: 'name-in-use', errors: {name: string, message: string}[]};
 export type EmailInUseError = {type: 'email-in-use', message: string};
 export type UnknownError = {type: 'unknown'};
 export const ApiErrors = {
@@ -23,7 +24,15 @@ export const ApiErrors = {
     unknownError: {type: 'unknown'} as UnknownError,
 }
 
-export type ApiError = UnknownError | ConnectionError | NotFoundError | NoTokenError | InvalidFieldsError | MissingFieldsError | EmailInUseError;
+export type ApiError =
+    | ConnectionError
+    | NoTokenError
+    | NotFoundError
+    | InvalidFieldsError
+    | MissingFieldsError
+    | NameInUseError
+    | EmailInUseError
+    | UnknownError
 
 export type ApiRequest<Result> = {
     path: string,

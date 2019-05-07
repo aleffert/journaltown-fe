@@ -2,9 +2,8 @@ import React from 'react';
 
 import { Form, InputOnChangeData, TextAreaProps } from 'semantic-ui-react';
 import { L, withLanguage } from '../localization/L';
-import { Language, Domain } from '../../utils';
+import { Language } from '../../utils';
 import strings from '../../strings';
-import { actions } from '../../store';
 
 type ComposeSubmitMode = 'post' | 'update';
 
@@ -36,7 +35,7 @@ export function _ComposePostForm(props: ComposePostFormProps) {
             loading={props.isLoading}
             onClick={props.onPost}
         >
-        <L>{props.submitMode == 'post' ? strings.compose.post : strings.edit.update}</L>
+        <L>{props.submitMode === 'post' ? strings.compose.post : strings.edit.update}</L>
         </Form.Button>
     </Form>;
 }

@@ -1,17 +1,25 @@
 import * as faker from 'faker';
 import { FactoryBot } from 'factory-bot-ts';
-import { Post, CurrentUser, User, DraftPost, UserProfile, RelatedUser } from '../services/api/models';
+import { Post, CurrentUser, User, DraftPost, UserProfile, RelatedUser, FriendGroup } from '../services/api/models';
 import { DateTime } from 'luxon';
+
+
+FactoryBot.define<RelatedUser>('relatedUser', {
+    username: (() => FactoryBot.seq(s => `${faker.name.firstName()}_${s}`)) as any,
+});
+
+FactoryBot.define<FriendGroup>('friendGroup', {
+    id: FactoryBot.seq(s => s) as any,
+    name: (() => FactoryBot.seq(s => `${faker.name.jobArea()}_${s}`)) as any,
+    members: []
+});
 
 FactoryBot.define<CurrentUser>('currentUser', {
     id: FactoryBot.seq(s => s) as any,
     username: (() => FactoryBot.seq(s => `${faker.name.firstName()}_${s}`)) as any,
     email: faker.internet.exampleEmail as any,
-    profile: (() => FactoryBot.build<UserProfile>('userProfile')) as any
-});
-
-FactoryBot.define<RelatedUser>('relatedUser', {
-    username: (() => FactoryBot.seq(s => `${faker.name.firstName()}_${s}`)) as any,
+    profile: (() => FactoryBot.build<UserProfile>('userProfile')) as any,
+    groups: (() => FactoryBot.buildList<FriendGroup>('friendGroup')) as any
 });
 
 FactoryBot.define<User>('user', {

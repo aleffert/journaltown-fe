@@ -1,6 +1,6 @@
 import React from 'react';
 
-import { isLoading, isSuccess, safeGet } from '../../utils';
+import { isLoading, safeGet } from '../../utils';
 import { FeedPost } from './FeedPost';
 import { Container, Button, Grid, Message } from 'semantic-ui-react';
 import strings from '../../strings';

@@ -27,6 +27,8 @@ type ApiErrorViewProps = {
 export function ApiErrorView(props: ApiErrorViewProps) {
     let message: LocalizedString = strings.errors.unknown;
     let icon: Optional<SemanticICONS> = undefined;
+    // Remove once we're on react-scripts ^3.0.1
+    // eslint-disable-next-line
     switch(props.error.type) {
         case 'not-found':
             message = strings.errors.notFound;

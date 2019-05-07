@@ -3,7 +3,7 @@ import { callApi } from "../services";
 import { put, takeEvery } from 'redux-saga/effects';
 import { createPostRequest, CreatePostResult, PostResult, postRequest, updatePostRequest } from "../services/api/requests";
 import { Async } from "../utils";
-import { navigate, actions as navigationActions } from "./navigation";
+import * as Navigation from './navigation';
 import { DraftPost } from "../services/api/models";
 
 type ComposeState = {
@@ -44,7 +44,7 @@ class ComposeReducers extends ImmerReducer<ComposeState> {
     }
 
     // saga actions
-    startEditingPost(postId: number) {}
+    startEditingPost(_: number) {}
 
     post(_: DraftPost) {}
 
@@ -66,7 +66,7 @@ export function* createPostSaga(action: ReturnType<typeof actions.post>) {
     const result = yield callApi(createPostRequest(action.payload[0]));
     if(result.type === "success") {
         yield put(actions.clear());
-        yield* navigate(navigationActions.to({type: 'view-post', id: result.value.id, username: result.value.author.username}));
+        yield* Navigation.navigate(Navigation.actions.to({type: 'view-post', id: result.value.id, username: result.value.author.username}));
     }
     else {
         yield put(actions.setCreatePostResult(result));
@@ -78,7 +78,7 @@ export function* updatePostSaga(action: ReturnType<typeof actions.update>) {
     const result = yield callApi(updatePostRequest(action.payload[0].postId, action.payload[0].draft));
     if(result.type === "success") {
         yield put(actions.clear());
-        yield* navigate(navigationActions.to({type: 'view-post', id: result.value.id, username: result.value.author.username}));
+        yield* Navigation.navigate(Navigation.actions.to({type: 'view-post', id: result.value.id, username: result.value.author.username}));
     }
     else {
         yield put(actions.setCreatePostResult(result));

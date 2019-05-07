@@ -53,7 +53,7 @@ export class _EditPostPage extends React.Component<EditPostPageProps> {
     }
 
     renderEditor() {
-        const submitDisabled = this.props.compose.body.length == 0 || !!this.props.compose.updatePostResult;
+        const submitDisabled = this.props.compose.body.length === 0 || !!this.props.compose.updatePostResult;
         const success = isSuccess(this.props.compose.updatePostResult);
         const failure = isFailure(this.props.compose.updatePostResult);
         const loading = isLoading(this.props.compose.updatePostResult);

@@ -53,11 +53,13 @@ export const PostActions = (props: PostActionsProps) => {
     return (
         <List horizontal relaxed>{actions.map(action => {
             const Wrapper = (props: {children: JSX.Element[]}) => {
+            // Remove once we're on react-scripts ^3.0.1
+            // eslint-disable-next-line
                 switch(action.type) {
                     case 'link':
                         return <Link id={`action-${action.key}`} to={renderNavigationPath(action.link)}>{props.children}</Link>
                     case 'callback':
-                        return <a id={`action-${action.key}`} onClick={action.callback}>{props.children}</a>
+                        return <button id={`action-${action.key}`} onClick={action.callback}>{props.children}</button>
                 }
             } 
             return <List.Item key={action.icon}>

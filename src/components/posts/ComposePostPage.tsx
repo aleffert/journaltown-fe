@@ -40,7 +40,7 @@ export class _ComposePostPage extends React.Component<ComposePostPageProps, {}> 
     }
 
     render() {
-        const submitDisabled = this.props.compose.body.length == 0 || !!this.props.compose.createPostResult;
+        const submitDisabled = this.props.compose.body.length === 0 || !!this.props.compose.createPostResult;
         const success = isSuccess(this.props.compose.createPostResult);
         const failure = isFailure(this.props.compose.createPostResult);
         const loading = isLoading(this.props.compose.createPostResult);
