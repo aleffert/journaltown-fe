@@ -71,7 +71,7 @@ export function* saga() {
 // Types of the store pieces
 
 // helpers
-type UnionActions<T, K> = K extends any ? ObjectCodomain<T[K]> : never;
+type UnionActions<T, K> = K extends (keyof T)? ObjectCodomain<T[K]> : never;
 export type ExtractActions<T> = UnionActions<T, keyof T>;
 
 // actual types

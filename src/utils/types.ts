@@ -2,7 +2,7 @@
 export type Domain<T> = T extends (f: infer A) => infer _ ? A : never;
 
 // Helper to extract out types
-type UnionCodomain<T, K> = K extends any ? T[K] : never;
+type UnionCodomain<T, K> = K extends (keyof T) ? T[K] : never;
 
 // Unions the types of all the values in an object
 export type ObjectCodomain<T> = UnionCodomain<T, keyof T>;

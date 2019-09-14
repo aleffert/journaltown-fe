@@ -66,8 +66,7 @@ export class _Root extends React.Component<RootProps> {
                         user={this.props.user.currentUserResult.value}
                         onPost={this.onPost}
                         onProfile={this.onProfile}
-                        onLogout={this.onLogout}>
-                    </Header>
+                        onLogout={this.onLogout}/>
                     <Container text className='page-body'>
                         <Routes username={this.props.user.currentUserResult.value.username}/>
                     </Container>

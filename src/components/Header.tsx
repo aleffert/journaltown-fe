@@ -31,6 +31,7 @@ export class _Header extends React.Component<HeaderProps> {
                         <Dropdown.Menu direction='left'>
                             <Dropdown.Item
                                 text={strings.header.profile[this.props.language]}
+                                className="header-profile-item"
                                 onClick={() => this.props.onProfile(this.props.user.username)}
                             />
                             <Dropdown.Item
