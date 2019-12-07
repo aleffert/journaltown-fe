@@ -1,14 +1,14 @@
-import { UsernameAvailableResult, usernameAvailableRequest, CreateAccountResult } from '../services/api/requests';
-import { Async, isSuccess, callMethod } from '../utils';
+import { usernameAvailableRequest, ApiAsync, UsernameAvailableResponse } from '../services/api/requests';
+import { isSuccess, callMethod } from '../utils';
 import { ImmerReducer, createActionCreators, createReducerFunction } from 'immer-reducer';
 import { put, takeLatest, call } from 'redux-saga/effects';
-import { createAccountRequest, CreateAccountResponse, CreateAccountError } from '../services/api/requests';
+import { createAccountRequest, CreateAccountResponse } from '../services/api/requests';
 import { services, callApi } from '../services';
 
 type CreateAccountState = {
     username: string,
-    checkAvailabilityResult: Async<UsernameAvailableResult>,
-    createAccountResult: Async<CreateAccountResult>
+    checkAvailabilityResult: ApiAsync<UsernameAvailableResponse>,
+    createAccountResult: ApiAsync<CreateAccountResponse>
 }
 
 class CreateAccountReducers extends ImmerReducer<CreateAccountState> {
@@ -39,8 +39,8 @@ export const reducers = createReducerFunction(CreateAccountReducers, {
 
 export function* submitCreateAccountSaga(action: ReturnType<typeof actions.submitCreateAccount>) {
     yield put(actions.setCreateAccountResult({type: 'loading'}));
-    const result = yield callApi(createAccountRequest(action.payload[0]));
-    if(isSuccess<CreateAccountResponse, CreateAccountError>(result)) {
+    const result: ApiAsync<CreateAccountResponse> = yield callApi(createAccountRequest(action.payload[0]));
+    if(isSuccess(result)) {
         yield callMethod(services.storage, o => o.setToken, result.value.token);
         yield call(() => window.location.href = '/');
     }

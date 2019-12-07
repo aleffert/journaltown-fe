@@ -1,7 +1,8 @@
 import * as qs from 'query-string';
 import { StorageService } from './storage-service';
-import { Optional, commafy } from '../utils';
+import { Optional, commafy, makeFailure } from '../utils';
 import { pickBy } from 'lodash';
+import { ConnectionError, AppErrors } from '../utils/errors';
 
 declare global {
     interface EnvironmentVariables {
@@ -9,34 +10,17 @@ declare global {
     }
 }
 
-export type ConnectionError = {type: 'connection'};
-export type NoTokenError = {type: 'no-token'};
-export type NotFoundError = {type: 'not-found'};
-export type InvalidFieldsError = {type: 'invalid-fields', errors: {name: string, message: string}[]};
-export type MissingFieldsError = {type: 'missing-fields', errors: {name: string, message: string}[]};
-export type NameInUseError = {type: 'name-in-use', errors: {name: string, message: string}[]};
-export type EmailInUseError = {type: 'email-in-use', message: string};
-export type UnknownError = {type: 'unknown'};
-export const ApiErrors = {
-    connectionError: {type: 'connection'} as ConnectionError,
-    noTokenError: {type: 'no-token'} as NoTokenError,
-    notFoundError: {type: 'not-found'} as NotFoundError,
-    unknownError: {type: 'unknown'} as UnknownError,
-}
 
-export type ApiError =
-    | ConnectionError
-    | NoTokenError
-    | NotFoundError
-    | InvalidFieldsError
-    | MissingFieldsError
-    | NameInUseError
-    | EmailInUseError
-    | UnknownError
+export enum Method {
+    GET = "GET",
+    POST = "POST",
+    PUT = "PUT",
+    DELETE = "DELETE"
+}
 
 export type ApiRequest<Result> = {
     path: string,
-    method: 'GET' | 'POST' | 'PUT' | 'DELETE',
+    method: Method,
     query?: {[K: string]: Optional<string | string[]>},
     body?: object,
     deserializer(response: Response): Promise<Result>
@@ -74,7 +58,7 @@ export class ApiService {
             return request.deserializer(result);
         }
         catch {
-            return {type: 'failure', error: ApiErrors.connectionError};
+            return makeFailure(AppErrors.connectionError);
         }
     }
 }

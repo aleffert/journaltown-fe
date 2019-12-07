@@ -1,16 +1,15 @@
 import { ImmerReducer, createActionCreators, createReducerFunction } from 'immer-reducer';
-import { Async } from '../utils';
-import { PostResult, postRequest } from '../services/api/requests';
+import { postRequest, PostResponse, ApiAsync } from '../services/api/requests';
 
 import { put, takeEvery } from 'redux-saga/effects';
 import { callApi } from '../services';
 
 type PostState = {
-    posts: {[id: number]: Async<PostResult>},
+    posts: {[id: number]: ApiAsync<PostResponse>},
 }
 class PostReducers extends ImmerReducer<PostState> {
     // state
-    setPostResult(params: {postId: number, value: Async<PostResult>}) {
+    setPostResult(params: {postId: number, value: ApiAsync<PostResponse>}) {
         // TODO: garbage collect
         this.draftState.posts[params.postId] = params.value;
     }
@@ -19,7 +18,7 @@ class PostReducers extends ImmerReducer<PostState> {
     }
 
     // sagas
-    loadPost(_: {postId: number, current: Async<PostResult>}) {}
+    loadPost(_: {postId: number, current: ApiAsync<PostResponse>}) {}
 }
 
 export const actions = createActionCreators(PostReducers);

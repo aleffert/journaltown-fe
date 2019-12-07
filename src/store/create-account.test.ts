@@ -1,7 +1,8 @@
 import { submitCreateAccountSaga, actions, checkAvailabilitySaga } from "./create-account";
 import { put } from "redux-saga/effects";
-import { ApiErrors, callApi } from "../services";
 import { usernameAvailableRequest } from "../services/api/requests";
+import { makeSuccess, makeFailure } from "../utils";
+import { AppErrors } from "../utils/errors";
 
 describe('create-account', () => {
     const username = "someuser";
@@ -15,7 +16,7 @@ describe('create-account', () => {
 
         it('marks the state as failed if the request fails', () => {
             const events: Generator = submitCreateAccountSaga(actions.submitCreateAccount({username, token}));
-            const result = {type: 'failure' as 'failure', error: ApiErrors.unknownError};
+            const result = makeFailure(AppErrors.unknownError);
             events.next();
             events.next();
             expect(events.next(result).value).toEqual(put(actions.setCreateAccountResult(result)));;
@@ -23,7 +24,7 @@ describe('create-account', () => {
 
         it('sets the returned token if the request succeeds', () => {
             const events: Generator = submitCreateAccountSaga(actions.submitCreateAccount({username, token}));
-            const result = {type: 'success' as 'success', value: {token}};
+            const result = makeSuccess({token});
             events.next();
             events.next();
             expect(events.next(result).value.CALL.args).toEqual([token]);
@@ -31,7 +32,7 @@ describe('create-account', () => {
 
         it('refreshes the page if the request succeeds', () => {
             const events: Generator = submitCreateAccountSaga(actions.submitCreateAccount({username, token}));
-            const result = {type: 'success' as 'success', value: {token}};
+            const result = makeSuccess({token});
             events.next();
             events.next();
             events.next(result);
@@ -63,7 +64,7 @@ describe('create-account', () => {
             expect(events.next().value).toEqual(put(actions.setCheckAvailabilityResult({type: 'loading'})));
             expect(events.next().value.CALL.args[0].path).toEqual(usernameAvailableRequest(username).path);
 
-            const result = {type: 'success' as 'success', value: {}};
+            const result = makeSuccess({});
             expect(events.next(result).value).toEqual(put(actions.setCheckAvailabilityResult(result)));
         });
     });

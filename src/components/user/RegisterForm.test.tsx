@@ -5,6 +5,8 @@ import { Button } from 'semantic-ui-react';
 import { MemoryRouter } from 'react-router';
 import { merge } from 'lodash';
 import strings from '../../strings';
+import { makeSuccess, makeFailure } from '../../utils';
+import { AppErrors } from '../../utils/errors';
 
 describe('RegisterForm', () => {
     const baseProps = {
@@ -54,7 +56,7 @@ describe('RegisterForm', () => {
 
     it('shows a message once the request has succeeded', () => {
         const props = merge({}, baseProps, {
-            status: {type: 'success', value: {}}
+            status: makeSuccess({})
         });
         const w = mount(<MemoryRouter>
             <RegisterForm {...props}/>
@@ -64,7 +66,7 @@ describe('RegisterForm', () => {
 
     it('shows an error when the email address is already associated with an account', () => {
         const props = merge({}, baseProps, {
-            status: {type: 'failure', error: {type: 'email-in-use'}}
+            status: makeFailure({type: 'email-in-use'})
         });
         const w = mount(<MemoryRouter>
             <RegisterForm {...props}/>
@@ -74,7 +76,7 @@ describe('RegisterForm', () => {
 
     it('shows an error when something happens', () => {
         const props = merge({}, baseProps, {
-            status: {type: 'failure', error: {type: 'unknown'}}
+            status: makeFailure(AppErrors.unknownError)
         });
         const w = mount(<MemoryRouter>
             <RegisterForm {...props}/>

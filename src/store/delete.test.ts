@@ -4,6 +4,8 @@ import { put } from 'redux-saga/effects';
 import * as Feed from './feed';
 import * as Post from './post';
 import * as Navigate from './navigation';
+import { makeSuccess, makeFailure } from '../utils';
+import { AppErrors } from '../utils/errors';
 
 describe('delete sagas', () => {
     describe('deletePostSaga', () => {
@@ -19,7 +21,7 @@ describe('delete sagas', () => {
 
         it('does nothing if the API request fails', () => {
             const effects: Generator = deletePostSaga(actions.sendDeletePost({postId}));
-            const result = {type: 'failure', error: ApiErrors.unknownError};
+            const result = makeFailure(AppErrors.unknownError);
             effects.next();
             effects.next(result);
             expect(effects.next().done).toBe(true);
@@ -27,7 +29,7 @@ describe('delete sagas', () => {
 
         it('clears stuff out if the request succeeds', () => {
             const effects: Generator = deletePostSaga(actions.sendDeletePost({postId}));
-            const result = {type: 'success', value: {}};
+            const result = makeSuccess({});
             effects.next();
             const emitted = [];
             emitted.push(effects.next(result).value);
@@ -38,7 +40,7 @@ describe('delete sagas', () => {
 
         it('ends if there is no redirect', () => {
             const effects: Generator = deletePostSaga(actions.sendDeletePost({postId}));
-            const result = {type: 'success', value: {}};
+            const result = makeSuccess({});
             effects.next();
             effects.next(result);
             effects.next();
@@ -48,7 +50,7 @@ describe('delete sagas', () => {
         it('redirects if there is a redirect', () => {
             const redirect: Navigate.NavigationPath = {type: 'main'};
             const effects: Generator = deletePostSaga(actions.sendDeletePost({postId, redirect}));
-            const result = {type: 'success', value: {}};
+            const result = makeSuccess({});
             effects.next();
             effects.next(result);
             effects.next();

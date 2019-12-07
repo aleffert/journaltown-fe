@@ -5,6 +5,8 @@ import { Form } from 'semantic-ui-react';
 import strings from '../../strings';
 import { ApiErrors } from '../../services';
 import { MemoryRouter as Router } from 'react-router';
+import { makeSuccess, makeFailure } from '../../utils';
+import { AppErrors } from '../../utils/errors';
 
 describe('LoginForm', () => {
     const baseProps = {language: 'en' as 'en', status:undefined, onSubmit: () => {}};
@@ -34,7 +36,7 @@ describe('LoginForm', () => {
     it('shows a success message when status is success', () => {
         const w = render(
             <Router>
-                <_LoginForm {...baseProps} status={{type: 'success', value: {}}}></_LoginForm>
+                <_LoginForm {...baseProps} status={makeSuccess({})}></_LoginForm>
             </Router>
         );
         expect(w.text()).toContain(strings.login.sendLoginSuccess['en']);
@@ -44,7 +46,7 @@ describe('LoginForm', () => {
     it('shows a failure message when status is failure', () => {
         const w = render(
             <Router>
-                <_LoginForm {...baseProps} status={{type: 'failure', error: ApiErrors.notFoundError}}/>
+                <_LoginForm {...baseProps} status={makeFailure(AppErrors.notFoundError)}/>
             </Router>
         );
         expect(w.text()).not.toContain(strings.login.sendLoginSuccess['en']);

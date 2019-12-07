@@ -5,6 +5,7 @@ import { merge } from 'lodash';
 import { CreateAccountForm } from './CreateAccountForm';
 import { RegisterForm } from './RegisterForm';
 import { MemoryRouter } from 'react-router';
+import { makeSuccess } from '../../utils';
 
 describe('RegisterPage', () => {
 
@@ -84,7 +85,7 @@ describe('RegisterPage', () => {
                 }
             },
             createAccount: {
-                checkAvailabilityResult: {type: 'success', value: {}},
+                checkAvailabilityResult: makeSuccess({}),
                 username: username
             },
             actions: {

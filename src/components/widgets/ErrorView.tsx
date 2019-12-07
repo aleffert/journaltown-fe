@@ -2,9 +2,9 @@ import React from 'react';
 import { LocalizedString, Optional } from "../../utils";
 import { SemanticICONS, Icon, Grid } from "semantic-ui-react";
 import { L } from "../localization/L";
-import { ApiError } from "../../services";
 import strings from "../../strings";
 import { FullScreen } from './FullScreen';
+import { AppError } from '../../utils/errors';
 
 type ErrorViewProps = {
     message: LocalizedString,
@@ -22,13 +22,11 @@ export function ErrorView(props: ErrorViewProps) {
 }
 
 type ApiErrorViewProps = {
-    error: ApiError
+    error: AppError
 };
 export function ApiErrorView(props: ApiErrorViewProps) {
     let message: LocalizedString = strings.errors.unknown;
     let icon: Optional<SemanticICONS> = undefined;
-    // Remove once we're on react-scripts ^3.0.1
-    // eslint-disable-next-line
     switch(props.error.type) {
         case 'not-found':
             message = strings.errors.notFound;

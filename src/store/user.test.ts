@@ -3,6 +3,8 @@ import { ApiErrors } from "../services";
 import { FactoryBot } from "factory-bot-ts";
 import { UserProfile, User, CurrentUser } from "../services/api/models";
 import { expectSaga } from "redux-saga-test-plan";
+import { makeSuccess, makeFailure } from "../utils";
+import { AppErrors } from "../utils/errors";
 
 describe('user sagas', () => {
     describe('submitRegisterSaga', () => {
@@ -23,7 +25,7 @@ describe('user sagas', () => {
         });
 
         it('marks the state with the result of the api call', async () => {
-            const result = {type: 'success' as 'success', value: {}};
+            const result = makeSuccess({});
             await expectSaga(submitRegisterSaga, action)
                 .provide({call: () => result})
                 .put(actions.setRegisterResult(result))
@@ -49,7 +51,7 @@ describe('user sagas', () => {
         });
 
         it('marks the state with the result of the api call', async () => {
-            const result = {type: 'success' as 'success', value: {}};
+            const result = makeSuccess({});
             await expectSaga(submitLoginSaga, action)
                 .provide({call: () => result})
                 .put(actions.setLoginResult(result))
@@ -74,7 +76,7 @@ describe('user sagas', () => {
         });
 
         it('if validation succeeds we store the token', async () => {
-            const result = {type: 'success', value: {token: token}};
+            const result = makeSuccess({token});
             await expectSaga(loadIfPossibleSaga, actions.loadIfPossible({token}))
                 .provide({call: () => result})
                 .call.like({args: [token]})
@@ -82,7 +84,7 @@ describe('user sagas', () => {
         });
 
         it('if validation fails we do not store the token', async () => {
-            const result = {type: 'failure', error: {}};
+            const result = makeFailure(undefined);
             await expectSaga(loadIfPossibleSaga, actions.loadIfPossible({token}))
                 .provide({call: () => result})
                 .not.call.like({args: [token]})
@@ -90,7 +92,7 @@ describe('user sagas', () => {
         });
 
         it('if we do not have a token we do not try to load the current user', async () => {
-            const result = {type: 'failure' as 'failure', error: ApiErrors.noTokenError};
+            const result = makeFailure(AppErrors.noTokenError);
             await expectSaga(loadIfPossibleSaga, actions.loadIfPossible({token: undefined}))
                 .provide({call: () => result})
                 .put(actions.setCurrentUserResult(result))
@@ -98,7 +100,7 @@ describe('user sagas', () => {
         });
 
         it('if we have a token we try to load the current user', async () => {
-            const result = {type: 'success' as 'success', value: 'whatever'};
+            const result = makeSuccess('whatever');
             await expectSaga(loadIfPossibleSaga, actions.loadIfPossible({token}))
                 .provide({call: () => result})
                 .put(actions.setCurrentUserResult({type: 'loading'}))
@@ -107,7 +109,7 @@ describe('user sagas', () => {
 
         it('if we have a token we request the current user', async () => {
             const currentUser = FactoryBot.build<CurrentUser>('currentUser');
-            const result = {type: 'success' as 'success', value: currentUser};
+            const result = makeSuccess(currentUser);
             await expectSaga(loadIfPossibleSaga, actions.loadIfPossible({token}))
                 .provide({call: () => result})
                 .put(actions.setCurrentUserResult(result))
@@ -118,7 +120,7 @@ describe('user sagas', () => {
 
     describe('updateProfileSaga', () => {
         const user = FactoryBot.build<CurrentUser>('currentUser');
-        const action = actions.updateProfile({username: user.username, profile: user.profile})
+        const action = actions.updateProfile({username: user.username, profile: user.profile});
         it('sets loading on start', async () => {
             await expectSaga(updateProfileSaga, action)
                 .provide({call: () => ({type: 'loading'})})
@@ -127,7 +129,7 @@ describe('user sagas', () => {
         });
 
         it('updates with the result', async () => {
-            const result = {type: 'failure' as 'failure', error: ApiErrors.connectionError};
+            const result = makeFailure(AppErrors.connectionError);
             await expectSaga(updateProfileSaga, action)
                 .provide({call: () => result})
                 .put(actions.setUpdateProfileResult(result))
@@ -135,7 +137,7 @@ describe('user sagas', () => {
         });
 
         it('it does not update the current user if the result is failure', async () => {
-            const result = {type: 'failure' as 'failure', error: ApiErrors.connectionError};
+            const result = makeFailure(AppErrors.connectionError);
             await expectSaga(updateProfileSaga, action)
                 .provide({call: () => result})
                 .not.put.like({action: {type: actions.setCurrentUserProfile.type}})
@@ -143,7 +145,7 @@ describe('user sagas', () => {
         });
 
         it('it updates the current user if the result is success', async () => {
-            const result = {type: 'success' as 'success', value: user.profile};
+            const result = makeSuccess(user.profile);
             await expectSaga(updateProfileSaga, action)
                 .provide({call: () => result})
                 .put(actions.setCurrentUserProfile(result.value))
@@ -161,11 +163,11 @@ describe('user reducers', () => {
         });
         it('does not change the value if the current user is set', () => {
             const profile = FactoryBot.build<UserProfile>('userProfile');
-            const result = {type: 'success', value: {
+            const result = makeSuccess({
                 profile: {
                     bio: 'abc123'
                 }
-            }}
+            });
             const state = reducers({currentUserResult: result} as any, actions.setCurrentUserProfile(profile));
             expect((state.currentUserResult as any).value.profile).toEqual(profile);
         });
@@ -175,8 +177,8 @@ describe('user reducers', () => {
         it('adds to the list of followers for the followee', () => {
             const followeeUser = FactoryBot.build<User>('user');
             const followerUser = FactoryBot.build<User>('user');
-            const followeeResult = {type: 'success', value: followeeUser};
-            const followerResult = {type: 'success', value: followerUser};
+            const followeeResult = makeSuccess(followeeUser);
+            const followerResult = makeSuccess(followerUser);
             const followeeUsername = followeeUser.username;
             const followerUsername = followerUser.username;
             const baseState = {
@@ -192,8 +194,8 @@ describe('user reducers', () => {
         it('adds to the list of followees for the follower', () => {
             const followeeUser = FactoryBot.build<User>('user');
             const followerUser = FactoryBot.build<User>('user');
-            const followeeResult = {type: 'success', value: followeeUser};
-            const followerResult = {type: 'success', value: followerUser};
+            const followeeResult = makeSuccess(followeeUser);
+            const followerResult = makeSuccess(followerUser);
             const followeeUsername = followeeUser.username;
             const followerUsername = followerUser.username;
             const baseState = {
@@ -208,7 +210,7 @@ describe('user reducers', () => {
 
         it('adds to the both lists if the user follows themselves', () => {
             const user = FactoryBot.build<User>('user');
-            const result = {type: 'success', value: user};
+            const result = makeSuccess(user);
             const followeeUsername = user.username;
             const followerUsername = user.username;
             const baseState = {

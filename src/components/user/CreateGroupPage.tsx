@@ -6,9 +6,9 @@ import { EditGroupForm } from './EditGroupForm';
 import { connect } from 'react-redux';
 import { AsyncView } from '../widgets/AsyncView';
 import { Message } from 'semantic-ui-react';
-import { ApiError } from '../../services';
 import strings from '../../strings';
 import { L } from '../localization/L';
+import { AppError } from '../../utils/errors';
 
 const mapStateToProps = (state: AppState) => pick(state, ['user', 'friendGroup']);
 const mapDispatchToProps = bindDispatch(pick(actions, ['user', 'friendGroup']));
@@ -55,7 +55,7 @@ class _CreateGroupPage extends React.Component<CreateGroupPageProps> {
         this.props.actions.friendGroup.createGroup({username, groupName, members});
     }
 
-    messageForError(error: ApiError): LocalizedString {
+    messageForError(error: AppError): LocalizedString {
         switch(error.type) {
             case 'name-in-use':
                 return strings.errors.groupAlreadyExists;
@@ -79,6 +79,7 @@ class _CreateGroupPage extends React.Component<CreateGroupPageProps> {
                         onNameChange={this.onNameChange}
                         onSubmit={this.onCreateGroup}
                         name={this.props.friendGroup.name}
+                        kind='create'
                     />
                     {isFailure(this.props.friendGroup.createGroupResult)
                     ? <Message negative><L>{this.messageForError(this.props.friendGroup.createGroupResult.error)}</L></Message>

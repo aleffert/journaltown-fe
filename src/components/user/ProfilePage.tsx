@@ -1,6 +1,6 @@
 import React from 'react';
 import { AppState, actions } from '../../store';
-import { pick, bindDispatch, safeGet, hasContent, isSuccess } from '../../utils';
+import { pick, bindDispatch, safeGet, hasContent, resultJoin } from '../../utils';
 import { orderBy } from 'lodash';
 import { RouteComponentProps } from 'react-router';
 import { connect } from 'react-redux';
@@ -53,13 +53,10 @@ export class _ProfilePage extends React.Component<ProfilePageProps> {
 
     render() {
         const user = this.props.user.profiles[this.props.match.params.username];
-        return <AsyncView result={user}>{u =>  {
-            const currentUser = (
-                isSuccess(this.props.user.currentUserResult) 
-                    && this.props.user.currentUserResult.value.username === u.username 
-            ) ? this.props.user.currentUserResult.value : null;
+        return <AsyncView result={resultJoin(user, this.props.user.currentUserResult)}>{([u, currentUser]) =>  {
+            const viewingSelf = currentUser.username === u.username;
             const bio = safeGet(u['profile'], 'bio');
-            const following = (u.following || []).find(f => !!currentUser && f.username === currentUser.username);
+            const following = (u.following || []).find(f => viewingSelf && f.username === currentUser.username);
             return <List relaxed>
                 <List.Item>
                     <Header as="h2">{u.username}</Header>
@@ -92,7 +89,19 @@ export class _ProfilePage extends React.Component<ProfilePageProps> {
                 ?
                     <List.Item>
                         <Header as="h3"><L>{strings.user.profile.groups}</L></Header>
-                        {currentUser.groups.length > 0 ? <List horizontal bulleted>{orderBy(currentUser.groups, 'name').map(group => <List.Item key={group.id}>{group.name}</List.Item>)}</List>: "You have no friend groups"}
+                        {
+                            currentUser.groups.length > 0 ?
+                                <List horizontal bulleted>{
+                                    orderBy(currentUser.groups, 'name')
+                                        .map(
+                                            group =>
+                                                <List.Item key={group.id}>
+                                                    <Link to={
+                                                        renderNavigationPath({type: 'edit-group', id: group.id, username: u.username})
+                                                    }>{group.name}</Link>
+                                                </List.Item>
+                                        )
+                                }</List>: "You have no friend groups"}
                         <div><Button secondary onClick={this.onNewGroup}>New Group</Button></div>
                     </List.Item>
                 : null

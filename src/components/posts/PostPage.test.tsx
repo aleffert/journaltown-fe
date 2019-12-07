@@ -5,6 +5,7 @@ import { FeedPost } from './FeedPost';
 import { FactoryBot } from 'factory-bot-ts';
 import { Post, CurrentUser } from '../../services/api/models';
 import { MemoryRouter } from 'react-router';
+import { makeSuccess } from '../../utils';
 
 describe('PostPage', () => {
 
@@ -16,10 +17,10 @@ describe('PostPage', () => {
                 params: {postId: '123'}
             },
             post: {
-                posts: {123: {type: 'success', value: post}}
+                posts: {123: makeSuccess(post)}
             },
             user: {
-                currentUserResult: {type: 'success', value: user}
+                currentUserResult: makeSuccess(user)
             },
             actions: {
                 post: {loadPost: () => {}}

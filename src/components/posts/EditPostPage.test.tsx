@@ -7,7 +7,8 @@ import { FactoryBot } from 'factory-bot-ts';
 import { Post } from '../../services/api/models';
 import { InitialLoader } from '../user/InitialLoader';
 import { ErrorView } from '../widgets/ErrorView';
-import { ApiErrors } from '../../services';
+import { makeSuccess, makeFailure } from '../../utils';
+import { AppErrors } from '../../utils/errors';
 
 describe('EditPostPage', () => {
 
@@ -17,7 +18,7 @@ describe('EditPostPage', () => {
         compose: {
             title: '',
             body: '',
-            existingPostResult: {type: 'success', value: post}
+            existingPostResult: makeSuccess(post)
         },
         actions: {
             compose: {
@@ -39,20 +40,20 @@ describe('EditPostPage', () => {
     });
 
     it('shows an when loading fails', () => {
-        const props = merge({}, baseProps, {compose: {existingPostResult: {type: 'failure', error: ApiErrors.notFoundError}}});
+        const props = merge({}, baseProps, {compose: {existingPostResult: makeFailure(AppErrors.notFoundError)}});
         const w = mount(<_EditPostPage {...props} />);
         expect(w.find(ErrorView).exists()).toBe(true);
     });
 
     it('shows a success message when a post succeeds', () => {
-        const props = merge({}, baseProps, {compose: {updatePostResult: {type: 'success', value: {} as any}}});
+        const props = merge({}, baseProps, {compose: {updatePostResult: makeSuccess({} as any)}});
         const w = mount(<_EditPostPage {...props} />);
         expect(w.html()).toContain(strings.edit.sendSuccess['en']);
         expect(w.html()).not.toContain(strings.edit.sendFailure['en']);
     });
 
     it('shows a failure message when a post fails', () => {
-        const props = merge({}, baseProps, {compose: {updatePostResult: {type: 'failure', error: {} as any}}});
+        const props = merge({}, baseProps, {compose: {updatePostResult: makeFailure({} as any)}});
         const w = mount(<_EditPostPage {...props} />);
         expect(w.html()).not.toContain(strings.edit.sendSuccess['en']);
         expect(w.html()).toContain(strings.edit.sendFailure['en']);

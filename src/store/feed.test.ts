@@ -2,8 +2,9 @@ import produce from "immer"
 import { put } from 'redux-saga/effects';
 import { FactoryBot } from 'factory-bot-ts';
 import { actions, getNextPostsSaga, getChangedPostsSaga, reducers, keyForFilters } from './feed';
-import { ApiErrors } from '../services';
 import { Post } from '../services/api/models';
+import { makeSuccess, makeFailure } from "../utils";
+import { AppErrors } from "../utils/errors";
 
 describe('feed sagas', () => {
     const filters = {username: 'hi'};
@@ -31,7 +32,7 @@ describe('feed sagas', () => {
             const posts = FactoryBot.buildList<Post>('post', 2);
             effects.next();
             effects.next();
-            expect(effects.next({type: 'success', value: posts}).value).toEqual(put(actions.integratePosts(filters, posts)));
+            expect(effects.next(makeSuccess(posts)).value).toEqual(put(actions.integratePosts(filters, posts)));
         });
 
         it('does not integrate posts on failure', () => {
@@ -39,7 +40,7 @@ describe('feed sagas', () => {
             const posts = FactoryBot.buildList<Post>('post', 2);
             effects.next();
             effects.next();
-            expect(effects.next({type: 'failed', error: ApiErrors.connectionError}).value).not.toEqual(
+            expect(effects.next(makeFailure(AppErrors.connectionError)).value).not.toEqual(
                 put(actions.integratePosts(filters, posts))
             );
         });
@@ -49,7 +50,7 @@ describe('feed sagas', () => {
             const posts: any = [];
             effects.next();
             effects.next();
-            const result = {type: 'success' as 'success', value: posts};
+            const result = makeSuccess(posts);
             effects.next(result);
             expect(effects.next().value).toEqual(put(actions.setNextPostsResult(filters, result)));
             expect(effects.next().done).toBe(true);
@@ -81,7 +82,7 @@ describe('feed sagas', () => {
             const posts = [post];
             effects.next();
             effects.next();
-            expect(effects.next({type: 'success', value: posts}).value).toEqual(put(actions.integratePosts(filters, posts)));
+            expect(effects.next(makeSuccess(posts)).value).toEqual(put(actions.integratePosts(filters, posts)));
         });
 
         it('does not integrate posts on failure', () => {
@@ -90,7 +91,7 @@ describe('feed sagas', () => {
             const posts = [post];
             effects.next();
             effects.next();
-            expect(effects.next({type: 'failed', error: ApiErrors.connectionError}).value).not.toEqual(put(actions.integratePosts(filters, posts)));
+            expect(effects.next(makeFailure(AppErrors.connectionError)).value).not.toEqual(put(actions.integratePosts(filters, posts)));
         });
 
         it('sets the result status when done', () => {
@@ -98,7 +99,7 @@ describe('feed sagas', () => {
             const posts: any = [];
             effects.next();
             effects.next();
-            const result = {type: 'success' as 'success', value: posts};
+            const result = makeSuccess(posts);
             effects.next(result);
             expect(effects.next().value).toEqual(put(actions.setChangedPostsResult(filters, result)));
             expect(effects.next().done).toBe(true);
@@ -152,7 +153,7 @@ describe('feed sagas', () => {
     describe('setNextPostsResult', () => {
         it('makes up a new feed entry if none is present', () => {
             const store = {posts: {}, feeds: {}};
-            const result = {type: 'success' as 'success', value: []};
+            const result = makeSuccess([]);
             expect(reducers(store, actions.setNextPostsResult(filters, result)).feeds[keyForFilters(filters)]).toEqual(
                 {changedPostsResult: undefined, filters, nextPostsResult: result, postIds: []}
             );
@@ -162,7 +163,7 @@ describe('feed sagas', () => {
     describe('setChangedPostsResult', () => {
         it('makes up a new feed entry if none is present', () => {
             const store = {posts: {}, feeds: {}};
-            const result = {type: 'success' as 'success', value: []};
+            const result = makeSuccess([]);
             expect(reducers(store, actions.setChangedPostsResult(filters, result)).feeds[keyForFilters(filters)]).toEqual(
                 {changedPostsResult: result, filters, nextPostsResult: undefined, postIds: []}
             );

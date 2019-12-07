@@ -1,21 +1,26 @@
 import { ImmerReducer, createActionCreators, createReducerFunction } from 'immer-reducer';
 import { put, takeEvery, takeLatest, call } from 'redux-saga/effects';
 
-import { isString, callMethod, Optional, Async, isSuccess } from '../utils';
-import * as requests from '../services/api/requests';
-import { services, ApiErrors, callApi } from '../services';
+import { isString, callMethod, Optional, isSuccess, makeFailure } from '../utils';
+import { services, callApi } from '../services';
 import { UserProfile, FriendGroup } from '../services/api/models';
+import { 
+    ApiAsync, LoginResponse, CurrentUserResponse, UserResponse,
+    UpdateProfileResponse, userRequest, currentUserRequest,
+    exchangeTokenRequest, loginRequest, registerRequest, updateProfileRequest, ApiResult
+} from '../services/api/requests';
+import { AppErrors } from '../utils/errors';
 
 // redux
 
 type UserState = {
-    loginResult: Async<requests.LoginResult>,
-    registerResult: Async<requests.LoginResult>,
+    loginResult: ApiAsync<LoginResponse>
+    registerResult: ApiAsync<LoginResponse>,
     validating: boolean,
-    currentUserResult: Async<requests.CurrentUserResult>,
-    profiles: {[username: string]: Async<requests.UserResult>},
+    currentUserResult: ApiAsync<CurrentUserResponse>,
+    profiles: {[username: string]: ApiAsync<UserResponse>},
     draftProfile: UserProfile,
-    updateProfileResult: Async<requests.UpdateProfileResult>
+    updateProfileResult: ApiAsync<UpdateProfileResponse>
 };
 
 class UserReducers extends ImmerReducer<UserState> {
@@ -37,7 +42,7 @@ class UserReducers extends ImmerReducer<UserState> {
         this.draftState.currentUserResult = value;
     }
 
-    setUserResult(params: {username: string, value: Async<requests.UserResult>}) {
+    setUserResult(params: {username: string, value: ApiAsync<UserResponse>}) {
         // TODO: garbage collect
         this.draftState.profiles[params.username] = params.value;
     }
@@ -97,7 +102,7 @@ class UserReducers extends ImmerReducer<UserState> {
     }
 
     // sagas
-    loadUser(_: {username: string, current: Async<requests.UserResult>}) {}
+    loadUser(_: {username: string, current: ApiAsync<UserResponse>}) {}
     submitLogin(_: {email: string}) {}
     submitRegister(_: {email: string}) {}
     logout() {}
@@ -123,7 +128,7 @@ function* loadUserSaga(action: ReturnType<typeof actions.loadUser>) {
     if(!action.payload[0].current) {
         yield put(actions.setUserResult({username, value: {type: 'loading'}}));
     }
-    const result = yield callApi(requests.userRequest(action.payload[0].username));
+    const result = yield callApi(userRequest(action.payload[0].username));
     yield put(actions.setUserResult({username, value: result}));
 }
 
@@ -132,11 +137,11 @@ function* loadCurrentUserSaga() {
     const authToken = yield call(services.storage.getToken);
     if(authToken) {
         yield put(actions.setCurrentUserResult({type: 'loading'}));
-        const result = yield callApi(requests.currentUserRequest());
+        const result = yield callApi(currentUserRequest());
         yield put(actions.setCurrentUserResult(result));
     }
     else {
-        yield put(actions.setCurrentUserResult({type: 'failure', error: ApiErrors.noTokenError}));
+        yield put(actions.setCurrentUserResult(makeFailure(AppErrors.noTokenError)));
     }
 }
 
@@ -146,7 +151,7 @@ export function* loadIfPossibleSaga(action: ReturnType<typeof actions.loadIfPoss
     if(token && isString(token)) {
         yield put(actions.setValidating(true));
         // if so, try to turn it into a useful auth token
-        const result = yield callApi(requests.exchangeTokenRequest({token: token}));
+        const result = yield callApi(exchangeTokenRequest({token: token}));
         if(result.type === "success") {
             yield callMethod(services.storage, o => o.setToken, result.value.token);
         }
@@ -159,13 +164,13 @@ export function* loadIfPossibleSaga(action: ReturnType<typeof actions.loadIfPoss
 
 export function* submitLoginSaga(action: ReturnType<typeof actions.submitLogin>) {
     yield put(actions.setLoginResult({type: 'loading'}));
-    const result = yield callApi(requests.loginRequest(action.payload[0]));
+    const result = yield callApi(loginRequest(action.payload[0]));
     yield put(actions.setLoginResult(result));
 }
 
 export function* submitRegisterSaga(action: ReturnType<typeof actions.submitRegister>) {
     yield put(actions.setRegisterResult({type: 'loading'}));
-    const result = yield callApi(requests.registerRequest(action.payload[0]));
+    const result = yield callApi(registerRequest(action.payload[0]));
     yield put(actions.setRegisterResult(result));
 }
 
@@ -176,9 +181,9 @@ export function* logoutSaga(_: ReturnType<typeof actions.logout>) {
 
 export function* updateProfileSaga(action: ReturnType<typeof actions.updateProfile>) {
     yield put(actions.setUpdateProfileResult({type: 'loading'}));
-    const result = yield callApi(requests.updateProfileRequest(action.payload[0]));
+    const result: ApiResult<UpdateProfileResponse> = yield callApi(updateProfileRequest(action.payload[0]));
     yield put(actions.setUpdateProfileResult(result));
-    if(isSuccess<requests.UpdateProfileResponse, requests.UpdateProfileError>(result)) {
+    if(isSuccess(result)) {
         yield put(actions.setCurrentUserProfile(result.value))
     }
 }

@@ -3,6 +3,7 @@ import { mount } from 'enzyme';
 import { _ComposePostPage } from './ComposePostPage';
 import { merge } from 'lodash';
 import strings from '../../strings';
+import { makeSuccess, makeFailure } from '../../utils';
 
 describe('ComposePostPage', () => {
 
@@ -14,14 +15,14 @@ describe('ComposePostPage', () => {
     } as any;
 
     it('shows a success message when a post succeeds', () => {
-        const props = merge({}, baseProps, {compose: {createPostResult: {type: 'success', value: {} as any}}});
+        const props = merge({}, baseProps, {compose: {createPostResult: makeSuccess({} as any)}});
         const w = mount(<_ComposePostPage {...props} />);
         expect(w.html()).toContain(strings.compose.sendSuccess['en']);
         expect(w.html()).not.toContain(strings.compose.sendFailure['en']);
     });
 
     it('shows a failure message when a post fails', () => {
-        const props = merge({}, baseProps, {compose: {createPostResult: {type: 'failure', error: {} as any}}});
+        const props = merge({}, baseProps, {compose: {createPostResult: makeFailure({} as any)}});
         const w = mount(<_ComposePostPage {...props} />);
         expect(w.html()).not.toContain(strings.compose.sendSuccess['en']);
         expect(w.html()).toContain(strings.compose.sendFailure['en']);

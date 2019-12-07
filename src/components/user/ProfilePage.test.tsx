@@ -8,6 +8,7 @@ import { FactoryBot } from 'factory-bot-ts';
 import { User, CurrentUser } from '../../services/api/models';
 import strings from '../../strings';
 import configureMockStore from 'redux-mock-store';
+import { makeSuccess } from '../../utils';
 
 describe('ProfilePage', () => {
 
@@ -46,8 +47,8 @@ describe('ProfilePage', () => {
         });
         const store = makeTestStore({
             user: {
-                profiles: {[user.username]: {type: 'success', value: user}},
-                currentUserResult: {type: 'success', value: currentUser}
+                profiles: {[user.username]: makeSuccess(user)},
+                currentUserResult: makeSuccess(currentUser)
             }
         });
         const w = mount(
@@ -67,8 +68,8 @@ describe('ProfilePage', () => {
         });
         const store = makeTestStore({
             user: {
-                profiles: {[user.username]: {type: 'success', value: user}},
-                currentUserResult: {type: 'success', value: currentUser}
+                profiles: {[user.username]: makeSuccess(user)},
+                currentUserResult: makeSuccess(currentUser)
             }
         });
         const w = mount(
@@ -88,8 +89,8 @@ describe('ProfilePage', () => {
         });
         const store = makeTestStore({
             user: {
-                profiles: {[user.username]: {type: 'success', value: user}},
-                currentUserResult: {type: 'success', value: currentUser}
+                profiles: {[user.username]: makeSuccess(user)},
+                currentUserResult: makeSuccess(currentUser)
             }
         });
         const w = mount(
@@ -112,8 +113,8 @@ describe('ProfilePage', () => {
         });
         const store = makeTestStore({
             user: {
-                profiles: {[user.username]: {type: 'success', value: user}},
-                currentUserResult: {type: 'success', value: currentUser}
+                profiles: {[user.username]: makeSuccess(user)},
+                currentUserResult: makeSuccess(currentUser)
             }
         });
         const w = mount(

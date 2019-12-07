@@ -6,8 +6,9 @@ import { Provider } from 'react-redux';
 import configureMockStore from 'redux-mock-store';
 import { FactoryBot } from 'factory-bot-ts';
 import { User } from '../../services/api/models';
-import { ApiErrors, ApiError } from '../../services';
 import strings from '../../strings';
+import { makeSuccess, makeFailure } from '../../utils';
+import { AppError, AppErrors } from '../../utils/errors';
 
 describe('CreateGroupPage', () => {
 
@@ -34,13 +35,13 @@ describe('CreateGroupPage', () => {
 
     describe('when create friend group fails', () => {
 
-        function makeFailingStore(error: ApiError) {
+        function makeFailingStore(error: AppError) {
             const store = makeTestStore({
                 user: {profiles: {
-                    [user.username]: {type: 'success', value: user}
+                    [user.username]: makeSuccess(user)
                 }},
                 friendGroup: {
-                    createGroupResult: {type: 'failure', error},
+                    createGroupResult: makeFailure(error),
                     selectedFriends: []
                 }
             });
@@ -57,7 +58,7 @@ describe('CreateGroupPage', () => {
         } as any;
 
         it('shows a failure message when group creation fails', () => {
-            const store = makeFailingStore(ApiErrors.unknownError);
+            const store = makeFailingStore(AppErrors.unknownError);
             const w = mount(
                 <Provider store={store}><CreateGroupPage {...props}/></Provider>
             );

@@ -1,15 +1,15 @@
 import { ImmerReducer, createActionCreators, createReducerFunction } from "immer-reducer";
 import { callApi } from "../services";
 import { put, takeEvery } from 'redux-saga/effects';
-import { createPostRequest, CreatePostResult, PostResult, postRequest, updatePostRequest } from "../services/api/requests";
-import { Async } from "../utils";
+import { createPostRequest, postRequest, updatePostRequest, ApiAsync, CreatePostResponse, PostResponse, UpdatePostResponse } from "../services/api/requests";
+import { isSuccess } from "../utils";
 import * as Navigation from './navigation';
 import { DraftPost } from "../services/api/models";
 
 type ComposeState = {
-    createPostResult: Async<CreatePostResult>,
-    existingPostResult: Async<PostResult>,
-    updatePostResult: Async<PostResult>
+    createPostResult: ApiAsync<CreatePostResponse>,
+    existingPostResult: ApiAsync<PostResponse>,
+    updatePostResult: ApiAsync<UpdatePostResponse>
 } & DraftPost
 
 class ComposeReducers extends ImmerReducer<ComposeState> {
@@ -75,8 +75,8 @@ export function* createPostSaga(action: ReturnType<typeof actions.post>) {
 
 export function* updatePostSaga(action: ReturnType<typeof actions.update>) {
     yield put(actions.setUpdatePostResult({type: 'loading'}))
-    const result = yield callApi(updatePostRequest(action.payload[0].postId, action.payload[0].draft));
-    if(result.type === "success") {
+    const result: ApiAsync<UpdatePostResponse> = yield callApi(updatePostRequest(action.payload[0].postId, action.payload[0].draft));
+    if(isSuccess(result)) {
         yield put(actions.clear());
         yield* Navigation.navigate(Navigation.actions.to({type: 'view-post', id: result.value.id, username: result.value.author.username}));
     }
@@ -89,8 +89,8 @@ export function* startEditingPostSaga(action: ReturnType<typeof actions.startEdi
     yield put(actions.setCreatePostResult(undefined));
     yield put(actions.setUpdatePostResult(undefined));
     yield put(actions.setExistingPostResult({type: 'loading'}))
-    const result = yield callApi(postRequest(action.payload[0]));
-    if(result && result.type === 'success') {
+    const result: ApiAsync<PostResponse> = yield callApi(postRequest(action.payload[0]));
+    if(isSuccess(result)) {
         yield put(actions.setTitle(result.value.title));
         yield put(actions.setBody(result.value.body));
     }

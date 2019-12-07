@@ -5,6 +5,7 @@ import { merge } from 'lodash';
 import { mount } from 'enzyme';
 import { MemoryRouter } from 'react-router';
 import { _EditProfilePage } from './EditProfilePage';
+import { makeSuccess } from '../../utils';
 
 describe('EditProfilePage', () => {
     const baseProps = {
@@ -26,7 +27,7 @@ describe('EditProfilePage', () => {
         const props = merge({}, baseProps, {
             match: {params: {username: currentUser.username}},
             user: {
-                currentUserResult: {type: 'success', value: currentUser}
+                currentUserResult: makeSuccess(currentUser),
             },
             actions: {
                 user: {

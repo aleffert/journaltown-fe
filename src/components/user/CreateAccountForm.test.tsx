@@ -3,6 +3,8 @@ import { mount } from 'enzyme';
 import { _CreateAccountForm } from './CreateAccountForm';
 import strings from '../../strings';
 import { Button } from 'semantic-ui-react';
+import { makeSuccess, makeFailure } from '../../utils';
+import { AppErrors } from '../../utils/errors';
 
 describe("CreateAccountForm", () => {
 
@@ -13,13 +15,13 @@ describe("CreateAccountForm", () => {
     });
 
     it('shows a message when the username is unavailable', () => {
-        const props = {createAccount: {username: 'abc', checkAvailabilityResult: {type: 'failure', error: {type: 'invalid-fields'}}}} as any;
+        const props = {createAccount: {username: 'abc', checkAvailabilityResult: makeFailure({type: 'invalid-fields'})}} as any;
         const w = mount(<_CreateAccountForm {...props} />);
         expect(w.html()).toContain(strings.login.unavailable('abc')['en']);
     });
 
     it('shows a message when username is bad for some other reason', () => {
-        const props = {createAccount: {username: 'abc', checkAvailabilityResult: {type: 'failure', error: {type: 'unknown'}}}} as any;
+        const props = {createAccount: {username: 'abc', checkAvailabilityResult: makeFailure(AppErrors.unknownError)}} as any;
         const w = mount(<_CreateAccountForm {...props} />);
         expect(w.html()).toContain(strings.login.unavailable('abc')['en']);
     });
@@ -28,7 +30,7 @@ describe("CreateAccountForm", () => {
         const props = {
             createAccount: {
                 username: 'abc', 
-                checkAvailabilityResult: {type: 'success', value: {}},
+                checkAvailabilityResult: makeSuccess({}),
                 createAccountResult: {type: 'loading'}
             }
         } as any;
@@ -40,7 +42,7 @@ describe("CreateAccountForm", () => {
         const props = {
             createAccount: {
                 username: 'abc', 
-                checkAvailabilityResult: {type: 'success', value: {}},
+                checkAvailabilityResult: makeSuccess({}),
                 createAccountResult: {type: 'loading'}
             }
         } as any;
@@ -52,7 +54,7 @@ describe("CreateAccountForm", () => {
         const props = {
             createAccount: {
                 username: 'abc', 
-                checkAvailabilityResult: {type: 'loading', value: {}}
+                checkAvailabilityResult: {type: 'loading'}
             }
         } as any;
         const w = mount(<_CreateAccountForm {...props} />);
@@ -63,8 +65,8 @@ describe("CreateAccountForm", () => {
         const props = {
             createAccount: {
                 username: 'abc', 
-                checkAvailabilityResult: {type: 'success', value: {}},
-                createAccountResult: {type: 'failure', error: {type: 'invalid-fields'}}
+                checkAvailabilityResult: makeSuccess({}),
+                createAccountResult: makeFailure({type: 'invalid-fields'})
             }
         } as any;
         const w = mount(<_CreateAccountForm {...props} />);
@@ -75,8 +77,8 @@ describe("CreateAccountForm", () => {
         const props = {
             createAccount: {
                 username: 'abc', 
-                checkAvailabilityResult: {type: 'success', value: {}},
-                createAccountResult: {type: 'failure', error: {type: 'unknown'}}
+                checkAvailabilityResult: makeSuccess({}),
+                createAccountResult: makeFailure(AppErrors.unknownError)
             }
         } as any;
         const w = mount(<_CreateAccountForm {...props} />);

@@ -1,9 +1,10 @@
 import { reduce, orderBy } from 'lodash';
 import { Post } from "../../services/api/models";
-import { Optional, AsyncResult, Async } from "../../utils";
-import { PostsResponse, PostsError, CurrentUserResult } from '../../services/api/requests';
+import { Optional, AsyncResult } from "../../utils";
+import { PostsResponse, ApiAsync, CurrentUserResponse } from '../../services/api/requests';
+import { AppError } from '../../utils/errors';
 
-export function shouldShowLoadMore(nextPostResult: AsyncResult<PostsResponse, PostsError>) {
+export function shouldShowLoadMore(nextPostResult: AsyncResult<PostsResponse, AppError>) {
     if(nextPostResult && nextPostResult.type === 'success') {
         return nextPostResult.value.length > 0;
     }
@@ -37,7 +38,7 @@ export function sortPosts(posts: {[id: number]: Post}) {
     return orderBy(Object.values(posts), 'created_at', 'desc');
 }
 
-export function canEditPost(post: Post, currentUser: Async<CurrentUserResult>) {
+export function canEditPost(post: Post, currentUser: ApiAsync<CurrentUserResponse>) {
     if(currentUser && currentUser.type === "success") {
         return currentUser.value.id === post.author.id;
     }

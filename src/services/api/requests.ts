@@ -1,8 +1,19 @@
-import { Result, isObject, isArray, Validator, } from '../../utils';
-import { ApiError, ApiRequest, ApiErrors } from '../api-service';
+import { Result, isObject, isArray, Validator, Async, makeSuccess, makeFailure, } from '../../utils';
+import { Method } from '../api-service';
 import * as models from './models';
+import { AppErrors, AppError } from '../../utils/errors';
 
-function parseError(type: string, error: any): ApiError {
+export type ApiResult<V, E = AppError> = Result<V, E>
+export type ApiAsync<V> = Async<ApiResult<V>>
+
+type RequestResponseType<T extends (...args: any) => any> = 
+    ReturnType<T> extends {deserializer: (...args: any) => infer T1} ? 
+    T1 extends Promise<infer T2> ?
+    T2 extends Result<infer T3> ?
+    T3
+    : never : never : never;
+
+function parseError(type: string, error: any): AppError {
     switch(type) {
         case 'invalid-fields':
             return {type: 'invalid-fields', errors: error};
@@ -13,215 +24,186 @@ function parseError(type: string, error: any): ApiError {
         case 'name-in-use':
             return {type: 'name-in-use', errors: error};
         default:
-            return ApiErrors.unknownError;
+            return AppErrors.unknownError;
     }
 }
 
-async function noContentDeserializer(response: Response): Promise<Result<{}, ApiError>> {
+async function noContentDeserializer(response: Response): Promise<Result<{}, AppError>> {
     if(response.ok) {
-        return {type: 'success', value: {}};
+        return makeSuccess({})
     }
     else if(response.status === 404) {
-        return {type: 'failure', error: {type: 'not-found'}};
+        return makeFailure(AppErrors.notFoundError)
     }
     else {
         const json = await response.json();
-        return {type: 'failure', error: parseError(json.type, json.errors)};
+        return makeFailure(parseError(json.type, json.errors));
     }
 }
 
-function jsonDeserializer<T>(validator: Validator<T>): (response: Response) => Promise<Result<T, ApiError>> {
+function jsonDeserializer<T>(validator: Validator<T>): (response: Response) => Promise<Result<T, AppError>> {
     return async function(response: Response) {
         if(response.ok) {
             const json = await response.json();
             if(validator(json)) {
-                return {type: 'success', value: json};
+                return makeSuccess(json);
             }
         }
         else if(response.status === 404) {
-            return {type: 'failure', error: {type: 'not-found'}};
+            return makeFailure(AppErrors.notFoundError);
         }
         else {
             const json = await response.json();
-            return {type: 'failure', error: parseError(json.type, json.errors)};
+            return makeFailure(parseError(json.type, json.errors));
         }
-        return {type: 'failure', error: {type: 'unknown'}};
+        return makeFailure(AppErrors.unknownError);
     }
 }
 
-export type UserResponse = models.User;
-export type UserError = ApiError;
-export type UserResult = Result<UserResponse, UserError>;
-export function userRequest(username: string): ApiRequest<UserResult> {
+
+export function userRequest(username: string) {
     return {
         path: `/users/${username}/`,
-        method: 'GET',
+        method: Method.GET,
         query: {expand: 'profile,followers,following'},
         deserializer: jsonDeserializer(models.isUser)
     };
 }
+export type UserResponse = RequestResponseType<typeof userRequest>;
 
-export type FollowsResponse = models.RelatedUser[];
-export type FollowsError = ApiError;
-export type FollowsResult = Result<FollowsResponse, FollowsError>;
 export type FollowsFilters = {
     username?: string
     username__in?: string[]
 };
-export function followsRequest(params: {followee: string, filters: FollowsFilters}): ApiRequest<FollowsResult> {
+export function followsRequest(params: {followee: string, filters: FollowsFilters}) {
+    debugger;
     return {
         path: `/users/${params.followee}/follows/`,
-        method: 'GET',
+        method: Method.GET,
         query: params.filters,
         deserializer: jsonDeserializer(isArray(models.isRelatedUser))
     }
 }
+export type FollowsResponse = RequestResponseType<typeof followsRequest>;
 
-export type AddUserFollowsResponse = models.RelatedUser[];
-export type AddUserFollowsError = ApiError;
-export type AddUserFollowsResult = Result<AddUserFollowsResponse, AddUserFollowsError>;
-export function addUserFollowsRequest(params: {follower: string, followee: string}): ApiRequest<AddUserFollowsResult> {
+export function addUserFollowsRequest(params: {follower: string, followee: string}) {
     return {
         path: `/users/${params.follower}/follows/`,
-        method: 'PUT',
+        method: Method.PUT,
         body:{username: params.followee},
         deserializer: jsonDeserializer(isArray(models.isRelatedUser))
     }
 }
+export type AddUserFollowsResponse = RequestResponseType<typeof addUserFollowsRequest>;
 
-export type RemoveUserFollowsResponse = {};
-export type RemoveUserFollowsError = ApiError;
-export type RemoveUserFollowsResult = Result<RemoveUserFollowsResponse, RemoveUserFollowsError>;
-export function removeUserFollowsRequest(params: {follower: string, followee: string}): ApiRequest<RemoveUserFollowsResult> {
+export function removeUserFollowsRequest(params: {follower: string, followee: string}) {
     return {
         path: `/users/${params.follower}/follows/`,
-        method: 'DELETE',
+        method: Method.DELETE,
         body:{username: params.followee},
         deserializer: noContentDeserializer
     }
 }
+export type RemoveUserFollowsResponse = RequestResponseType<typeof removeUserFollowsRequest>;
 
-export type UpdateProfileResponse = models.UserProfile;
-export type UpdateProfileError = ApiError;
-export type UpdateProfileResult = Result<UpdateProfileResponse, UpdateProfileError>;
-export function updateProfileRequest(params: {username: string, profile: models.UserProfile}): ApiRequest<UpdateProfileResult> {
+export function updateProfileRequest(params: {username: string, profile: models.UserProfile}) {
     return {
         path: `/users/${params.username}/`,
-        method: 'PUT',
+        method: Method.PUT,
         query: {expand: 'profile'},
         body: {profile: params.profile},
         deserializer: jsonDeserializer(models.isUserProfile)
     };
 }
+export type UpdateProfileResponse = RequestResponseType<typeof updateProfileRequest>;
 
-export type CurrentUserResponse = models.CurrentUser;
-export type CurrentUserError = ApiError;
-export type CurrentUserResult = Result<CurrentUserResponse, CurrentUserError>;
-export function currentUserRequest(): ApiRequest<CurrentUserResult> {
+export function currentUserRequest() {
     return {
         path: '/me/',
-        method: 'GET',
+        method: Method.GET,
         deserializer: jsonDeserializer(models.isCurrentUser)
     };
 }
+export type CurrentUserResponse = RequestResponseType<typeof currentUserRequest>;
 
-export type LoginResponse = {};
-export type LoginError = ApiError;
-export type LoginResult = Result<LoginResponse, LoginError>;
-export function loginRequest(body: {email: string}): ApiRequest<LoginResult> {
+export function loginRequest(body: {email: string}) {
     return {
         path: '/auth/email/',
-        method: 'POST',
+        method: Method.POST,
         body,
         deserializer: jsonDeserializer(isObject({}))
     };
 }
+export type LoginResponse = RequestResponseType<typeof loginRequest>;
 
-export type RegisterResponse = {};
-export type RegisterError = ApiError;
-export type RegisterResult = Result<RegisterResponse, LoginError>;
-export function registerRequest(body: {email: string}): ApiRequest<RegisterResult> {
+export function registerRequest(body: {email: string}) {
     return {
         path: '/register/email/',
-        method: 'POST',
+        method: Method.POST,
         body,
         deserializer: noContentDeserializer
     };
 }
+export type RegisterResponse = RequestResponseType<typeof registerRequest>;
 
-export type CreateAccountResponse = {token: string};
-export type CreateAccountError = ApiError;
-export type CreateAccountResult = Result<CreateAccountResponse, CreateAccountError>;
-export function createAccountRequest(body: {username: string, token: string}): ApiRequest<CreateAccountResult> {
+export function createAccountRequest(body: {username: string, token: string}) {
     return {
         path: '/callback/register/',
-        method: 'POST',
+        method: Method.POST,
         body,
         deserializer: jsonDeserializer(models.isToken)
     };
 }
+export type CreateAccountResponse = RequestResponseType<typeof createAccountRequest>;
 
-export type UsernameAvailableResponse = {};
-export type UsernameAvailableError = ApiError;
-export type UsernameAvailableResult = Result<UsernameAvailableResponse, UsernameAvailableError>;
-export function usernameAvailableRequest(username: string): ApiRequest<UsernameAvailableResult> {
+export function usernameAvailableRequest(username: string) {
     return {
         path: `/users/${username}/available`,
-        method: 'GET',
+        method: Method.GET,
         deserializer: noContentDeserializer
     };
 }
+export type UsernameAvailableResponse = RequestResponseType<typeof usernameAvailableRequest>;
 
-export type ExchangeTokenResponse = models.Token;
-export type ExchangeTokenError = ApiError;
-export type ExchangeResult = Result<ExchangeTokenResponse, ExchangeTokenError>;
-export function exchangeTokenRequest(body: {token: string}): ApiRequest<ExchangeResult> {
+export function exchangeTokenRequest(body: {token: string}) {
     return {
         path: '/callback/auth/',
-        method: 'POST',
+        method: Method.POST,
         body,
         deserializer: jsonDeserializer(models.isToken)
     };
 }
+export type ExchangeTokenResponse = RequestResponseType<typeof exchangeTokenRequest>;
 
-export type CreatePostResponse = models.Post;
-export type CreatePostError = ApiError;
-export type CreatePostResult = Result<CreatePostResponse, CreatePostError>;
-export function createPostRequest(draft: models.DraftPost): ApiRequest<CreatePostResult> {
+export function createPostRequest(draft: models.DraftPost) {
     return {
         path: '/posts/',
-        method: 'POST',
+        method: Method.POST,
         body: draft,
         deserializer: jsonDeserializer(models.isPost)
     };
 }
+export type CreatePostResponse = RequestResponseType<typeof createPostRequest>;
 
-export type UpdatePostResponse = models.Post;
-export type UpdatePostError = ApiError;
-export type UpdatePostResult = Result<CreatePostResponse, CreatePostError>;
-export function updatePostRequest(postId: number, draft: models.DraftPost): ApiRequest<CreatePostResult> {
+export function updatePostRequest(postId: number, draft: models.DraftPost) {
     return {
         path: `/posts/${postId}/`,
-        method: 'PUT',
+        method: Method.PUT,
         body: draft,
         deserializer: jsonDeserializer(models.isPost)
     };
 }
+export type UpdatePostResponse = RequestResponseType<typeof updatePostRequest>;
 
-export type DeletePostResponse = {};
-export type DeletePostError = ApiError;
-export type DeletePostResult = Result<DeletePostResponse, DeletePostError>;
-export function deletePostRequest(postId: number): ApiRequest<DeletePostResult> {
+export function deletePostRequest(postId: number) {
     return {
         path: `/posts/${postId}/`,
-        method: 'DELETE',
+        method: Method.DELETE,
         deserializer: noContentDeserializer
     };
 }
+export type DeletePostResponse = RequestResponseType<typeof deletePostRequest>;
 
-export type PostsResponse = models.Post[];
-export type PostsError = ApiError;
-export type PostsResult = Result<PostsResponse, PostsError>;
 export type PostsFeedFilters = {
     username ?: string
 };
@@ -231,47 +213,53 @@ export type PostsFilters = {
     created_at__lt?: string,
     created_at__gt?: string
 } & PostsFeedFilters
-export function postsRequest(filters: PostsFilters): ApiRequest<PostsResult> {
+export function postsRequest(filters: PostsFilters) {
     return {
         path: '/posts/',
-        method: 'GET',
+        method: Method.GET,
         query: filters,
         deserializer: jsonDeserializer(isArray(models.isPost))
     };
 }
+export type PostsResponse = RequestResponseType<typeof postsRequest>;
 
-export type PostResponse = models.Post;
-export type PostError = ApiError;
-export type PostResult = Result<PostResponse, PostError>;
-export function postRequest(id: number): ApiRequest<PostResult> {
+export function postRequest(id: number) {
     return {
         path: `/posts/${id}/`,
-        method: 'GET',
+        method: Method.GET,
         deserializer: jsonDeserializer(models.isPost)
     };
-
 }
+export type PostResponse = RequestResponseType<typeof postRequest>;
 
-export type CreateGroupResponse = models.FriendGroup;
-export type CreateGroupError = ApiError;
-export type CreateGroupResult = Result<CreateGroupResponse, CreateGroupError>;
-export function createGroupRequest(params: {username: string, groupName: string}): ApiRequest<CreateGroupResult> {
+export function createGroupRequest(params: {username: string, groupName: string, members: string[]}) {
     return {
         path: `/users/${params.username}/groups/`,
-        method: 'POST',
+        method: Method.POST,
         body: {name: params.groupName},
         deserializer: jsonDeserializer(models.isFriendGroup)
     };
 }
+export type CreateGroupResponse = RequestResponseType<typeof createGroupRequest>;
 
-export type SetGroupMembersResponse = models.RelatedUser[];
-export type SetGroupMembersError = ApiError;
-export type SetGroupMembersResult = Result<SetGroupMembersResponse, SetGroupMembersError>;
-export function setGroupMembersRequest(params: {username: string, groupId: number, members: string[]}): ApiRequest<SetGroupMembersResult> {
+export function groupRequest(params: {username: string, groupId: number}) {
     return {
-        path: `/users/${params.username}/groups/${params.groupId}/members/`,
-        method: 'PUT',
-        body: {usernames: params.members},
-        deserializer: jsonDeserializer(isArray(models.isRelatedUser))
+        path: `/users/${params.username}/groups/${params.groupId}/`,
+        method: Method.GET,
+        deserializer: jsonDeserializer(models.isFriendGroup)
     };
 }
+export type GroupResponse = RequestResponseType<typeof groupRequest>;
+
+export function updateGroupRequest(params: {username: string, groupId: number, groupName: string, members: string[]}) {
+    return {
+        path: `/users/${params.username}/groups/${params.groupId}/`,
+        method: Method.PUT,
+        body: {
+            name: params.groupName,
+            members: params.members
+        },
+        deserializer: jsonDeserializer(models.isFriendGroup)
+    };
+}
+export type UpdateGroupResponse = RequestResponseType<typeof groupRequest>;

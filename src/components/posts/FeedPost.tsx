@@ -2,15 +2,14 @@ import React from 'react';
 import { Post } from '../../services/api/models';
 import { Container, Header, Grid, Modal, Button } from 'semantic-ui-react';
 import { PostActions } from './PostActions';
-import { CurrentUserResult } from '../../services/api/requests';
-import { Async } from '../../utils';
 import { canEditPost } from './feed-helpers';
 import strings from '../../strings';
 import { L } from '../localization/L';
+import { ApiAsync, CurrentUserResponse } from '../../services/api/requests';
 
 type FeedPostProps = {
     post: Post,
-    currentUser: Async<CurrentUserResult>,
+    currentUser: ApiAsync<CurrentUserResponse>,
     onDelete: () => void
 };
 

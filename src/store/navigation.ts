@@ -15,6 +15,7 @@ export type NavigationPath =
 | {type: 'view-profile', username: string}
 | {type: 'edit-profile', username: string}
 | {type: 'create-group', username: string}
+| {type: 'edit-group', id: number, username: string}
 
 class NavigationReducers extends ImmerReducer<{}> {
     to(_: NavigationPath) {}
@@ -30,8 +31,6 @@ type Stringify<T> = T extends number ? string : T
 type Templated<T extends object> = {[K in keyof T]: Stringify<T[K]>}
 
 export function renderNavigationTemplate(path: Templated<NavigationPath>): string {
-    // Remove once we're on react-scripts ^3.0.1
-    // eslint-disable-next-line
     switch(path.type) {
         case 'main':
             return `/`;
@@ -53,6 +52,8 @@ export function renderNavigationTemplate(path: Templated<NavigationPath>): strin
             return `/u/${path.username}/profile/edit`;
         case 'create-group':
             return `/u/${path.username}/groups/create`;
+        case 'edit-group':
+            return `/u/${path.username}/g/${path.id}`;
     }
 }
 

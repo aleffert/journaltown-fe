@@ -1,16 +1,16 @@
 import { ImmerReducer, createActionCreators, createReducerFunction } from "immer-reducer";
-import { Async, Optional, ObjectCodomain } from "../utils";
+import { Optional, ObjectCodomain } from "../utils";
 import { callApi } from "../services";
 import { put, takeEvery } from 'redux-saga/effects';
 import { Post } from "../services/api/models";
-import { postsRequest, PostsResult, PostsFilters, PostsFeedFilters } from "../services/api/requests";
+import { postsRequest, PostsFilters, PostsFeedFilters, ApiAsync, PostsResponse } from "../services/api/requests";
 import qs from 'query-string';
 
 
 type FeedStatus = {
     filters: PostsFeedFilters
-    nextPostsResult: Async<PostsResult>
-    changedPostsResult: Async<PostsResult>
+    nextPostsResult: ApiAsync<PostsResponse>
+    changedPostsResult: ApiAsync<PostsResponse>
     postIds: number[]
 }
 
@@ -76,7 +76,7 @@ export const reducers = createReducerFunction(FeedReducers,
 
 function* getPostsSaga(
     filters: PostsFeedFilters, since: Optional<string>, makeParams: (since: string) => PostsFilters, 
-    action: (result: Async<PostsResult>) => ReturnType<ObjectCodomain<typeof actions>>
+    action: (result: ApiAsync<PostsResponse>) => ReturnType<ObjectCodomain<typeof actions>>
 ) {
     yield put(action({type: 'loading'}));
 

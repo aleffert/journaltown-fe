@@ -5,6 +5,7 @@ import { Post, CurrentUser } from '../../services/api/models';
 import { mount } from 'enzyme';
 import { MemoryRouter } from 'react-router';
 import { Modal } from 'semantic-ui-react';
+import { makeSuccess } from '../../utils';
 
 describe('FeedPost', () => {
     const post = FactoryBot.build<Post>('post');
@@ -21,7 +22,7 @@ describe('FeedPost', () => {
         const user = FactoryBot.build<CurrentUser>('currentUser', post.author);
         const w = mount(
             <MemoryRouter>
-                <FeedPost post={post} currentUser={{type: 'success', value: user}} onDelete={() => {}}/>
+                <FeedPost post={post} currentUser={makeSuccess(user)} onDelete={() => {}}/>
             </MemoryRouter>
         );
         w.find('#action-delete').hostNodes().simulate('click');

@@ -5,12 +5,13 @@ import { Form, Grid, Header, InputOnChangeData, Message, Container } from 'seman
 import strings from '../../strings';
 import { L, withLanguage } from '../localization/L';
 import { AsyncResult, Optional, Language, LocalizedString, isSuccess, isFailure, isLoading } from '../../utils';
-import { LoginError, LoginResponse, RegisterError } from '../../services/api/requests';
+import { LoginResponse } from '../../services/api/requests';
 import { FullScreen } from '../widgets/FullScreen';
 import { Link } from 'react-router-dom';
+import { AppError } from '../../utils/errors';
 
 type LoginFormProps = {
-    status: Optional<AsyncResult<LoginResponse, LoginError>>,
+    status: Optional<AsyncResult<LoginResponse, AppError>>,
     onSubmit(email: string): void,
     language: Language
 };
@@ -38,7 +39,7 @@ export class _LoginForm extends React.Component<LoginFormProps, LoginFormState> 
         this.setState({email: d.value});
     }
 
-    errorMessage(error: RegisterError): LocalizedString {
+    errorMessage(error: AppError): LocalizedString {
         switch(error) {
             default:
             return strings.login.sendRegisterFailure;

@@ -3,6 +3,7 @@ import { FactoryBot } from 'factory-bot-ts';
 import { RelatedUser, CurrentUser, User } from '../services/api/models';
 import { expectSaga } from 'redux-saga-test-plan';
 import * as U from './user';
+import { makeSuccess, makeFailure } from '../utils';
 
 describe('follows sagas', () => {
     describe('loadUserFollowingSaga', () => {
@@ -13,20 +14,20 @@ describe('follows sagas', () => {
         it('sets the status to loading', async () => {
             const result = {type: 'loading' as 'loading'};
             await expectSaga(loadUserFollowingSaga, action)
-                .provide({call: () => ({type: 'success', value: [target]})})
+                .provide({call: () => makeSuccess([target])})
                 .put(actions.setUserResults({usernames: [target.username], result}))
                 .run();
         });
 
         it('it passes the right arguments to the api', async () => {
             await expectSaga(loadUserFollowingSaga, action)
-                .provide({call: () => ({type: 'success', value: [target]})})
+                .provide({call: () => makeSuccess([target])})
                 .call.like({args: [{query: {username: target.username}}]})
                 .run();
         });
 
         it('it puts the result value', async () => {
-            const result = {type: 'success' as 'success', value: [target]};
+            const result = makeSuccess([target]);
             await expectSaga(loadUserFollowingSaga, action)
                 .provide({call: () => result})
                 .put(actions.setUserResults({usernames: [target.username], result}))
@@ -41,7 +42,7 @@ describe('follows sagas', () => {
         it('sets the status to loading for the given user', async () => {
             const result = {type: 'loading' as 'loading'};
             await expectSaga(addUserFollowingSaga, action)
-                .provide({call: () => ({type: 'success', value: [target]})})
+                .provide({call: () => makeSuccess([target])})
                 .put(actions.setUserResults({usernames: [target.username], result}))
                 .run();
 
@@ -49,13 +50,13 @@ describe('follows sagas', () => {
 
         it('passes the right arguments to the api', async () => {
             await expectSaga(addUserFollowingSaga, action)
-                .provide({call: () => ({type: 'success', value: [target]})})
+                .provide({call: () => makeSuccess([target])})
                 .call.like({args: [{body: {username: target.username}}]})
                 .run();
         });
 
         it('it puts the result value', async () => {
-            const result = {type: 'success' as 'success', value: [target]};
+            const result = makeSuccess([target]);
             await expectSaga(addUserFollowingSaga, action)
                 .provide({call: () => result})
                 .put(actions.setUserResults({usernames: [target.username], result}))
@@ -72,28 +73,28 @@ describe('follows sagas', () => {
         it('sets the status to loading for the given user', async () => {
             const result = {type: 'loading' as 'loading'};
             await expectSaga(removeUserFollowingSaga, action)
-                .provide({call: () => ({type: 'success', value: {}})})
+                .provide({call: () => makeSuccess({})})
                 .put(actions.setUserResults({usernames: [target.username], result}))
                 .run();
         });
 
         it('passes the right arguments to the api', async () => {
             await expectSaga(removeUserFollowingSaga, action)
-                .provide({call: () => ({type: 'success', value: {}})})
+                .provide({call: () => makeSuccess({})})
                 .call.like({args: [{body: {username: target.username}}]})
                 .run();
         });
 
         it('on success it removes the follow from the store', async () => {
             await expectSaga(removeUserFollowingSaga, action)
-                .provide({call: () => ({type: 'success', value: {}})})
+                .provide({call: () => makeSuccess({})})
                 .put(U.actions.removeFollower({followerUsername: current.username, followeeUsername: target.username}))
                 .run();
         });
 
         it('on failure it does not remove the follow from the store', async () => {
             await expectSaga(removeUserFollowingSaga, action)
-                .provide({call: () => ({type: 'failure', value: {}})})
+                .provide({call: () => makeFailure({})})
                 .not.put(U.actions.removeFollower({followerUsername: current.username, followeeUsername: target.username}))
                 .run();
 
@@ -105,18 +106,18 @@ describe('follows reducers', () => {
     it('sets a value on success when there is a related user', () => {
         const user = FactoryBot.build<RelatedUser>('relatedUser');
         const usernames = [user.username];
-        const result = {type: 'success' as 'success', value: [user]};
+        const result = makeSuccess([user]);
         const state = reducers({results: {}, values: {}} as any, actions.setUserResults({usernames, result}));
-        expect(state.results[user.username]).toEqual({type: 'success', value: user});
+        expect(state.results[user.username]).toEqual(makeSuccess(user));
         expect(state.values[user.username]).toEqual(true);
     });
 
     it('clears a value on success when there is no related user', () => {
         const user = FactoryBot.build<RelatedUser>('relatedUser');
         const usernames = [user.username];
-        const result = {type: 'success' as 'success', value: []};
+        const result = makeSuccess([]);
         const state = reducers({results: {}, values: {}} as any, actions.setUserResults({usernames, result}));
-        expect(state.results[user.username]).toEqual({type: 'success', value: undefined});
+        expect(state.results[user.username]).toEqual(makeSuccess(undefined));
         expect(state.values[user.username]).toEqual(false);
     });
 

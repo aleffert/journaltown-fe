@@ -5,15 +5,16 @@ import { shuffle } from 'lodash';
 
 import { sortPosts, newestModifiedDate, oldestCreatedDate, shouldShowLoadMore, canEditPost } from './feed-helpers';
 import { Post, CurrentUser } from '../../services/api/models';
-import { isSorted } from '../../utils';
+import { isSorted, makeSuccess, makeFailure } from '../../utils';
+import { AppErrors } from '../../utils/errors';
 
 describe('feed-helpers', () => {
     describe('shouldShowLoadMore', () => {
         it('it should be hidden when there are no more posts to load', () => {
-            expect(shouldShowLoadMore({type: 'success', value: []})).toEqual(false);
+            expect(shouldShowLoadMore(makeSuccess([]))).toEqual(false);
         });
         it('it should be visible when there are more posts to load', () => {
-            expect(shouldShowLoadMore({type: 'failure', error: []})).toEqual(true);
+            expect(shouldShowLoadMore(makeFailure(AppErrors.unknownError))).toEqual(true);
             expect(shouldShowLoadMore(undefined)).toEqual(true);
             expect(shouldShowLoadMore({type: 'loading'})).toEqual(true);
         });
@@ -71,13 +72,13 @@ describe('feed-helpers', () => {
         it('should return true if the post author is the user', () => {
             const post = FactoryBot.build<Post>('post');
             const currentUser = FactoryBot.build<CurrentUser>('currentUser', post.author);
-            expect(canEditPost(post, {type: 'success', value: currentUser})).toBe(true);
+            expect(canEditPost(post, makeSuccess(currentUser))).toBe(true);
         });
 
         it('should return false if the post author is not the user', () => {
             const post = FactoryBot.build<Post>('post');
             const currentUser = FactoryBot.build<CurrentUser>('currentUser');
-            expect(canEditPost(post, {type: 'success', value: currentUser})).toBe(false);
+            expect(canEditPost(post, makeSuccess(currentUser))).toBe(false);
         });
 
         it('should return false if there is no user', () => {

@@ -2,7 +2,6 @@ import React from 'react';
 import { Root } from './Root';
 import { mount } from 'enzyme';
 import { LoginForm } from './user/LoginForm';
-import { ApiErrors } from '../services';
 import { InitialLoader } from './user/InitialLoader';
 import { Header } from './Header';
 import { MemoryRouter as Router } from 'react-router';
@@ -11,6 +10,8 @@ import { createStore } from 'redux';
 import { replace } from 'connected-react-router';
 import { FactoryBot } from 'factory-bot-ts';
 import { CurrentUser } from '../services/api/models';
+import { makeSuccess, makeFailure } from '../utils';
+import { AppErrors } from '../utils/errors';
 
 describe('Root', () => {
 
@@ -37,7 +38,7 @@ describe('Root', () => {
 
     it('shows header when there is a current user', () => {
         const w = mount(
-            <Router><Provider store={makeTestStore({type: 'success', value: user})}>
+            <Router><Provider store={makeTestStore(makeSuccess(user))}>
             <Root
                 {...{} as any}
             /></Provider></Router>
@@ -67,7 +68,7 @@ describe('Root', () => {
 
     it('does not show the initial loader after loading', () => {
         let w = mount(
-            <Router><Provider store={makeTestStore({type: 'success', value: user})}>
+            <Router><Provider store={makeTestStore(makeSuccess(user))}>
             <Root
                 {...{} as any}
             /></Provider></Router>
@@ -75,7 +76,7 @@ describe('Root', () => {
         expect(w.find(InitialLoader).exists()).toBe(false);
 
         w = mount(
-            <Router><Provider store={makeTestStore({type: 'failed', error: ApiErrors.noTokenError})}>
+            <Router><Provider store={makeTestStore(makeFailure(AppErrors.noTokenError))}>
             <Root
                 {...{} as any}
             /></Provider></Router>
@@ -85,7 +86,7 @@ describe('Root', () => {
 
     it('shows the login form when there is not a current user', () => {
         const w = mount(
-            <Router><Provider store={makeTestStore({type: 'failed', error: ApiErrors.noTokenError})}>
+            <Router><Provider store={makeTestStore(makeFailure(AppErrors.noTokenError))}>
             <Root
                 {...{} as any}
             /></Provider></Router>
@@ -95,7 +96,7 @@ describe('Root', () => {
 
     it('does not show the login form when there is a current user', () => {
         const w = mount(
-            <Router><Provider store={makeTestStore({type: 'success', value: user})}>
+            <Router><Provider store={makeTestStore(makeSuccess(user))}>
             <Root
                 {...{} as any}
             /></Provider></Router>
@@ -107,7 +108,7 @@ describe('Root', () => {
         const spy = jest.fn();
         mount(
             <Router><Provider store={makeTestStore(
-                {type: 'success', value: user}, spy, 'token=xyz'
+                makeSuccess(user), spy, 'token=xyz'
             )}>
             <Root
                 {...{} as any}
@@ -121,7 +122,7 @@ describe('Root', () => {
         mount(
             <Router initialEntries={[{search:'token=xyz&foo=bar'}]}>
             <Provider store={makeTestStore(
-                {type: 'success', value: user}, spy, 'token=xyz&foo=bar'
+                makeSuccess(user), spy, 'token=xyz&foo=bar'
             )}>
             <Root
                 {...{} as any}

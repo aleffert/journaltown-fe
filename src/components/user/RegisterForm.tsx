@@ -4,14 +4,14 @@ import EmailValidator from 'email-validator';
 import { Form, Grid, Header, InputOnChangeData, Message, Container } from 'semantic-ui-react';
 import strings from '../../strings';
 import { L, withLanguage } from '../localization/L';
-import { Language, isFailure, Async, isLoading, isSuccess } from '../../utils';
-import { RegisterResult } from '../../services/api/requests';
+import { Language, isFailure, isLoading, isSuccess } from '../../utils';
 import { FullScreen } from '../widgets/FullScreen';
-import { ApiError } from '../../services';
 import { Link } from 'react-router-dom';
+import { RegisterResponse, ApiAsync } from '../../services/api/requests';
+import { AppError } from '../../utils/errors';
 
 type RegisterFormProps = {
-    status: Async<RegisterResult>,
+    status: ApiAsync<RegisterResponse>,
     onSubmit(email: string): void,
     language: Language
 };
@@ -39,7 +39,7 @@ export class _RegisterForm extends React.Component<RegisterFormProps, RegisterFo
         this.setState({email: d.value});
     }
 
-    getError(error: ApiError) {
+    getError(error: AppError) {
         switch(error.type) {
             case 'email-in-use':
                 return strings.login.emailInUse;

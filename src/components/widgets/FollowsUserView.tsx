@@ -58,6 +58,7 @@ export class _FollowsUserView extends React.Component<FollowsUserViewProps> {
             const targetUsername = this.props.targetUsername;
             const follows = this.props.follows.values[targetUsername] || false;
             const loading = isLoading(this.props.follows.results[targetUsername]);
+            debugger;
             const text = follows ? strings.user.follows.unfollow : strings.user.follows.follow;
             const onToggleFollow = () => this.onToggleFollow(
                 !follows, currentUsername, targetUsername

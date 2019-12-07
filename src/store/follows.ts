@@ -1,7 +1,7 @@
 import { ImmerReducer, createActionCreators, createReducerFunction } from 'immer-reducer';
 import { takeEvery, put } from 'redux-saga/effects';
 import { callApi } from "../services";
-import { AsyncResult, isSuccess, Optional } from '../utils';
+import { AsyncResult, isSuccess, Optional, makeSuccess } from '../utils';
 import { RelatedUser } from '../services/api/models';
 import { followsRequest, addUserFollowsRequest, removeUserFollowsRequest } from '../services/api/requests';
 import * as User from './user';
@@ -17,14 +17,15 @@ class FollowsReducers extends ImmerReducer<FollowsState> {
     setUserResults(params: {usernames: string[], result: AsyncResult<RelatedUser[]>}) {
         for(const username of params.usernames) {
             if(isSuccess(params.result)) {
+                debugger;
                 const entry = params.result.value.find(r => r.username === username);
                 if(entry) {
                     this.draftState.values[username] = true;
-                    this.draftState.results[username] = {type: 'success', value: entry};
+                    this.draftState.results[username] = makeSuccess(entry);
                 }
                 else {
                     this.draftState.values[username] = false;
-                    this.draftState.results[username] = {type: 'success', value: undefined};
+                    this.draftState.results[username] = makeSuccess(undefined);
                 }
             }
             else {
@@ -64,7 +65,7 @@ export function* removeUserFollowingSaga(action: ReturnType<typeof actions.remov
     yield put(actions.setUserResults({usernames: [username], result: {type: 'loading'}}));
     const result = yield callApi(removeUserFollowsRequest({follower: currentUsername, followee: username}));
     if(isSuccess(result)) {
-        yield put(actions.setUserResults({usernames: [username], result: {type: 'success', value: []}}));
+        yield put(actions.setUserResults({usernames: [username], result: makeSuccess([])}));
         yield put(User.actions.removeFollower({followerUsername: currentUsername, followeeUsername: username}));
     }
     else {

@@ -2,9 +2,10 @@ import { createPostSaga, startEditingPostSaga, updatePostSaga, actions, reducers
 import { FactoryBot } from 'factory-bot-ts';
 import { DraftPost, Post } from '../services/api/models';
 import { put } from 'redux-saga/effects';
-import { ApiErrors } from '../services';
 import { push } from 'connected-react-router';
 import { renderNavigationPath } from './navigation';
+import { makeSuccess, makeFailure } from '../utils';
+import { AppErrors } from '../utils/errors';
 
 describe('compose sagas', () => {
     describe('createPostSaga', () => {
@@ -20,7 +21,7 @@ describe('compose sagas', () => {
             const effects: Generator = createPostSaga(actions.post(draft));
             effects.next();
             effects.next();
-            expect(effects.next({type: 'success', value: post}).value).toEqual(put(actions.clear()));
+            expect(effects.next(makeSuccess(post)).value).toEqual(put(actions.clear()));
         });
 
         it('redirects to the post if the request succeeds', () => {
@@ -29,7 +30,7 @@ describe('compose sagas', () => {
             const effects: Generator = createPostSaga(actions.post(draft));
             effects.next();
             effects.next();
-            effects.next({type: 'success', value: post});
+            effects.next(makeSuccess(post));
             expect(effects.next().value).toEqual(put(push(renderNavigationPath({type: 'view-post', id: post.id, username: post.author.username}))));
         });
 
@@ -39,7 +40,7 @@ describe('compose sagas', () => {
             const effects: Generator = createPostSaga(actions.post(draft));
             effects.next();
             effects.next();
-            expect(effects.next({type: 'failed', error: ApiErrors.noTokenError}).value).not.toEqual(put(actions.clear()));
+            expect(effects.next(makeFailure(AppErrors.noTokenError)).value).not.toEqual(put(actions.clear()));
         })
     });
 
@@ -56,7 +57,7 @@ describe('compose sagas', () => {
             const effects: Generator = updatePostSaga(actions.update({postId: 1, draft}));
             effects.next();
             effects.next();
-            expect(effects.next({type: 'success', value: post}).value).toEqual(put(actions.clear()));
+            expect(effects.next(makeSuccess(post)).value).toEqual(put(actions.clear()));
         });
 
         it('redirects to the post if the request succeeds', () => {
@@ -65,7 +66,7 @@ describe('compose sagas', () => {
             const effects: Generator = updatePostSaga(actions.update({postId: 1, draft}));
             effects.next();
             effects.next();
-            effects.next({type: 'success', value: post});
+            effects.next(makeSuccess(post));
             expect(effects.next().value).toEqual(put(push(renderNavigationPath({type: 'view-post', id: post.id, username: post.author.username}))));
         });
 
@@ -74,7 +75,7 @@ describe('compose sagas', () => {
             const effects: Generator = updatePostSaga(actions.update({postId: 1, draft}));
             effects.next();
             effects.next();
-            expect(effects.next({type: 'failed', error: ApiErrors.noTokenError}).value).not.toEqual(put(actions.clear()));
+            expect(effects.next(makeFailure(AppErrors.noTokenError)).value).not.toEqual(put(actions.clear()));
         })
     });
 
@@ -94,7 +95,7 @@ describe('compose sagas', () => {
             effects.next();
             effects.next();
             effects.next();
-            expect(effects.next({type: 'success', value: post}).value).toEqual(put(actions.setTitle(post.title)));
+            expect(effects.next(makeSuccess(post)).value).toEqual(put(actions.setTitle(post.title)));
             expect(effects.next().value).toEqual(put(actions.setBody(post.body)));
         });
 
@@ -105,7 +106,7 @@ describe('compose sagas', () => {
             effects.next();
             effects.next();
             effects.next();
-            expect(effects.next({type: 'failed', error: ApiErrors.connectionError}).value).not.toEqual(put(actions.setTitle(post.title)));
+            expect(effects.next(makeFailure(AppErrors.connectionError)).value).not.toEqual(put(actions.setTitle(post.title)));
         });
     });
 

@@ -26,6 +26,10 @@ export default {
         form: {
             placeholders: {
                 name: "My New Group"
+            },
+            fields: {
+                name: "Name",
+                members: "Members"
             }
         }
     },

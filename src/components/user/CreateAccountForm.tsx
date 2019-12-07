@@ -3,18 +3,18 @@ import React from 'react';
 import { Form, Grid, Header, InputOnChangeData, Message, Container } from 'semantic-ui-react';
 import strings from '../../strings';
 import { L, withLanguage } from '../localization/L';
-import { Language, isFailure, Async, isSuccess, isLoading } from '../../utils';
-import { CreateAccountResult, UsernameAvailableResult } from '../../services/api/requests';
+import { Language, isFailure, isSuccess, isLoading } from '../../utils';
 import { FullScreen } from '../widgets/FullScreen';
-import { ApiError } from '../../services';
+import { ApiAsync, CreateAccountResponse, UsernameAvailableResponse } from '../../services/api/requests';
+import { AppError } from '../../utils/errors';
 
 type CreateAccountFormProps = {
     onSubmit(email: string): void,
     language: Language,
     createAccount: {
         username: string,
-        createAccountResult: Async<CreateAccountResult>,
-        checkAvailabilityResult: Async<UsernameAvailableResult>
+        createAccountResult: ApiAsync<CreateAccountResponse>,
+        checkAvailabilityResult: ApiAsync<UsernameAvailableResponse>
     }
     actions: {
         createAccount: {
@@ -42,7 +42,7 @@ export class _CreateAccountForm extends React.Component<CreateAccountFormProps> 
         this.props.actions.createAccount.checkAvailability({username: d.value});
     }
 
-    getError(error: ApiError) {
+    getError(error: AppError) {
         switch(error.type) {
             case 'invalid-fields':
                 return strings.login.invalidUsername;

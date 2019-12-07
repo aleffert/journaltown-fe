@@ -2,6 +2,7 @@ import { loadPostSaga, actions } from './post';
 import { put } from 'redux-saga/effects';
 import { FactoryBot } from 'factory-bot-ts';
 import { Post } from '../services/api/models';
+import { makeSuccess } from '../utils';
 
 describe('post sagas', () => {
     describe('loadPostSaga', () => {
@@ -13,7 +14,7 @@ describe('post sagas', () => {
 
         it('does not set loading if there is a current post', () => {
             const post = FactoryBot.build<Post>('post');
-            const effects = loadPostSaga(actions.loadPost({postId: post.id, current: {type: 'success', value: post}}));
+            const effects = loadPostSaga(actions.loadPost({postId: post.id, current: makeSuccess(post)}));
             expect(effects.next().value).not.toEqual(
                 put(actions.setPostResult({postId: post.id, value: {type: 'loading'}}))
             );
@@ -21,10 +22,10 @@ describe('post sagas', () => {
 
         it('updates the post with the api result', () => {
             const post = FactoryBot.build<Post>('post');
-            const effects = loadPostSaga(actions.loadPost({postId: post.id, current: {type: 'success', value: post}}));
+            const effects = loadPostSaga(actions.loadPost({postId: post.id, current: makeSuccess(post)}));
             effects.next();
-            expect(effects.next({type: 'success', value: post}).value).toEqual(
-                put(actions.setPostResult({postId: post.id, value: {type: 'success', value: post}}))
+            expect(effects.next(makeSuccess(post)).value).toEqual(
+                put(actions.setPostResult({postId: post.id, value: makeSuccess(post)}))
             );
         });
     });

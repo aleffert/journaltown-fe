@@ -9,6 +9,7 @@ import { Feed } from './Feed';
 import { Post } from '../../services/api/models';
 import { FeedPost } from './FeedPost';
 import { FeedSummary } from 'semantic-ui-react';
+import { makeSuccess } from '../../utils';
 
 describe('Feed', () => {
 
@@ -52,7 +53,7 @@ describe('Feed', () => {
             posts: [],
             feeds: {
                 '': {
-                    nextPostsResult: {type: 'success', value: []}
+                    nextPostsResult: makeSuccess([])
                 }
             }
         };

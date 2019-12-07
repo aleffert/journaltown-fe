@@ -3,10 +3,10 @@ import React from 'react';
 import { Result, Async } from '../../utils';
 import { InitialLoader } from '../user/InitialLoader';
 import { ApiErrorView } from './ErrorView';
-import { ApiError } from '../../services';
+import { AppError } from '../../utils/errors';
 
 type AsyncViewProps<T> = {
-    result: Async<Result<T, ApiError>>,
+    result: Async<Result<T, AppError>>,
     children: (value: T) => JSX.Element
 };
 
