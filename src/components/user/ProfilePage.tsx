@@ -67,7 +67,7 @@ export class _ProfilePage extends React.Component<ProfilePageProps> {
                 <List.Item>
                     <FollowsUserView currentUsername={safeGet(currentUser, 'username')} targetUsername={u.username}/>
                 </List.Item>
-                {currentUser
+                {viewingSelf
                 ? currentUser.email
                 : null
                 }
@@ -75,7 +75,7 @@ export class _ProfilePage extends React.Component<ProfilePageProps> {
                     <label><L>{strings.user.profile.biography}</L></label>
                     <p>{bio}</p>
                 </List.Item> : null}
-                {currentUser
+                {viewingSelf
                     ? <List.Item><Link to={renderNavigationPath({type: 'edit-profile', username: currentUser.username})}><L>{strings.user.profile.edit}</L></Link></List.Item>
                     : null
                 }
@@ -85,7 +85,7 @@ export class _ProfilePage extends React.Component<ProfilePageProps> {
                 <Header as="h3"><L>{strings.user.profile.following}</L></Header>
                 {u.following && u.following.length > 0 ? <List horizontal bulleted>{u.following.map(u => <List.Item key={u.username}><Link to={renderNavigationPath({type: 'view-profile', username: u.username})}>{u.username}</Link></List.Item>)}</List> : "None"}
                 </List.Item>
-                {currentUser
+                {viewingSelf
                 ?
                     <List.Item>
                         <Header as="h3"><L>{strings.user.profile.groups}</L></Header>
