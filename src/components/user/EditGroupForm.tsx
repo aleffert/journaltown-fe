@@ -17,6 +17,14 @@ type EditGroupFormProps = {
 };
 
 function _EditGroupForm(props: EditGroupFormProps) {
+    const action = (() => {
+        switch (props.kind) {
+            case 'create':
+                return strings.common.create;
+            case 'update':
+                return strings.common.save;
+        }
+    })();
     return <Form>
         <label htmlFor="name-field"><L>{strings.groups.form.fields.name}</L></label>
         <Form.Input size="large" id='name-field'
@@ -26,7 +34,7 @@ function _EditGroupForm(props: EditGroupFormProps) {
         />
         <label htmlFor="members-field"><L>{strings.groups.form.fields.members}</L></label>
         <FriendsPicker allFriends={props.allFriends} selectedFriends={props.selectedFriends} onSelectedFriends={props.onSelectedFriends}/>
-        <Button primary onClick={props.onSubmit}>Create</Button>
+        <Button primary onClick={props.onSubmit}><L>{action}</L></Button>
     </Form>;
 }
 

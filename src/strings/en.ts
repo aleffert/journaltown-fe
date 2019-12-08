@@ -2,7 +2,8 @@ export default {
     common: {
         cancel: "Cancel",
         delete: "Delete",
-        save: "Save"
+        save: "Save",
+        create: "Create"
     },
     user: {
         profile: {
